@@ -41,9 +41,9 @@ public class gpsiDatasetReader <R extends gpsiFileReader> {
         String currentClass, files[];
         for(int i = 0; i < classes.length; i++){
             currentClass = classes[i];
-            files = (new File(masksPath + '/' + currentClass)).list();
-            for(int j = 0; i < files.length; j++){
-                masks.add(new gpsiMask(this.fileReader.read2dStructure(masksPath + '/' + currentClass)));
+            files = (new File(masksPath + '/' + currentClass)).list((File current, String name) -> new File(current, name).getName().endsWith(".mat"));
+            for(int j = 0; j < files.length; j++){
+                masks.add(new gpsiMask(this.fileReader.read2dStructure(masksPath + '/' + currentClass + '/' + files[j])));
                 labels.add(currentClass);
             }
         }

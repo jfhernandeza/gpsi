@@ -6,7 +6,7 @@
 package br.unicamp.ic.recod.gpsi.io;
 
 import com.jmatio.io.MatFileReader;
-import com.jmatio.types.MLDouble;
+import com.jmatio.types.MLNumericArray;
 import java.io.IOException;
 import java.util.Map;
 
@@ -18,11 +18,11 @@ public class gpsiMatlabFileReader extends gpsiFileReader {
     
     MatFileReader reader;
 
-    private MLDouble read(String path) throws IOException{
+    private MLNumericArray read(String path) throws IOException{
         this.reader = new MatFileReader(path);
         Map elements = this.reader.getContent();
         for(Object element : elements.keySet()){
-            return (MLDouble) this.reader.getMLArray((String) element);
+            return (MLNumericArray) this.reader.getMLArray((String) element);
         }
         return null;
     }
@@ -30,7 +30,7 @@ public class gpsiMatlabFileReader extends gpsiFileReader {
     @Override
     public double[][] read2dStructure(String path) throws IOException {
         
-        MLDouble element = read(path);
+        MLNumericArray element = read(path);
         
         int dimensions[] = element.getDimensions();
         if(dimensions.length != 2)
@@ -40,7 +40,7 @@ public class gpsiMatlabFileReader extends gpsiFileReader {
         
         for(int x = 0; x < dimensions[1]; x++)
             for(int y = 0; y < dimensions[0]; y++)
-                data[y][x] = element.get(y + x * dimensions[0]);
+                data[y][x] = element.get(y + x * dimensions[0]).doubleValue();
         
         return data;
         
@@ -49,7 +49,7 @@ public class gpsiMatlabFileReader extends gpsiFileReader {
     @Override
     public double[][][] read3dStructure(String path) throws IOException {
         
-        MLDouble element = read(path);
+        MLNumericArray element = read(path);
         
         int dimensions[] = element.getDimensions();
         if(dimensions.length != 3)
@@ -60,7 +60,7 @@ public class gpsiMatlabFileReader extends gpsiFileReader {
         for(int z = 0; z < dimensions[2]; z++)
             for(int x = 0; x < dimensions[1]; x++)
                 for(int y = 0; y < dimensions[0]; y++)
-                    data[y][x][z] = element.get(y + x * dimensions[0] + z * dimensions[0] * dimensions[1]); 
+                    data[y][x][z] = element.get(y + x * dimensions[0] + z * dimensions[0] * dimensions[1]).doubleValue();
         
         return data;
         

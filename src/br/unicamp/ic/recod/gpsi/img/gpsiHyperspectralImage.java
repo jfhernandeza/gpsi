@@ -24,5 +24,17 @@ public class gpsiHyperspectralImage {
     public double[][][] getImg() {
         return img;
     }
+
+    public int getN_bands() {
+        return n_bands;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
     
 }

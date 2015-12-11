@@ -5,8 +5,6 @@
  */
 package br.unicamp.ic.recod.gpsi.img;
 
-import java.awt.geom.Point2D;
-
 /**
  *
  * @author jfhernandeza
@@ -14,7 +12,7 @@ import java.awt.geom.Point2D;
 public class gpsiMask {
     
     private boolean[][] mask;
-    private Point2D min, max;
+    public int min_x, min_y, max_x, max_y;
     private final int height, width;
 
     public gpsiMask(boolean[][] mask) {
@@ -39,45 +37,24 @@ public class gpsiMask {
     
     private void calculateBoundingBox(){
         
-        double min_x, min_y, max_x, max_y;
-        
-        min_x = Double.POSITIVE_INFINITY;
-        min_y = Double.POSITIVE_INFINITY;
-        max_x = Double.NEGATIVE_INFINITY;
-        max_y = Double.NEGATIVE_INFINITY;
+        this.min_x = Integer.MAX_VALUE;
+        this.min_y = Integer.MAX_VALUE;
+        this.max_x = Integer.MIN_VALUE;
+        this.max_y = Integer.MIN_VALUE;
         
         for(int y = 0; y < this.height; y++)
             for(int x = 0; x < this.width; x++)
                 if(this.mask[y][x]){
-                    min_x = Math.min(min_x, x);
-                    min_y = Math.min(min_y, y);
-                    max_x = Math.max(max_x, x);
-                    max_y = Math.max(max_y, y);
+                    this.min_x = Math.min(this.min_x, x);
+                    this.min_y = Math.min(this.min_y, y);
+                    this.max_x = Math.max(this.max_x, x);
+                    this.max_y = Math.max(this.max_y, y);
                 }
-        
-        this.min.setLocation(min_x, min_y);
-        this.max.setLocation(max_x, max_y);
         
     }
     
     public boolean[][] getMask() {
         return mask;
-    }
-
-    public Point2D getMin() {
-        return min;
-    }
-
-    public void setMin(Point2D min) {
-        this.min = min;
-    }
-
-    public Point2D getMax() {
-        return max;
-    }
-
-    public void setMax(Point2D max) {
-        this.max = max;
     }
     
 }
