@@ -5,7 +5,6 @@
  */
 package br.unicamp.ic.recod.gpsi.data;
 
-import br.unicamp.ic.recod.gpsi.ml.gpsiFeatureVector;
 import java.util.ArrayList;
 
 /**

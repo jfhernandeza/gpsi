@@ -13,7 +13,7 @@ public class gpsiMask {
     
     private boolean[][] mask;
     public int min_x, min_y, max_x, max_y;
-    private final int height, width;
+    private int height, width;
 
     public gpsiMask(boolean[][] mask) {
         this.mask = mask;

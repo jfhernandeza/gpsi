@@ -13,7 +13,7 @@ import org.jgap.gp.terminal.Variable;
  *
  * @author juan
  */
-public class gpsiFitnessFunction extends GPFitnessFunction{
+public class gpsiFitnessFunction_ extends GPFitnessFunction{
 
     private Variable vx;
     private Float[] x = new Float[20];

@@ -3,15 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.ml;
+package br.unicamp.ic.recod.gpsi.features;
 
-/**
- *
- * @author jfhernandeza
- */
-public class gpsiFeatureVector {
-    
-    private int dimensionality;
-    private double[] features;
+
+public interface gpsiLocalDescriptor extends gpsiDescriptor {
     
 }

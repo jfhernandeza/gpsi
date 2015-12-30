@@ -17,9 +17,6 @@ public class gpsiRawDataset extends gpsiDataset<gpsiMask, String> {
     
     private gpsiHyperspectralImage hyperspectralImage;
 
-    public gpsiRawDataset() {
-    }
-
     public gpsiHyperspectralImage getHyperspectralImage() {
         return hyperspectralImage;
     }
