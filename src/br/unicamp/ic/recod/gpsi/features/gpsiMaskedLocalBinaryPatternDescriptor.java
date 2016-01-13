@@ -7,6 +7,7 @@ package br.unicamp.ic.recod.gpsi.features;
 
 import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
 import br.unicamp.ic.recod.gpsi.img.gpsiMask;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -14,11 +15,40 @@ import java.util.Arrays;
  * @author juan
  */
 public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescriptor{
+    
+    private ArrayList<int[]> neighborhood;
 
+    public gpsiMaskedLocalBinaryPatternDescriptor(ArrayList<int[]> neighborhood) {
+        this.neighborhood = neighborhood;
+    }
+
+    public gpsiMaskedLocalBinaryPatternDescriptor() {
+        predefinedNeighborhood(8);
+    }
+    
+    public gpsiMaskedLocalBinaryPatternDescriptor(int type){
+        predefinedNeighborhood(type);
+    }
+    
+    private void predefinedNeighborhood(int type){
+        
+        type = type != 4 && type != 8 ? 8 : type;
+        
+        this.neighborhood = new ArrayList<>();
+        this.neighborhood.add(new int[] {-1, 0});
+        if(type == 8) this.neighborhood.add(new int[] {-1, 1});
+        this.neighborhood.add(new int[] { 0, 1});
+        if(type == 8) this.neighborhood.add(new int[] { 1, 1});
+        this.neighborhood.add(new int[] { 1, 0});
+        if(type == 8) this.neighborhood.add(new int[] { 1,-1});
+        this.neighborhood.add(new int[] { 0,-1});
+        if(type == 8) this.neighborhood.add(new int[] {-1,-1});
+    }
+    
     @Override
     public gpsiFeatureVector getFeatureVector(gpsiCombinedImage combinedImage, gpsiMask roi) {
         
-        double[] vector = new double[256];
+        double[] vector = new double[(int) Math.pow(2, this.neighborhood.size())];
         int binaryPattern;
         Arrays.fill(vector, 0.0);
         
@@ -30,24 +60,24 @@ public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescript
         int h, k;
         for(int y = 1; y < combinedImage.getHeight() - 1; y++){
             for(int x = 1; x < combinedImage.getWidth() - 1; x++){
+                
+                if(!mask[y][x]) continue;
+                
                 consider = true;
-                for(h = -1; h <= 1; h++)
-                    for(k = -1; k <= 1; k++)
-                        consider &= mask[y + h][x + k];
-                if( consider ){
-                    binaryPattern = 0;
-                    binaryPattern += (img[y][x] > img[y - 1][  x  ]) ? 1 : 0;
-                    binaryPattern += (img[y][x] > img[y - 1][x + 1]) ? 2 : 0;
-                    binaryPattern += (img[y][x] > img[  y  ][x + 1]) ? 4 : 0;
-                    binaryPattern += (img[y][x] > img[y + 1][x + 1]) ? 8 : 0;
-                    binaryPattern += (img[y][x] > img[y + 1][  x  ]) ? 16 : 0;
-                    binaryPattern += (img[y][x] > img[y + 1][x - 1]) ? 32 : 0;
-                    binaryPattern += (img[y][x] > img[  y  ][x - 1]) ? 64 : 0;
-                    binaryPattern += (img[y][x] > img[y - 1][x - 1]) ? 128 : 0;
-                    
-                    vector[binaryPattern]++;
-                    
+                for(int[] n : this.neighborhood)
+                    consider &= mask[y + n[0]][x + n[1]];
+                if( !consider ) continue;
+                
+                binaryPattern = 0;
+                
+                int pow = 0;
+                for(int[] n : this.neighborhood){
+                    binaryPattern += (img[y][x] > img[y + n[0]][x + n[1]]) ? Math.pow(2, pow) : 0;
+                    pow++;
                 }
+                
+                vector[binaryPattern]++;
+                    
             }
         }
         

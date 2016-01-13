@@ -12,6 +12,10 @@ import br.unicamp.ic.recod.gpsi.gp.gpsiFitnessFunction_;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiMatlabFileReader;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Random;
 import org.apache.commons.lang.ArrayUtils;
 import org.jgap.InvalidConfigurationException;
@@ -21,7 +25,6 @@ import org.jgap.gp.function.Divide;
 import org.jgap.gp.function.Multiply;
 import org.jgap.gp.function.Subtract;
 import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
-import org.jgap.gp.impl.DeltaGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
 import org.jgap.gp.terminal.Terminal;
@@ -52,25 +55,29 @@ public class gpsi {
         int numGenerations = Integer.parseInt(args[3]);
 
         gpsiRawDataset dataset = reader.readDataset(HyperspectralImagePath, masksPath);
-        gpsiDescriptor descriptor = new gpsiMaskedLocalBinaryPatternDescriptor();
+        gpsiDescriptor descriptor = new gpsiMaskedLocalBinaryPatternDescriptor(4);
         
         System.out.println("Loaded " + dataset.getHyperspectralImage().getHeight() + "x" + dataset.getHyperspectralImage().getWidth() + " hyperspectral image with " + dataset.getHyperspectralImage().getN_bands() + " bands.");
         System.out.println("Loaded " + dataset.getEntities().size() + " examples.");
         
         GPConfiguration config = new GPConfiguration();
-        config.setGPFitnessEvaluator(new DeltaGPFitnessEvaluator());  //new DefaultGPFitnessEvaluator()
+        config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator());  //new DeltaGPFitnessEvaluator()
         config.setMaxInitDepth(6);
         config.setPopulationSize(popSize);
-        //gpsiFitnessFunction_ fitness = new gpsiFitnessFunction_();
         gpsiJGAPFitnessFunction fitness = new gpsiJGAPFitnessFunction(dataset, descriptor);
         config.setFitnessFunction(fitness);
-        
         GPGenotype gp = create(config, dataset.getHyperspectralImage().getN_bands(), fitness);
         gp.evolve(numGenerations);
         gp.outputSolution(gp.getAllTimeBest());
         
-        System.exit(0);
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        Calendar cal = Calendar.getInstance();
         
+        PrintWriter out = new PrintWriter("results/" + dateFormat.format(cal.getTime()) + ".out");
+        out.println(gp.getAllTimeBest().getFitnessValue());
+        out.println(gp.getAllTimeBest().toStringNorm(0));
+        out.close();
+        System.exit(0);
 
     }
 

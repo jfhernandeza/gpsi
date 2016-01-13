@@ -43,4 +43,7 @@ public class gpsiMLDataset extends gpsiDataset<gpsiFeatureVector, Integer>{
         
     }
     
+    public int getDimensionality(){
+        return this.entities.get(0).getDimensionality();
+    }
 }

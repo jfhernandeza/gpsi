@@ -56,5 +56,5 @@ public class gpsiLabelEncoder {
     public String getLabel(int code){
         return decoder.get(code);
     }
-    
+
 }

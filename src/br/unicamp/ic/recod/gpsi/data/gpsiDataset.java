@@ -6,14 +6,46 @@
 package br.unicamp.ic.recod.gpsi.data;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  *
  * @author jfhernandeza
+ * @param <E>
+ * @param <L>
  */
 public abstract class gpsiDataset<E, L> {
     
     protected ArrayList<E> entities;
     protected ArrayList<L> labels;
+    private HashSet<L> listOfClasses;
+    
+    public int getNumberOfClasses(){
+        loadListOfClasses();
+        return this.listOfClasses.size();
+    }
+
+    public HashSet<L> getListOfClasses() {
+        loadListOfClasses();
+        return listOfClasses;
+    }
+    
+    public int getNumberOfEntities(){
+        return this.entities.size();
+    }
+    
+    private void loadListOfClasses(){
+        if(this.listOfClasses == null){
+            this.listOfClasses = new HashSet<>(this.labels);
+        }
+    }
+
+    public ArrayList<E> getEntities() {
+        return entities;
+    }
+
+    public ArrayList<L> getLabels() {
+        return labels;
+    }
     
 }
