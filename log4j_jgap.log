@@ -368,3 +368,114 @@
 [09.01.2016 18:50:02,257] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
 [09.01.2016 18:50:03,227] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 619.2 MB
 [09.01.2016 18:50:03,264] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 13:51:22,563] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 13:51:22,704] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 622.7 MB
+[13.01.2016 13:51:22,748] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 13:51:23,184] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 558.0 MB
+[13.01.2016 13:51:23,196] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 13:56:20,658] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 13:56:20,729] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 607.7 MB
+[13.01.2016 13:56:20,779] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 13:56:21,346] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 608.7 MB
+[13.01.2016 13:56:21,366] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:00:48,356] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:00:48,409] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 618.2 MB
+[13.01.2016 14:00:48,433] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:00:48,946] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 618.0 MB
+[13.01.2016 14:00:48,952] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:03:39,899] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:03:39,942] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 607.2 MB
+[13.01.2016 14:03:39,979] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:03:40,814] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 621.7 MB
+[13.01.2016 14:03:40,840] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:07:05,942] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:07:06,047] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 712.7 MB
+[13.01.2016 14:07:06,101] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:07:06,948] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 667.7 MB
+[13.01.2016 14:07:06,963] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:10:18,689] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:10:18,805] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 614.0 MB
+[13.01.2016 14:10:18,875] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:10:19,959] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 616.7 MB
+[13.01.2016 14:10:19,984] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:16:35,703] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:16:35,922] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 614.0 MB
+[13.01.2016 14:16:35,981] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:16:37,331] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 545.0 MB
+[13.01.2016 14:16:37,386] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:17:50,652] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution fitness: 0.43
+[13.01.2016 14:17:50,653] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution: b49
+[13.01.2016 14:17:50,654] [main] INFO  org.jgap.gp.impl.GPGenotype  - Depth of chrom: 0
+[13.01.2016 14:27:19,843] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:27:19,888] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 592.2 MB
+[13.01.2016 14:27:19,920] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:27:20,341] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 602.2 MB
+[13.01.2016 14:27:20,345] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:27:56,768] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution fitness: 0.44
+[13.01.2016 14:27:56,792] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution: b48
+[13.01.2016 14:27:56,803] [main] INFO  org.jgap.gp.impl.GPGenotype  - Depth of chrom: 0
+[13.01.2016 14:31:37,933] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:31:37,960] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 591.2 MB
+[13.01.2016 14:31:37,982] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:31:38,437] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 596.5 MB
+[13.01.2016 14:31:38,443] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:36:17,965] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:36:18,003] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 611.7 MB
+[13.01.2016 14:36:18,036] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:36:18,584] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 615.2 MB
+[13.01.2016 14:36:18,594] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:42:01,673] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution fitness: 0.47
+[13.01.2016 14:42:01,674] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution: b59
+[13.01.2016 14:42:01,674] [main] INFO  org.jgap.gp.impl.GPGenotype  - Depth of chrom: 0
+[13.01.2016 14:49:23,388] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:49:23,429] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 599.0 MB
+[13.01.2016 14:49:23,461] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:49:24,007] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 609.0 MB
+[13.01.2016 14:49:24,014] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:53:18,696] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:53:18,714] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 525.7 MB
+[13.01.2016 14:53:18,744] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:53:19,005] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 589.0 MB
+[13.01.2016 14:53:19,010] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:56:16,724] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:56:16,744] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 526.7 MB
+[13.01.2016 14:56:16,766] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:56:17,032] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 591.0 MB
+[13.01.2016 14:56:17,036] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:57:57,456] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 14:57:57,492] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 528.5 MB
+[13.01.2016 14:57:57,515] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 14:57:57,799] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 593.7 MB
+[13.01.2016 14:57:57,803] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 14:59:00,370] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution fitness: 0.54
+[13.01.2016 14:59:00,371] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution: ((b139 * b144) + (b112 / b189)) / ((b65 - b14) * ((b139 * b144) + (b112 / b189)))
+[13.01.2016 14:59:00,372] [main] INFO  org.jgap.gp.impl.GPGenotype  - Depth of chrom: 4
+[13.01.2016 15:04:54,529] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 15:04:54,569] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 607.2 MB
+[13.01.2016 15:04:54,605] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 15:04:54,968] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 624.7 MB
+[13.01.2016 15:04:54,979] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 15:16:46,817] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 15:16:46,837] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 638.0 MB
+[13.01.2016 15:16:46,863] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 15:16:47,096] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 609.0 MB
+[13.01.2016 15:16:47,102] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 15:19:19,836] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution fitness: 0.64
+[13.01.2016 15:19:19,839] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution: b88
+[13.01.2016 15:19:19,843] [main] INFO  org.jgap.gp.impl.GPGenotype  - Depth of chrom: 0
+[13.01.2016 15:19:58,329] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 15:19:58,356] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 589.0 MB
+[13.01.2016 15:19:58,390] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 15:19:58,638] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 589.0 MB
+[13.01.2016 15:19:58,648] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 15:24:16,881] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution fitness: 0.66
+[13.01.2016 15:24:16,882] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution: b83
+[13.01.2016 15:24:16,882] [main] INFO  org.jgap.gp.impl.GPGenotype  - Depth of chrom: 0
+[13.01.2016 15:25:12,183] [main] INFO  org.jgap.gp.impl.GPGenotype  - Creating initial population
+[13.01.2016 15:25:12,212] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free: 523.2 MB
+[13.01.2016 15:25:12,242] [main] INFO  org.jgap.gp.impl.GPPopulation  - Prototype program set
+[13.01.2016 15:25:12,525] [main] INFO  org.jgap.gp.impl.GPGenotype  - Mem free after creating population: 586.0 MB
+[13.01.2016 15:25:12,529] [main] INFO  org.jgap.gp.impl.GPGenotype  - Your configuration does not contain unused commands, this is good
+[13.01.2016 15:36:30,947] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution fitness: 0.7
+[13.01.2016 15:36:30,980] [main] INFO  org.jgap.gp.impl.GPGenotype  - Best solution: b93
+[13.01.2016 15:36:30,982] [main] INFO  org.jgap.gp.impl.GPGenotype  - Depth of chrom: 0

@@ -134,8 +134,6 @@ public class gpsiJGAPFitnessFunction extends GPFitnessFunction {
         
         mean_accuracy /= (folds * 100);
         
-        System.out.println(mean_accuracy);
-        
         return mean_accuracy;
         
     }

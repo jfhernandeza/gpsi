@@ -8,18 +8,20 @@ package br.unicamp.ic.recod.gpsi;
 import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
 import br.unicamp.ic.recod.gpsi.features.gpsiMaskedLocalBinaryPatternDescriptor;
-import br.unicamp.ic.recod.gpsi.gp.gpsiFitnessFunction_;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiMatlabFileReader;
+import java.io.FileInputStream;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Random;
+import java.util.LinkedList;
+import java.util.Properties;
 import org.apache.commons.lang.ArrayUtils;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
+import org.jgap.gp.IGPProgram;
 import org.jgap.gp.function.Add;
 import org.jgap.gp.function.Divide;
 import org.jgap.gp.function.Multiply;
@@ -27,7 +29,6 @@ import org.jgap.gp.function.Subtract;
 import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
-import org.jgap.gp.terminal.Terminal;
 import org.jgap.gp.terminal.Variable;
 
 /**
@@ -38,24 +39,26 @@ public class gpsi {
 
     public static void main(String[] args) throws Exception {
         
-        if (args.length < 4){
+        if (args.length < 2){
             System.out.println("Arguments:\n"
-                    + "\t<Path to the hyperspectral image>\n"
-                    + "\t<Path to the directory with the examples grouped by class>\n"
-                    + "\t<Population size>\n"
-                    + "\t<Number of generations>");
+                    + "\t<Configuration code>\n"
+                    + "\t<Dataset>");
             System.exit(1);
         }
 
+        Properties propParams = new Properties();
+        Properties propDataset = new Properties();
+        propParams.load(new FileInputStream("conf/params/" + args[0] + ".properties"));
+        propDataset.load(new FileInputStream("conf/datasets/" + args[1] + ".properties"));
+
+        int popSize = Integer.parseInt(propParams.getProperty("pop_size"));
+        int numGenerations = Integer.parseInt(propParams.getProperty("num_gen"));
+
         gpsiDatasetReader reader = new gpsiDatasetReader(new gpsiMatlabFileReader());
-
-        String HyperspectralImagePath = args[0];
-        String masksPath = args[1];
-        int popSize = Integer.parseInt(args[2]);
-        int numGenerations = Integer.parseInt(args[3]);
-
-        gpsiRawDataset dataset = reader.readDataset(HyperspectralImagePath, masksPath);
-        gpsiDescriptor descriptor = new gpsiMaskedLocalBinaryPatternDescriptor(4);
+        
+        gpsiRawDataset dataset = reader.readDataset(propDataset.getProperty("img_path"), propDataset.getProperty("masks_path"));
+        
+        gpsiDescriptor descriptor = new gpsiMaskedLocalBinaryPatternDescriptor(Integer.parseInt(propParams.getProperty("lbp_neighborhood")));
         
         System.out.println("Loaded " + dataset.getHyperspectralImage().getHeight() + "x" + dataset.getHyperspectralImage().getWidth() + " hyperspectral image with " + dataset.getHyperspectralImage().getN_bands() + " bands.");
         System.out.println("Loaded " + dataset.getEntities().size() + " examples.");
@@ -67,16 +70,33 @@ public class gpsi {
         gpsiJGAPFitnessFunction fitness = new gpsiJGAPFitnessFunction(dataset, descriptor);
         config.setFitnessFunction(fitness);
         GPGenotype gp = create(config, dataset.getHyperspectralImage().getN_bands(), fitness);
-        gp.evolve(numGenerations);
-        gp.outputSolution(gp.getAllTimeBest());
+        
+        LinkedList<Double> fitnessCurve = new LinkedList<>();
+        IGPProgram best;
+        
+        for(int generation = 0; generation < numGenerations; generation++){
+            gp.evolve(1);
+            best = gp.getAllTimeBest();
+            System.out.println(best.getFitnessValue());
+            fitnessCurve.add(best.getFitnessValue());
+        }
+        
+        best = gp.getAllTimeBest();
         
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         Calendar cal = Calendar.getInstance();
         
-        PrintWriter out = new PrintWriter("results/" + dateFormat.format(cal.getTime()) + ".out");
-        out.println(gp.getAllTimeBest().getFitnessValue());
-        out.println(gp.getAllTimeBest().toStringNorm(0));
-        out.close();
+        PrintWriter outProgram = new PrintWriter("results/" + dateFormat.format(cal.getTime()) + ".program");
+        outProgram.println(best.getFitnessValue());
+        outProgram.println(best.toStringNorm(0));
+        outProgram.close();
+        
+        PrintWriter outCurve = new PrintWriter("results/" + dateFormat.format(cal.getTime()) + ".curve");
+        for(double f : fitnessCurve)
+            outCurve.println(f);
+        outCurve.close();
+        
+        gp.outputSolution(best);
         System.exit(0);
 
     }
@@ -110,40 +130,6 @@ public class gpsi {
         fitness.setB(b);
         
         return GPGenotype.randomInitialGenotype(conf, types, argTypes, nodeSets, 100, true);
-    }
-    
-    public static GPGenotype create_(GPConfiguration a_conf, gpsiFitnessFunction_ fitness) throws InvalidConfigurationException{
-        Class[] types = {CommandGene.FloatClass};
-        Class[][] argTypes = {{}};
-        
-        Variable vx;
-        Float[] x = new Float[20];
-        float[] y = new float[20];
-        
-        CommandGene[][] nodeSets = {{
-            vx = Variable.create(a_conf, "X", CommandGene.FloatClass),
-            new Add(a_conf, CommandGene.FloatClass),
-            new Subtract(a_conf, CommandGene.FloatClass),
-            new Multiply(a_conf, CommandGene.FloatClass),
-            new Divide(a_conf,CommandGene.FloatClass),
-            //new Sine(a_conf, CommandGene.FloatClass),
-            //new Cosine(a_conf, CommandGene.FloatClass),
-            //new Exp(a_conf, CommandGene.FloatClass),
-            new Terminal(a_conf,CommandGene.FloatClass, 2.0d, 10.0d, false)
-        }};
-        CommandGene[] conc = (CommandGene[]) ArrayUtils.addAll(nodeSets[0], nodeSets[0]);
-        nodeSets[0] = conc;
-        Random random = new Random();
-        for (int i = 0; i < 20; i++){
-            float f = 2.0f* (random.nextFloat() - 0.5f);
-            x[i] = new Float(f);
-            y[i] = f * f * f * f + f * f * f + f * f - f;
-            System.out.println(i+ ") " + x[i] + " " + y[i]);
-        }
-        fitness.setVx(vx);
-        fitness.setX(x);
-        fitness.setY(y);
-        return GPGenotype.randomInitialGenotype(a_conf, types, argTypes, nodeSets, 100, true);
     }
 
 }
