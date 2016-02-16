@@ -29,7 +29,7 @@ public class gpsiMLDataset extends gpsiDataset<gpsiFeatureVector, Integer>{
         
     }
     
-    public void loadDataset(gpsiRawDataset rawDataset, gpsiCombinedImage combinedImage){
+    public void loadDataset(gpsiRoiRawDataset rawDataset, gpsiCombinedImage combinedImage){
         
         ArrayList<String> rawLabels = rawDataset.getLabels();
         ArrayList<gpsiMask> rawEntities = rawDataset.getEntities();

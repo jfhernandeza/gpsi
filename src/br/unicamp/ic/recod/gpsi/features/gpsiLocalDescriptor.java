@@ -7,5 +7,4 @@ package br.unicamp.ic.recod.gpsi.features;
 
 
 public interface gpsiLocalDescriptor extends gpsiDescriptor {
-    
 }

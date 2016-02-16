@@ -6,17 +6,17 @@
 package br.unicamp.ic.recod.gpsi.data;
 
 import br.unicamp.ic.recod.gpsi.img.gpsiHyperspectralImage;
-import br.unicamp.ic.recod.gpsi.img.gpsiMask;
-import java.util.ArrayList;
 
 /**
  *
- * @author jfhernandeza
+ * @author juan
+ * @param <E>
+ * @param <L>
  */
-public class gpsiRawDataset extends gpsiDataset<gpsiMask, String> {
+public class gpsiRawDataset<E, L> extends gpsiDataset {
     
     private gpsiHyperspectralImage hyperspectralImage;
-
+    
     public gpsiHyperspectralImage getHyperspectralImage() {
         return hyperspectralImage;
     }
@@ -24,22 +24,5 @@ public class gpsiRawDataset extends gpsiDataset<gpsiMask, String> {
     public void setHyperspectralImage(gpsiHyperspectralImage hyperspectralImage) {
         this.hyperspectralImage = hyperspectralImage;
     }
-
-    public ArrayList<gpsiMask> getEntities() {
-        return entities;
-    }
-
-    public void setEntities(ArrayList<gpsiMask> entities) {
-        this.entities = entities;
-    }
-
-    public ArrayList<String> getLabels() {
-        return labels;
-    }
-
-    public void setLabels(ArrayList<String> labels) {
-        this.labels = labels;
-    }
-    
     
 }

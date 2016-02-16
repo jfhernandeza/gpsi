@@ -47,5 +47,13 @@ public abstract class gpsiDataset<E, L> {
     public ArrayList<L> getLabels() {
         return labels;
     }
+
+    public void setEntities(ArrayList<E> entities) {
+        this.entities = entities;
+    }
+
+    public void setLabels(ArrayList<L> labels) {
+        this.labels = labels;
+    }
     
 }

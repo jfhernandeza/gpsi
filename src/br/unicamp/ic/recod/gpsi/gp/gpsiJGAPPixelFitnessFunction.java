@@ -5,45 +5,29 @@
  */
 package br.unicamp.ic.recod.gpsi.gp;
 
-import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
-import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
-import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
-import br.unicamp.ic.recod.gpsi.features.gpsiFeatureVector;
+import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jgap.gp.GPFitnessFunction;
 import org.jgap.gp.IGPProgram;
 import org.jgap.gp.terminal.Variable;
-import weka.classifiers.Classifier;
-import weka.classifiers.Evaluation;
-import weka.classifiers.functions.SimpleLogistic;
-import weka.core.Attribute;
-import weka.core.FastVector;
-import weka.core.Instance;
-import weka.core.Instances;
 
 /**
  *
  * @author juan
  */
-public class gpsiJGAPFitnessFunction extends GPFitnessFunction {
-    
-    private final gpsiRawDataset dataset;
-    private final gpsiDescriptor descriptor;
+public class gpsiJGAPPixelFitnessFunction extends GPFitnessFunction {
+
+    private final gpsiVoxelRawDataset dataset;
     private Variable[] b;
 
-    public gpsiJGAPFitnessFunction(gpsiRawDataset dataset, gpsiDescriptor descriptor) {
+    public gpsiJGAPPixelFitnessFunction(gpsiVoxelRawDataset dataset) {
         this.dataset = dataset;
-        this.descriptor = descriptor;
     }
     
     @Override
     protected double evaluate(IGPProgram igpp) {
         
-        double mean_accuracy = 0.0;
+        double p_value = 1.0;
         Object[] noargs = new Object[0];
         
         double[][][] image = this.dataset.getHyperspectralImage().getImg();
@@ -125,21 +109,17 @@ public class gpsiJGAPFitnessFunction extends GPFitnessFunction {
                     eTest = new Evaluation(trainingSet);
                     eTest.evaluateModel(cModel, testingSet);
                     
-                    mean_accuracy += eTest.pctCorrect();
+                    p_value += eTest.pctCorrect();
                     
             }
         } catch (Exception ex) {
-            Logger.getLogger(gpsiJGAPFitnessFunction.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(gpsiJGAPRoiFitnessFunction.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        mean_accuracy /= (folds * 100);
+        p_value /= (folds * 100);
         
-        return mean_accuracy;
+        return p_value;
         
-    }
-
-    public void setB(Variable[] b) {
-        this.b = b;
     }
     
 }

@@ -5,19 +5,19 @@
  */
 package br.unicamp.ic.recod.gpsi;
 
-import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
-import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
-import br.unicamp.ic.recod.gpsi.features.gpsiMaskedLocalBinaryPatternDescriptor;
-import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
+import br.unicamp.ic.recod.gpsi.conf.gpsiConfiguration;
+import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
+import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
+import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPRoiFitnessFunction;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiMatlabFileReader;
-import java.io.FileInputStream;
+import br.unicamp.ic.recod.gpsi.io.gpsiRoiDatasetReader;
+import br.unicamp.ic.recod.gpsi.io.gpsiVoxelDatasetReader;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.LinkedList;
-import java.util.Properties;
 import org.apache.commons.lang.ArrayUtils;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
@@ -39,42 +39,42 @@ public class gpsi {
 
     public static void main(String[] args) throws Exception {
         
-        if (args.length < 2){
+        if (args.length < 3){
             System.out.println("Arguments:\n"
                     + "\t<Configuration code>\n"
-                    + "\t<Dataset>");
+                    + "\t<Dataset>\n"
+                    + "\t<Descriptor code>");
             System.exit(1);
         }
 
-        Properties propParams = new Properties();
-        Properties propDataset = new Properties();
-        propParams.load(new FileInputStream("conf/params/" + args[0] + ".properties"));
-        propDataset.load(new FileInputStream("conf/datasets/" + args[1] + ".properties"));
-
-        int popSize = Integer.parseInt(propParams.getProperty("pop_size"));
-        int numGenerations = Integer.parseInt(propParams.getProperty("num_gen"));
-
-        gpsiDatasetReader reader = new gpsiDatasetReader(new gpsiMatlabFileReader());
+        String  gpConfCode = args[0],
+                dataSetCode = args[1],
+                descriptorConfCode = args[2];
         
-        gpsiRawDataset dataset = reader.readDataset(propDataset.getProperty("img_path"), propDataset.getProperty("masks_path"));
+        gpsiConfiguration conf = new gpsiConfiguration(gpConfCode, dataSetCode, descriptorConfCode);
+
+        //gpsiRoiDatasetReader reader = new gpsiRoiDatasetReader(new gpsiMatlabFileReader());
+        //gpsiRoiRawDataset dataset = reader.readDataset(conf.imgPath, conf.masksPath);
         
-        gpsiDescriptor descriptor = new gpsiMaskedLocalBinaryPatternDescriptor(Integer.parseInt(propParams.getProperty("lbp_neighborhood")));
+        gpsiVoxelDatasetReader reader = new gpsiVoxelDatasetReader(new gpsiMatlabFileReader());
+        gpsiVoxelRawDataset dataset = reader.readDataset(conf.imgPath, conf.masksPath);
         
         System.out.println("Loaded " + dataset.getHyperspectralImage().getHeight() + "x" + dataset.getHyperspectralImage().getWidth() + " hyperspectral image with " + dataset.getHyperspectralImage().getN_bands() + " bands.");
         System.out.println("Loaded " + dataset.getEntities().size() + " examples.");
         
         GPConfiguration config = new GPConfiguration();
         config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator());  //new DeltaGPFitnessEvaluator()
-        config.setMaxInitDepth(6);
-        config.setPopulationSize(popSize);
-        gpsiJGAPFitnessFunction fitness = new gpsiJGAPFitnessFunction(dataset, descriptor);
+        config.setMaxInitDepth(conf.maxInitDepth);
+        config.setPopulationSize(conf.popSize);
+        gpsiJGAPRoiFitnessFunction fitness = new gpsiJGAPRoiFitnessFunction(null, conf.descriptor);
+        //gpsiJGAPFitnessFunction fitness = new gpsiJGAPFitnessFunction(dataset, conf.descriptor);
         config.setFitnessFunction(fitness);
         GPGenotype gp = create(config, dataset.getHyperspectralImage().getN_bands(), fitness);
         
         LinkedList<Double> fitnessCurve = new LinkedList<>();
         IGPProgram best;
         
-        for(int generation = 0; generation < numGenerations; generation++){
+        for(int generation = 0; generation < conf.numGenerations; generation++){
             gp.evolve(1);
             best = gp.getAllTimeBest();
             System.out.println(best.getFitnessValue());
@@ -101,7 +101,7 @@ public class gpsi {
 
     }
 
-    public static GPGenotype create(GPConfiguration conf, int n_bands, gpsiJGAPFitnessFunction fitness) throws InvalidConfigurationException{
+    public static GPGenotype create(GPConfiguration conf, int n_bands, gpsiJGAPRoiFitnessFunction fitness) throws InvalidConfigurationException{
         
         Class[] types = {CommandGene.FloatClass};
         Class[][] argTypes = {{}};

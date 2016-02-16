@@ -18,16 +18,16 @@ public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescript
     
     private ArrayList<int[]> neighborhood;
 
-    public gpsiMaskedLocalBinaryPatternDescriptor(ArrayList<int[]> neighborhood) {
-        this.neighborhood = neighborhood;
-    }
-
     public gpsiMaskedLocalBinaryPatternDescriptor() {
         predefinedNeighborhood(8);
     }
     
-    public gpsiMaskedLocalBinaryPatternDescriptor(int type){
+    public void setNeighborhood(int type){
         predefinedNeighborhood(type);
+    }
+    
+    public void setNeighborhood(ArrayList<int[]> neighborhood){
+        this.neighborhood = neighborhood;
     }
     
     private void predefinedNeighborhood(int type){
