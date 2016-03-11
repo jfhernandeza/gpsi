@@ -24,17 +24,21 @@ public class gpsiConfiguration {
     public final int numGenerations;
     public final int maxInitDepth;
     
+    public final String[] classLabels;
+    
     public final gpsiDescriptor descriptor;
     
-    public gpsiConfiguration(String gpConfCode, String dataSetCode, String descriptorConfCode) throws IOException {
+    public gpsiConfiguration(String[] confCode) throws IOException {
         
         Properties propConfGP = new Properties();
         Properties propDataSet = new Properties();
         Properties propConfDescriptor = new Properties();
+        Properties propClasses = new Properties();
         
-        propConfGP.load(new FileInputStream("conf/gp/" + gpConfCode + ".properties"));
-        propDataSet.load(new FileInputStream("conf/datasets/" + dataSetCode + ".properties"));
-        propConfDescriptor.load(new FileInputStream("conf/descriptors/" + descriptorConfCode + ".properties"));
+        propConfGP.load(new FileInputStream("conf/gp/" + confCode[0] + ".properties"));
+        propDataSet.load(new FileInputStream("conf/datasets/" + confCode[1] + ".properties"));
+        propConfDescriptor.load(new FileInputStream("conf/descriptors/" + confCode[2] + ".properties"));
+        propClasses.load(new FileInputStream("conf/classes/" + confCode[3] + ".properties"));
         
         this.imgPath = propDataSet.getProperty("img_path");
         this.masksPath = propDataSet.getProperty("masks_path");
@@ -42,7 +46,13 @@ public class gpsiConfiguration {
         this.numGenerations = Integer.parseInt(propConfGP.getProperty("num_generations"));
         this.popSize = Integer.parseInt(propConfGP.getProperty("pop_size"));
         this.maxInitDepth = Integer.parseInt(propConfGP.getProperty("max_init_depth"));
-                
+
+        int n_classes = Integer.parseInt(propClasses.getProperty("n_classes"));
+        this.classLabels = new String[n_classes];
+        
+        for(int i = 0; i < n_classes; i++)
+            this.classLabels[i] = propClasses.getProperty("c" + Integer.toString(i));
+        
         this.descriptor = gpsiDescriptorFactory.getInstance().create(propConfDescriptor);
         
     }

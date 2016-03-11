@@ -5,10 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.io;
 
-import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
-import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
-import br.unicamp.ic.recod.gpsi.img.gpsiMask;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.io.File;
 import java.util.ArrayList;

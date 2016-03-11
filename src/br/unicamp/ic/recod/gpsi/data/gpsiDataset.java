@@ -6,6 +6,7 @@
 package br.unicamp.ic.recod.gpsi.data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -18,6 +19,7 @@ public abstract class gpsiDataset<E, L> {
     
     protected ArrayList<E> entities;
     protected ArrayList<L> labels;
+    protected HashMap<L,ArrayList<Integer>> indexesPerClass;
     private HashSet<L> listOfClasses;
     
     public int getNumberOfClasses(){
@@ -32,6 +34,24 @@ public abstract class gpsiDataset<E, L> {
     
     public int getNumberOfEntities(){
         return this.entities.size();
+    }
+
+    public HashMap<L, ArrayList<Integer>> getIndexesPerClass() {
+        
+        L currentClass;
+        
+        if(this.indexesPerClass == null){
+            this.indexesPerClass = new HashMap<>();
+            for(int i = 0 ; i < this.entities.size(); i++){
+                currentClass = this.labels.get(i);
+                if(!this.indexesPerClass.keySet().contains(currentClass)){
+                    this.indexesPerClass.put(currentClass, new ArrayList<Integer>());
+                }
+                this.indexesPerClass.get(currentClass).add(i);
+            }
+        }
+        
+        return this.indexesPerClass;
     }
     
     private void loadListOfClasses(){

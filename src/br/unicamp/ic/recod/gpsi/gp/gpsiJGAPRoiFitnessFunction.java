@@ -10,13 +10,12 @@ import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
 import br.unicamp.ic.recod.gpsi.features.gpsiFeatureVector;
 import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
+import br.unicamp.ic.recod.gpsi.img.gpsiJGAPImageCombinator;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.jgap.gp.GPFitnessFunction;
 import org.jgap.gp.IGPProgram;
-import org.jgap.gp.terminal.Variable;
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
 import weka.classifiers.functions.SimpleLogistic;
@@ -29,14 +28,12 @@ import weka.core.Instances;
  *
  * @author juan
  */
-public class gpsiJGAPRoiFitnessFunction extends GPFitnessFunction {
+public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiRawDataset> {
     
-    private final gpsiRoiRawDataset dataset;
     private final gpsiDescriptor descriptor;
-    private Variable[] b;
 
     public gpsiJGAPRoiFitnessFunction(gpsiRoiRawDataset dataset, gpsiDescriptor descriptor) {
-        this.dataset = dataset;
+        super(dataset);
         this.descriptor = descriptor;
     }
     
@@ -46,23 +43,7 @@ public class gpsiJGAPRoiFitnessFunction extends GPFitnessFunction {
         double mean_accuracy = 0.0;
         Object[] noargs = new Object[0];
         
-        double[][][] image = this.dataset.getHyperspectralImage().getImg();
-        int height = this.dataset.getHyperspectralImage().getHeight();
-        int width = this.dataset.getHyperspectralImage().getWidth();
-        int n_bands = this.dataset.getHyperspectralImage().getN_bands();
-        
-        double[][] combined_image = new double[height][width];
-        gpsiCombinedImage combinedImage;
-        
-        for(int y = 0; y < height; y++){
-            for(int x = 0; x < width; x++){
-                for(int i = 0; i < n_bands; i++){
-                    this.b[i].set(image[y][x][i]);
-                }
-                combined_image[y][x] = igpp.execute_double(0, noargs);
-            }
-        }
-        combinedImage = new gpsiCombinedImage(combined_image);
+        gpsiCombinedImage combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(this.dataset.getHyperspectralImage(), super.b, igpp);
         
         gpsiMLDataset mlDataset = new gpsiMLDataset(this.descriptor);
         mlDataset.loadDataset(this.dataset, combinedImage);
@@ -136,10 +117,6 @@ public class gpsiJGAPRoiFitnessFunction extends GPFitnessFunction {
         
         return mean_accuracy;
         
-    }
-
-    public void setB(Variable[] b) {
-        this.b = b;
     }
     
 }
