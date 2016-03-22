@@ -28,6 +28,6 @@ public abstract class gpsiDatasetReader <R extends gpsiFileReader, D extends gps
         rawDataset.setHyperspectralImage(new gpsiHyperspectralImage(hiperspectralImage));
     }
     
-    public abstract D readDataset(String HyperspectralImagePath, String masksPath ) throws Exception;
+    public abstract D readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath ) throws Exception;
     
 }

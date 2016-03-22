@@ -18,7 +18,8 @@ import java.util.Properties;
 public class gpsiConfiguration {
     
     public final String imgPath;
-    public final String masksPath;
+    public final String trainingMasksPath;
+    public final String testMasksPath;
     
     public final int popSize;
     public final int numGenerations;
@@ -41,7 +42,8 @@ public class gpsiConfiguration {
         propClasses.load(new FileInputStream("conf/classes/" + confCode[3] + ".properties"));
         
         this.imgPath = propDataSet.getProperty("img_path");
-        this.masksPath = propDataSet.getProperty("masks_path");
+        this.trainingMasksPath = propDataSet.getProperty("tr_masks_path");
+        this.testMasksPath = propDataSet.getProperty("ts_masks_path");
         
         this.numGenerations = Integer.parseInt(propConfGP.getProperty("num_generations"));
         this.popSize = Integer.parseInt(propConfGP.getProperty("pop_size"));

@@ -22,8 +22,8 @@ public class gpsiMLDataset extends gpsiDataset<gpsiFeatureVector, Integer>{
 
     public gpsiMLDataset(gpsiDescriptor descriptor) {
         
-        this.entities = new ArrayList<>();
-        this.labels = new ArrayList<>();        
+        this.trainingEntities = new ArrayList<>();
+        this.trainingLabels = new ArrayList<>();        
         this.encoder = new gpsiLabelEncoder();
         this.descriptor = descriptor;
         
@@ -31,19 +31,19 @@ public class gpsiMLDataset extends gpsiDataset<gpsiFeatureVector, Integer>{
     
     public void loadDataset(gpsiRoiRawDataset rawDataset, gpsiCombinedImage combinedImage){
         
-        ArrayList<String> rawLabels = rawDataset.getLabels();
-        ArrayList<gpsiMask> rawEntities = rawDataset.getEntities();
+        ArrayList<String> rawLabels = rawDataset.getTrainingLabels();
+        ArrayList<gpsiMask> rawEntities = rawDataset.getTrainingEntities();
         
         this.encoder.loadLabels(rawLabels);
         
         for(int i = 0; i < rawEntities.size(); i++){
-            this.entities.add(this.descriptor.getFeatureVector(combinedImage, rawEntities.get(i)));
-            this.labels.add(this.encoder.getCode(rawLabels.get(i)));
+            this.trainingEntities.add(this.descriptor.getFeatureVector(combinedImage, rawEntities.get(i)));
+            this.trainingLabels.add(this.encoder.getCode(rawLabels.get(i)));
         }
         
     }
     
     public int getDimensionality(){
-        return this.entities.get(0).getDimensionality();
+        return this.trainingEntities.get(0).getDimensionality();
     }
 }

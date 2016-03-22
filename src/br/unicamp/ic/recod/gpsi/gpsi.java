@@ -14,15 +14,13 @@ import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
 import br.unicamp.ic.recod.gpsi.img.gpsiJGAPImageCombinator;
 import br.unicamp.ic.recod.gpsi.io.gpsiMatlabFileReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiVoxelDatasetReader;
-import br.unicamp.ic.recod.gpsi.measures.gpsiClusterDistortionScore;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
-import br.unicamp.ic.recod.gpsi.measures.gpsiWilcoxonRankSumTestScore;
 import java.io.File;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.LinkedList;
 import org.apache.commons.lang.ArrayUtils;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
@@ -35,7 +33,6 @@ import org.jgap.gp.function.Multiply;
 import org.jgap.gp.function.Sine;
 import org.jgap.gp.function.Subtract;
 import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
-import org.jgap.gp.impl.DeltaGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
 import org.jgap.gp.terminal.Variable;
@@ -63,10 +60,11 @@ public class gpsi {
         //gpsiRoiRawDataset dataset = reader.readDataset(conf.imgPath, conf.masksPath);
         
         gpsiVoxelDatasetReader reader = new gpsiVoxelDatasetReader(new gpsiMatlabFileReader());
-        gpsiVoxelRawDataset dataset = reader.readDataset(conf.imgPath, conf.masksPath);
+        gpsiVoxelRawDataset dataset = reader.readDataset(conf.imgPath, conf.trainingMasksPath, conf.testMasksPath);
         
         System.out.println("Loaded " + dataset.getHyperspectralImage().getHeight() + "x" + dataset.getHyperspectralImage().getWidth() + " hyperspectral image with " + dataset.getHyperspectralImage().getN_bands() + " bands.");
-        System.out.println("Loaded " + dataset.getEntities().size() + " examples.");
+        System.out.println("Loaded " + dataset.getTrainingEntities().size() + " examples for training.");
+        System.out.println("Loaded " + dataset.getTestEntities().size() + " examples for testing.");
         
         GPConfiguration config = new GPConfiguration();
         
@@ -80,19 +78,33 @@ public class gpsi {
         config.setFitnessFunction(fitness);
         GPGenotype gp = create(config, dataset.getHyperspectralImage().getN_bands(), fitness);
         
-        LinkedList<Double> fitnessCurve = new LinkedList<>();
+        double[] fitnessCurve = new double[conf.numGenerations];
+        double[] fitnessCurveTest = new double[conf.numGenerations];
         IGPProgram best;
         
+        gpsiCombinedImage combinedImage;
+        double testScore;
         for(int generation = 0; generation < conf.numGenerations; generation++){
             gp.evolve(1);
             best = gp.getAllTimeBest();
-            System.out.println(best.getFitnessValue());
-            fitnessCurve.add(best.getFitnessValue());
+            fitnessCurve[generation] = best.getFitnessValue() - 1.0;
+            
+            //TODO: Fix!
+
+            combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(dataset.getHyperspectralImage(), fitness.getB(), best);
+            ArrayList<double[]> samples = new ArrayList<>();
+            samples.add(gpsiSampler.getInstance().sample(dataset.getIndexesPerClass(), dataset.getTestEntities(), fitness.getClassLabels()[0], combinedImage));
+            samples.add(gpsiSampler.getInstance().sample(dataset.getIndexesPerClass(), dataset.getTestEntities(), fitness.getClassLabels()[1], combinedImage));
+            testScore = fitness.getScore().score(samples) - 1.0;
+            fitnessCurveTest[generation] = testScore;
+           
+            System.out.println(fitnessCurve[generation] + "\t" + testScore);
+            
         }
         
         best = gp.getAllTimeBest();
         
-        gpsiCombinedImage combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(dataset.getHyperspectralImage(), fitness.getB(), best);
+        combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(dataset.getHyperspectralImage(), fitness.getB(), best);
         
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd_HHmmss");
         String outRoot = "results/" + dateFormat.format(Calendar.getInstance().getTime()) + "/";
@@ -105,26 +117,49 @@ public class gpsi {
         outResults.println("Dataset code:\t" + args[1]);
         outResults.println("Descriptor code:\t" + args[2]);
         outResults.println("Classes code:\t" + args[3]);
-        outResults.println("Best fitness:\t" + best.getFitnessValue());
+        outResults.println("Best fitness:\t" + (best.getFitnessValue() - 1.0));
         outResults.close();
         
         PrintWriter outProgram = new PrintWriter(outRoot + "program.out");
         outProgram.println(best.toStringNorm(0));
         outProgram.close();
         
-        PrintWriter outCurve = new PrintWriter(outRoot + "curve.out");
-        for(double f : fitnessCurve)
-            outCurve.println(f);
-        outCurve.close();
+        PrintWriter outCurveTrain = new PrintWriter(outRoot + "curve_tr.out");
+        PrintWriter outCurveTest = new PrintWriter(outRoot + "curve_ts.out");
+        for(int i = 0; i < conf.numGenerations; i++){
+            outCurveTrain.println(fitnessCurve[i]);
+            outCurveTest.println(fitnessCurveTest[i]);
+        }
+        outCurveTrain.close();
+        outCurveTest.close();
+        
+        folder = new File(outRoot + "train_samples/");
+        folder.mkdir();
+        folder = new File(outRoot + "test_samples/");
+        folder.mkdir();
         
         PrintWriter outSample;
         for(Object className : dataset.getListOfClasses()){
             
             String classLabel = (String) className;
-            outSample = new PrintWriter(outRoot + "sample_" + classLabel + ".out");
-            for(double f : gpsiSampler.getInstance().sample(dataset, classLabel, combinedImage))
+            outSample = new PrintWriter(outRoot + "train_samples/" + "sample_" + classLabel + ".out");
+            for(double f : gpsiSampler.getInstance().sample(dataset.getIndexesPerClass(), dataset.getTrainingEntities(), classLabel, combinedImage))
                 outSample.println(f);
             outSample.close();
+        }
+        
+        for(Object className : dataset.getListOfClasses()){
+            
+            String classLabel = (String) className;
+            outSample = new PrintWriter(outRoot + "test_samples/" + "sample_" + classLabel + ".out");
+            for(double f : gpsiSampler.getInstance().sample(dataset.getIndexesPerClass(), dataset.getTestEntities(), classLabel, combinedImage))
+                outSample.println(f);
+            outSample.close();
+        }
+        
+        for(int i = 0; i < fitness.getClassLabels().length; i++){
+            folder = new File(outRoot + String.valueOf(fitness.getClassLabels()[i]) + ".train");
+            folder.createNewFile();
         }
         
         gp.outputSolution(best);

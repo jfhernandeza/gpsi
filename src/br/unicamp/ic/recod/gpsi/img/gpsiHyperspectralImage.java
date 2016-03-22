@@ -11,7 +11,7 @@ package br.unicamp.ic.recod.gpsi.img;
  */
 public class gpsiHyperspectralImage {
     
-    private double[][][] img;
+    public double[][][] img;
     private int n_bands, width, height;
 
     public gpsiHyperspectralImage(double[][][] img) {
@@ -19,10 +19,6 @@ public class gpsiHyperspectralImage {
         this.height = img.length;
         this.width = img[0].length;
         this.n_bands = img[0][0].length;
-    }
-
-    public double[][][] getImg() {
-        return img;
     }
 
     public int getN_bands() {

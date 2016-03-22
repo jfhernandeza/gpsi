@@ -73,8 +73,8 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         Instances instances = new Instances("Rel", fvWekaAttributes, n_entities);
         instances.setClassIndex(dimensionality);
         
-        ArrayList<gpsiFeatureVector> entities = mlDataset.getEntities();
-        ArrayList<Integer> labels = mlDataset.getLabels();
+        ArrayList<gpsiFeatureVector> entities = mlDataset.getTrainingEntities();
+        ArrayList<Integer> labels = mlDataset.getTrainingLabels();
         
         Instance iExample;
         double[] features;

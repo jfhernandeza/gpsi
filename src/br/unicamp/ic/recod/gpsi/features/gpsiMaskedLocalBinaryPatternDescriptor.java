@@ -52,7 +52,7 @@ public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescript
         int binaryPattern;
         Arrays.fill(vector, 0.0);
         
-        double[][] img = combinedImage.getImg();
+        double[][] img = combinedImage.img;
         boolean[][] mask = roi.getMask();
         
         boolean consider;

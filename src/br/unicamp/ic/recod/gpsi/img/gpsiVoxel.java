@@ -11,16 +11,9 @@ package br.unicamp.ic.recod.gpsi.img;
  */
 public class gpsiVoxel {
     
-    private final int dimensionality;
     private int[] vector;
-
-    public gpsiVoxel(int dimensionality) {
-        this.dimensionality = dimensionality;
-        this.vector = new int[this.dimensionality];
-    }
     
     public gpsiVoxel(int[] vector){
-        this.dimensionality = vector.length;
         this.vector = vector;
     }
 

@@ -11,7 +11,6 @@ import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
 import br.unicamp.ic.recod.gpsi.img.gpsiJGAPImageCombinator;
 import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
 import java.util.ArrayList;
-import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
 import org.jgap.gp.IGPProgram;
 
 /**
@@ -35,14 +34,22 @@ public class gpsiJGAPPixelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVo
         gpsiCombinedImage combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(this.dataset.getHyperspectralImage(), super.b, igpp);
         
         ArrayList<double[]> samples = new ArrayList<>();
-        samples.add(gpsiSampler.getInstance().sample(super.dataset, this.classLabels[0], combinedImage));
-        samples.add(gpsiSampler.getInstance().sample(super.dataset, this.classLabels[1], combinedImage));
+        samples.add(gpsiSampler.getInstance().sample(super.dataset.getIndexesPerClass(), super.dataset.getTrainingEntities(), this.classLabels[0], combinedImage));
+        samples.add(gpsiSampler.getInstance().sample(super.dataset.getIndexesPerClass(), super.dataset.getTestEntities(), this.classLabels[1], combinedImage));
         
         //MannWhitneyUTest t = new MannWhitneyUTest();        
         //double p_value = t.mannWhitneyUTest(samples.get(0), samples.get(1));
         
         return this.score.score(samples);
         
+    }
+
+    public String[] getClassLabels() {
+        return classLabels;
+    }
+
+    public gpsiSampleSeparationScore getScore() {
+        return score;
     }
     
 }

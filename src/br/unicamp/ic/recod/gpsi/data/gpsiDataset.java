@@ -17,8 +17,10 @@ import java.util.HashSet;
  */
 public abstract class gpsiDataset<E, L> {
     
-    protected ArrayList<E> entities;
-    protected ArrayList<L> labels;
+    protected ArrayList<E> trainingEntities;
+    protected ArrayList<L> trainingLabels;
+    protected ArrayList<E> testEntities;
+    protected ArrayList<L> testLabels;
     protected HashMap<L,ArrayList<Integer>> indexesPerClass;
     private HashSet<L> listOfClasses;
     
@@ -33,7 +35,7 @@ public abstract class gpsiDataset<E, L> {
     }
     
     public int getNumberOfEntities(){
-        return this.entities.size();
+        return this.trainingEntities.size();
     }
 
     public HashMap<L, ArrayList<Integer>> getIndexesPerClass() {
@@ -42,10 +44,10 @@ public abstract class gpsiDataset<E, L> {
         
         if(this.indexesPerClass == null){
             this.indexesPerClass = new HashMap<>();
-            for(int i = 0 ; i < this.entities.size(); i++){
-                currentClass = this.labels.get(i);
+            for(int i = 0 ; i < this.trainingEntities.size(); i++){
+                currentClass = this.trainingLabels.get(i);
                 if(!this.indexesPerClass.keySet().contains(currentClass)){
-                    this.indexesPerClass.put(currentClass, new ArrayList<Integer>());
+                    this.indexesPerClass.put(currentClass, new ArrayList<>());
                 }
                 this.indexesPerClass.get(currentClass).add(i);
             }
@@ -56,24 +58,40 @@ public abstract class gpsiDataset<E, L> {
     
     private void loadListOfClasses(){
         if(this.listOfClasses == null){
-            this.listOfClasses = new HashSet<>(this.labels);
+            this.listOfClasses = new HashSet<>(this.trainingLabels);
         }
     }
 
-    public ArrayList<E> getEntities() {
-        return entities;
+    public ArrayList<E> getTrainingEntities() {
+        return trainingEntities;
     }
 
-    public ArrayList<L> getLabels() {
-        return labels;
+    public ArrayList<L> getTrainingLabels() {
+        return trainingLabels;
     }
 
-    public void setEntities(ArrayList<E> entities) {
-        this.entities = entities;
+    public void setTrainingEntities(ArrayList<E> entities) {
+        this.trainingEntities = entities;
     }
 
-    public void setLabels(ArrayList<L> labels) {
-        this.labels = labels;
+    public void setTrainingLabels(ArrayList<L> labels) {
+        this.trainingLabels = labels;
+    }
+
+    public ArrayList<E> getTestEntities() {
+        return testEntities;
+    }
+
+    public void setTestEntities(ArrayList<E> testEntities) {
+        this.testEntities = testEntities;
+    }
+
+    public ArrayList<L> getTestLabels() {
+        return testLabels;
+    }
+
+    public void setTestLabels(ArrayList<L> testLabels) {
+        this.testLabels = testLabels;
     }
     
 }

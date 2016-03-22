@@ -8,6 +8,7 @@ package br.unicamp.ic.recod.gpsi.data;
 import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -26,18 +27,17 @@ public class gpsiSampler {
         private static final gpsiSampler INSTANCE = new gpsiSampler();
     }
     
-    public double[] sample(gpsiVoxelRawDataset dataset, String className, gpsiCombinedImage combImage){
-        
-        double[][] combinedImage = combImage.getImg();
-        ArrayList<Integer> indices = (ArrayList) dataset.getIndexesPerClass().get(className);
+    public double[] sample(HashMap indexesPerClass, ArrayList entities, String className, gpsiCombinedImage combImage){
+                
+        ArrayList<Integer> indices = (ArrayList) indexesPerClass.get(className);
         
         int size = indices.size();
         double[] vector = new double[size];
         
         int v[];
         for(int i = 0; i < size; i++){
-            v = ((gpsiVoxel) dataset.getEntities().get(indices.get(i))).getVector();
-            vector[i] = combinedImage[v[0]][v[1]];
+            v = ((gpsiVoxel) entities.get(indices.get(i))).getVector();
+            vector[i] = combImage.img[v[0]][v[1]];
         }
         
         return vector;

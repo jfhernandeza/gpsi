@@ -11,17 +11,13 @@ package br.unicamp.ic.recod.gpsi.img;
  */
 public class gpsiCombinedImage {
     
-    private double[][] img;
-    private int width, height;
+    public double[][] img;
+    private final int width, height;
 
     public gpsiCombinedImage(double[][] img) {
         this.img = img;
         this.height = img.length;
         this.width = img[0].length;
-    }
-
-    public double[][] getImg() {
-        return img;
     }
 
     public int getWidth() {
@@ -31,7 +27,5 @@ public class gpsiCombinedImage {
     public int getHeight() {
         return height;
     }
-    
-    
     
 }

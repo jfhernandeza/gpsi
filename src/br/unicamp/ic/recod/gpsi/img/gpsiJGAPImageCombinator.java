@@ -24,17 +24,12 @@ public class gpsiJGAPImageCombinator extends gpsiImageCombinator<Variable[], IGP
     @Override
     public gpsiCombinedImage combineImage(gpsiHyperspectralImage img, Variable[] b, IGPProgram individual) {
         
-        int height = img.getHeight();
-        int width = img.getWidth();
-        int n_bands = img.getN_bands();
+        double[][] combinedImage = new double[img.getHeight()][img.getWidth()];
         
-        double[][][] image = img.getImg();
-        double[][] combinedImage = new double[height][width];
-        
-        for(int y = 0; y < height; y++){
-            for(int x = 0; x < width; x++){
-                for(int i = 0; i < n_bands; i++){
-                    b[i].set(image[y][x][i]);
+        for(int y = 0; y < img.getHeight(); y++){
+            for(int x = 0; x < img.getWidth(); x++){
+                for(int i = 0; i < img.getN_bands(); i++){
+                    b[i].set(img.img[y][x][i]);
                 }
                 combinedImage[y][x] = individual.execute_double(0, new Object[0]);
             }
