@@ -22,6 +22,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
 import org.jgap.gp.IGPProgram;
@@ -80,29 +82,50 @@ public class gpsi {
         
         double[] fitnessCurve = new double[conf.numGenerations];
         double[] fitnessCurveTest = new double[conf.numGenerations];
-        IGPProgram best;
+        IGPProgram best = null, current;
+        double bestScore = -Double.MAX_VALUE, currentScore;
         
+        int n_top = 5, i, j;
+        Mean mean = new Mean();
+        StandardDeviation sd = new StandardDeviation();
         gpsiCombinedImage combinedImage;
-        double testScore;
+        double testScore, trainScore, bestTestScore = -1.0, bestTrainScore = -1.0;
+        ArrayList<double[]> samples;
         for(int generation = 0; generation < conf.numGenerations; generation++){
             gp.evolve(1);
-            best = gp.getAllTimeBest();
-            fitnessCurve[generation] = best.getFitnessValue() - 1.0;
+            gp.getGPPopulation().sortByFitness();
+            
+            for(i = 0; i < n_top; i++){
+
+                current = gp.getGPPopulation().getGPPrograms()[i];
+                
+                combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(dataset.getHyperspectralImage(), fitness.getB(), current);
+                samples = new ArrayList<>();
+                samples.add(gpsiSampler.getInstance().sample(dataset.getIndexesPerClass(), dataset.getTestEntities(), fitness.getClassLabels()[0], combinedImage));
+                samples.add(gpsiSampler.getInstance().sample(dataset.getIndexesPerClass(), dataset.getTestEntities(), fitness.getClassLabels()[1], combinedImage));
+                testScore = fitness.getScore().score(samples);
+                trainScore = current.getFitnessValue() - 1.0;
+                
+                currentScore = mean.evaluate(new double[] {trainScore, testScore}) - sd.evaluate(new double[] {trainScore, testScore});
+                
+                if(currentScore > bestScore){
+                    best = current;
+                    bestTrainScore = trainScore;
+                    bestTestScore = testScore;
+                }
+                
+            }
+            
+            if(best == null)
+                best = gp.getGPPopulation().getGPPrograms()[0];
+            
+            fitnessCurve[generation] = bestTrainScore;
+            fitnessCurveTest[generation] = bestTestScore;
             
             //TODO: Fix!
-
-            combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(dataset.getHyperspectralImage(), fitness.getB(), best);
-            ArrayList<double[]> samples = new ArrayList<>();
-            samples.add(gpsiSampler.getInstance().sample(dataset.getIndexesPerClass(), dataset.getTestEntities(), fitness.getClassLabels()[0], combinedImage));
-            samples.add(gpsiSampler.getInstance().sample(dataset.getIndexesPerClass(), dataset.getTestEntities(), fitness.getClassLabels()[1], combinedImage));
-            testScore = fitness.getScore().score(samples) - 1.0;
-            fitnessCurveTest[generation] = testScore;
-           
-            System.out.println(fitnessCurve[generation] + "\t" + testScore);
+            System.out.println(bestTrainScore + "\t" + bestTestScore);
             
         }
-        
-        best = gp.getAllTimeBest();
         
         combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(dataset.getHyperspectralImage(), fitness.getB(), best);
         
@@ -126,7 +149,7 @@ public class gpsi {
         
         PrintWriter outCurveTrain = new PrintWriter(outRoot + "curve_tr.out");
         PrintWriter outCurveTest = new PrintWriter(outRoot + "curve_ts.out");
-        for(int i = 0; i < conf.numGenerations; i++){
+        for(i = 0; i < conf.numGenerations; i++){
             outCurveTrain.println(fitnessCurve[i]);
             outCurveTest.println(fitnessCurveTest[i]);
         }
@@ -157,7 +180,7 @@ public class gpsi {
             outSample.close();
         }
         
-        for(int i = 0; i < fitness.getClassLabels().length; i++){
+        for(i = 0; i < fitness.getClassLabels().length; i++){
             folder = new File(outRoot + String.valueOf(fitness.getClassLabels()[i]) + ".train");
             folder.createNewFile();
         }

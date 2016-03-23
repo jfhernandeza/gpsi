@@ -17,7 +17,6 @@ public class gpsiClusterSilhouetteScore implements gpsiSampleSeparationScore{
     @Override
     public double score(ArrayList<double[]> samples) {
         
-        /*
         double score = 0.0;
         int m = 0, i, j, k;
         
@@ -50,76 +49,18 @@ public class gpsiClusterSilhouetteScore implements gpsiSampleSeparationScore{
                     k = Math.min(i, j);
                     dissimilarity[clusterAssignment[j]] += distances[k][Math.max(i, j) - 1 - k];
                 }
-            
-            for(j = 0; j < dissimilarity.length; j++)
-                if(clusterAssignment[i] == j)
-                    dissimilarity[j] /= (samples.get(j).length - 1);
-                else
-                    dissimilarity[j] /= samples.get(j).length;
-            
-            a = dissimilarity[clusterAssignment[i]];
+
+            a = dissimilarity[clusterAssignment[i]] / (samples.get(clusterAssignment[i]).length - 1);
             b = Double.MAX_VALUE;
             for(j = 0; j < dissimilarity.length; j++)
                 if(clusterAssignment[i] != j)
-                    b = Math.min(b, dissimilarity[j]);
-
-            if(Math.max(a, b) == 0)
-                System.err.println("AAA");
+                    b = Math.min(b, dissimilarity[j] / samples.get(j).length);
             
             score += (b - a) / Math.max(a, b);
             
         }
         
-        return 1.0 + score / m;
-*/
-        
-        double score = -1.0;
-        int m = 0;
-        
-        for(int i = 0; i < samples.size(); i++)
-            m += samples.get(i).length;
-        
-        int[] clusterAssignment = new int[m];
-        double[] values = new double[m];
-        double[][] distanceMatrix = new double[m][m];
-        
-        int mIndex = 0;
-        for(int i = 0; i < samples.size(); i++)
-            for(int j = 0; j < samples.get(i).length; j++){
-                values[mIndex] = samples.get(i)[j];
-                clusterAssignment[mIndex] = i;
-                mIndex++;
-            }
-        
-        for(int i = 0; i < m - 1; i++)
-            for(int j = i + 1; j < m; j++)
-                distanceMatrix[i][j] = Math.abs(values[i] - values[j]);
-        
-        double dissimilarity[] = new double[samples.size()];
-        double a, b;
-        for(int i = 0; i < m; i++){
-            Arrays.fill(dissimilarity, 0.0);
-            for(int j = 0; j < m; j++)
-                if(i != j)
-                    dissimilarity[clusterAssignment[j]] += distanceMatrix[Math.min(i, j)][Math.max(i, j)];
-            
-            for(int j = 0; j < dissimilarity.length; j++)
-                if(clusterAssignment[i] == j)
-                    dissimilarity[j] /= (samples.get(j).length - 1);
-                else
-                    dissimilarity[j] /= samples.get(j).length;
-            
-            a = dissimilarity[clusterAssignment[i]];
-            b = Double.MAX_VALUE;
-            for(int j = 0; j < dissimilarity.length; j++)
-                if(clusterAssignment[i] != j)
-                    b = Math.min(b, dissimilarity[j]);
-
-            score += (b - a) / Math.max(a, b);
-            
-        }
-        
-        return 1.0 + score / m;
+        return score / m;
         
     }
     

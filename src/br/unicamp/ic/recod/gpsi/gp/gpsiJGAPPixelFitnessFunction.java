@@ -36,11 +36,8 @@ public class gpsiJGAPPixelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVo
         ArrayList<double[]> samples = new ArrayList<>();
         samples.add(gpsiSampler.getInstance().sample(super.dataset.getIndexesPerClass(), super.dataset.getTrainingEntities(), this.classLabels[0], combinedImage));
         samples.add(gpsiSampler.getInstance().sample(super.dataset.getIndexesPerClass(), super.dataset.getTestEntities(), this.classLabels[1], combinedImage));
-        
-        //MannWhitneyUTest t = new MannWhitneyUTest();        
-        //double p_value = t.mannWhitneyUTest(samples.get(0), samples.get(1));
-        
-        return this.score.score(samples);
+                
+        return this.score.score(samples) + 1.0;
         
     }
 
