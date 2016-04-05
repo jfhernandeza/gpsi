@@ -17,12 +17,12 @@ import org.jgap.gp.IGPProgram;
  *
  * @author juan
  */
-public class gpsiJGAPPixelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVoxelRawDataset> {
+public class gpsiJGAPVoxelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVoxelRawDataset> {
 
     private final String[] classLabels;
     private final gpsiSampleSeparationScore score;
 
-    public gpsiJGAPPixelFitnessFunction(gpsiVoxelRawDataset dataset, String[] classLabels, gpsiSampleSeparationScore score) {
+    public gpsiJGAPVoxelFitnessFunction(gpsiVoxelRawDataset dataset, String[] classLabels, gpsiSampleSeparationScore score) {
         super(dataset);
         this.classLabels = classLabels;
         this.score = score;
@@ -34,8 +34,9 @@ public class gpsiJGAPPixelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVo
         gpsiCombinedImage combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(this.dataset.getHyperspectralImage(), super.b, igpp);
         
         ArrayList<double[]> samples = new ArrayList<>();
-        samples.add(gpsiSampler.getInstance().sample(super.dataset.getIndexesPerClass(), super.dataset.getTrainingEntities(), this.classLabels[0], combinedImage));
-        samples.add(gpsiSampler.getInstance().sample(super.dataset.getIndexesPerClass(), super.dataset.getTestEntities(), this.classLabels[1], combinedImage));
+        
+        for(String classLabel : this.classLabels)
+            samples.add(gpsiSampler.getInstance().sample(super.dataset.getTrainingEntities(), classLabel, combinedImage));
                 
         return this.score.score(samples) + 1.0;
         

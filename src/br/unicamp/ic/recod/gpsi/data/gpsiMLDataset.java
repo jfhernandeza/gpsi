@@ -10,6 +10,7 @@ import br.unicamp.ic.recod.gpsi.features.gpsiFeatureVector;
 import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
 import br.unicamp.ic.recod.gpsi.img.gpsiMask;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -21,9 +22,7 @@ public class gpsiMLDataset extends gpsiDataset<gpsiFeatureVector, Integer>{
     private final gpsiDescriptor descriptor;
 
     public gpsiMLDataset(gpsiDescriptor descriptor) {
-        
-        this.trainingEntities = new ArrayList<>();
-        this.trainingLabels = new ArrayList<>();        
+             
         this.encoder = new gpsiLabelEncoder();
         this.descriptor = descriptor;
         
@@ -31,19 +30,35 @@ public class gpsiMLDataset extends gpsiDataset<gpsiFeatureVector, Integer>{
     
     public void loadDataset(gpsiRoiRawDataset rawDataset, gpsiCombinedImage combinedImage){
         
-        ArrayList<String> rawLabels = rawDataset.getTrainingLabels();
-        ArrayList<gpsiMask> rawEntities = rawDataset.getTrainingEntities();
+        this.encoder.loadLabels(rawDataset.getValidationEntities().keySet());
         
-        this.encoder.loadLabels(rawLabels);
+        HashMap<String, ArrayList<gpsiMask>> trainingSet = rawDataset.getTrainingEntities();
+        HashMap<String, ArrayList<gpsiMask>> testSet = rawDataset.getValidationEntities();
         
-        for(int i = 0; i < rawEntities.size(); i++){
-            this.trainingEntities.add(this.descriptor.getFeatureVector(combinedImage, rawEntities.get(i)));
-            this.trainingLabels.add(this.encoder.getCode(rawLabels.get(i)));
+        for(String label : trainingSet.keySet()){
+            this.trainingEntities.put(this.encoder.getCode(label), new ArrayList<>());
+            for(gpsiMask mask : trainingSet.get(label)){
+                this.trainingEntities.get(this.encoder.getCode(label)).add(this.descriptor.getFeatureVector(combinedImage, mask));
+            }
         }
+        
+        for(String label : testSet.keySet()){
+            this.validationEntities.put(this.encoder.getCode(label), new ArrayList<>());
+            for(gpsiMask mask : testSet.get(label)){
+                this.validationEntities.get(this.encoder.getCode(label)).add(this.descriptor.getFeatureVector(combinedImage, mask));
+            }
+        }
+        
         
     }
     
     public int getDimensionality(){
-        return this.trainingEntities.get(0).getDimensionality();
+        
+        for(int label : this.trainingEntities.keySet()){
+            return this.trainingEntities.get(label).get(0).getDimensionality();
+        }
+        
+        return 0;
+        
     }
 }

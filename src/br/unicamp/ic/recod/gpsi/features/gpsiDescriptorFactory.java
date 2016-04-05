@@ -5,7 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.features;
 
-import java.util.Properties;
+import java.util.HashMap;
 
 /**
  *
@@ -16,14 +16,14 @@ public class gpsiDescriptorFactory {
     private gpsiDescriptorFactory() {
     }
     
-    public gpsiDescriptor create(Properties prop){
+    public gpsiDescriptor create(HashMap<String, String> prop){
         
-        String className = prop.getProperty("descriptorName");
+        String className = prop.get("desc0");
         
         switch(className){
             case "gpsiMaskedLocalBinaryPatternDescriptor":
                 gpsiMaskedLocalBinaryPatternDescriptor descriptor = new gpsiMaskedLocalBinaryPatternDescriptor();
-                descriptor.setNeighborhood(Integer.parseInt(prop.getProperty("neighborhood")));
+                descriptor.setNeighborhood(Integer.parseInt(prop.get("desc1")));
                 return descriptor;
         }
         

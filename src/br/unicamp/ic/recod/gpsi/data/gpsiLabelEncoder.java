@@ -5,7 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.data;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.TreeMap;
 
@@ -25,14 +25,8 @@ public class gpsiLabelEncoder {
         this.lastKey = 0;
     }
     
-    public void loadLabels(ArrayList<String> rawLabels){
-        
-        HashSet<String> labels = new HashSet<>(rawLabels);
-        
-        for(String label : labels){
-            addLabel(label);
-        }
-        
+    public void loadLabels(Collection<String> rawLabels){
+        rawLabels.stream().forEach((label) -> { addLabel(label); });
     }
     
     public int addLabel(String label){

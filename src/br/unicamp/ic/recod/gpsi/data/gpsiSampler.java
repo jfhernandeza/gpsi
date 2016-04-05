@@ -27,18 +27,15 @@ public class gpsiSampler {
         private static final gpsiSampler INSTANCE = new gpsiSampler();
     }
     
-    public double[] sample(HashMap indexesPerClass, ArrayList entities, String className, gpsiCombinedImage combImage){
+    public double[] sample(HashMap<String, ArrayList<gpsiVoxel>> entities, String className, gpsiCombinedImage combImage){
                 
-        ArrayList<Integer> indices = (ArrayList) indexesPerClass.get(className);
+        ArrayList<gpsiVoxel> samplingEntities = entities.get(className);
         
-        int size = indices.size();
-        double[] vector = new double[size];
+        double[] vector = new double[samplingEntities.size()];
         
-        int v[];
-        for(int i = 0; i < size; i++){
-            v = ((gpsiVoxel) entities.get(indices.get(i))).getVector();
-            vector[i] = combImage.img[v[0]][v[1]];
-        }
+        int i = 0;
+        for(gpsiVoxel voxel : samplingEntities)
+            vector[i++] = combImage.img[voxel.getVector()[0]][voxel.getVector()[1]];
         
         return vector;
         

@@ -17,8 +17,11 @@ import java.io.IOException;
  */
 public abstract class gpsiDatasetReader <R extends gpsiFileReader, D extends gpsiRawDataset, E> {
     
-    protected final R fileReader;
+    protected R fileReader;
 
+    public gpsiDatasetReader() {
+    }
+    
     public gpsiDatasetReader(R fileReader) {
         this.fileReader = fileReader;
     }
@@ -28,6 +31,10 @@ public abstract class gpsiDatasetReader <R extends gpsiFileReader, D extends gps
         rawDataset.setHyperspectralImage(new gpsiHyperspectralImage(hiperspectralImage));
     }
     
-    public abstract D readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath ) throws Exception;
+    public abstract D readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath, String[] classLabels ) throws Exception;
+
+    public void setFileReader(R fileReader) {
+        this.fileReader = fileReader;
+    }
     
 }

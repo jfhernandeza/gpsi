@@ -9,6 +9,7 @@ import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
 import br.unicamp.ic.recod.gpsi.img.gpsiMask;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -21,7 +22,7 @@ public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsi
     }
 
     @Override
-    public gpsiRoiRawDataset readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath) throws Exception {
+    public gpsiRoiRawDataset readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath, String[] classLabels) throws Exception {
         
         gpsiRoiRawDataset rawDataset = new gpsiRoiRawDataset();
         
@@ -32,42 +33,34 @@ public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsi
         
         if(classes.length <= 0)
             throw new Exception("Directory has not the suggested structure.");
-
-        ArrayList<gpsiMask> masks = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
+        
+        HashMap<String, ArrayList<gpsiMask>> trainingEntities = new HashMap<>();
+        HashMap<String, ArrayList<gpsiMask>> testEntities = new HashMap<>();
         
         String files[];
-        for (String currentClass : classes) {
+        for (String currentClass : classLabels) {
             files = (new File(trainingMasksPath + '/' + currentClass)).list((File current, String name) -> new File(current, name).getName().endsWith(".mat"));
-            for (String file : files) {
-                masks.add(new gpsiMask(super.fileReader.read2dStructure(trainingMasksPath + '/' + currentClass + '/' + file)));
-                labels.add(currentClass);
-            }
+            trainingEntities.put(currentClass, new ArrayList<>());
+            for (String file : files)
+                trainingEntities.get(currentClass).add(new gpsiMask(super.fileReader.read2dStructure(trainingMasksPath + '/' + currentClass + '/' + file)));
         }
         
-        rawDataset.setTrainingEntities(masks);
-        rawDataset.setTrainingLabels(labels);
-        
+        rawDataset.setTrainingEntities(trainingEntities);
         
         dir = new File(testMasksPath);
         classes = dir.list((File current, String name) -> new File(current, name).isDirectory());
         
         if(classes.length <= 0)
             throw new Exception("Directory has not the suggested structure.");
-
-        masks = new ArrayList<>();
-        labels = new ArrayList<>();
         
-        for (String currentClass : classes) {
+        for (String currentClass : classLabels) {
             files = (new File(trainingMasksPath + '/' + currentClass)).list((File current, String name) -> new File(current, name).getName().endsWith(".mat"));
-            for (String file : files) {
-                masks.add(new gpsiMask(super.fileReader.read2dStructure(trainingMasksPath + '/' + currentClass + '/' + file)));
-                labels.add(currentClass);
-            }
+            testEntities.put(currentClass, new ArrayList<>());
+            for (String file : files)
+                testEntities.get(currentClass).add(new gpsiMask(super.fileReader.read2dStructure(trainingMasksPath + '/' + currentClass + '/' + file)));
         }
         
-        rawDataset.setTestEntities(masks);
-        rawDataset.setTestLabels(labels);
+        rawDataset.setTestEntities(testEntities);
         
         return rawDataset;
         

@@ -9,6 +9,7 @@ import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  *
@@ -21,7 +22,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
     }
 
     @Override
-    public gpsiVoxelRawDataset readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath) throws Exception {
+    public gpsiVoxelRawDataset readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath, String[] classLabels) throws Exception {
         
         gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
         
@@ -32,29 +33,24 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         
         if(classes.length <= 0)
             throw new Exception("Directory has not the suggested structure.");
-
-        ArrayList<gpsiVoxel> voxels = new ArrayList<>();
-        ArrayList<String> labels = new ArrayList<>();
         
-        String currentClass;
-        for(int i = 0; i < classes.length; i++){
-            currentClass = classes[i].replace(".mat", "");
+        HashMap<String, ArrayList<gpsiVoxel>> trainingEntities = new HashMap<>();
+        HashMap<String, ArrayList<gpsiVoxel>> testEntities = new HashMap<>();
+        
+        for(int i = 0; i < classLabels.length; i++){
             
-            double[][] mask = super.fileReader.read2dStructure(trainingMasksPath + classes[i]);
+            double[][] mask = super.fileReader.read2dStructure(trainingMasksPath + classLabels[i] + ".mat");
             
-            for(int x = 0; x < mask[0].length; x++){
-                for(int y = 0; y < mask.length; y++){
-                    if(mask[y][x] == 1.0){
-                        voxels.add(new gpsiVoxel(new int[] {y,x}));
-                        labels.add(currentClass);
-                    }
-                }
-            }
+            trainingEntities.put(classLabels[i], new ArrayList<>());
+            
+            for(int x = 0; x < mask[0].length; x++)
+                for(int y = 0; y < mask.length; y++)
+                    if(mask[y][x] == 1.0)
+                        trainingEntities.get(classLabels[i]).add(new gpsiVoxel(new int[] {y,x}));
             
         }
         
-        rawDataset.setTrainingEntities(voxels);
-        rawDataset.setTrainingLabels(labels);
+        rawDataset.setTrainingEntities(trainingEntities);
         
         
         dir = new File(testMasksPath);
@@ -62,28 +58,21 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         
         if(classes.length <= 0)
             throw new Exception("Directory has not the suggested structure.");
-
-        voxels = new ArrayList<>();
-        labels = new ArrayList<>();
         
-        for(int i = 0; i < classes.length; i++){
-            currentClass = classes[i].replace(".mat", "");
+        for(int i = 0; i < classLabels.length; i++){
             
-            double[][] mask = super.fileReader.read2dStructure(testMasksPath + classes[i]);
+            double[][] mask = super.fileReader.read2dStructure(testMasksPath + classLabels[i] + ".mat");
             
-            for(int x = 0; x < mask[0].length; x++){
-                for(int y = 0; y < mask.length; y++){
-                    if(mask[y][x] == 1.0){
-                        voxels.add(new gpsiVoxel(new int[] {y,x}));
-                        labels.add(currentClass);
-                    }
-                }
-            }
+            testEntities.put(classLabels[i], new ArrayList<>());
+            
+            for(int x = 0; x < mask[0].length; x++)
+                for(int y = 0; y < mask.length; y++)
+                    if(mask[y][x] == 1.0)
+                        testEntities.get(classLabels[i]).add(new gpsiVoxel(new int[] {y,x}));
             
         }
         
-        rawDataset.setTestEntities(voxels);
-        rawDataset.setTestLabels(labels);
+        rawDataset.setTestEntities(testEntities);
         
         return rawDataset;
         

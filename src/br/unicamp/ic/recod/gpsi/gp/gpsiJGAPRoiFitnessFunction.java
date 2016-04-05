@@ -49,9 +49,9 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         mlDataset.loadDataset(this.dataset, combinedImage);
         
         int dimensionality = mlDataset.getDimensionality();
-        int n_classes = mlDataset.getNumberOfClasses();
-        int n_entities = mlDataset.getNumberOfEntities();
-        ArrayList<Integer> listOfClasses = new ArrayList<>(mlDataset.getListOfClasses());
+        int n_classes = mlDataset.getTrainingEntities().keySet().size();
+        int n_entities = mlDataset.getNumberOfTrainingEntities();
+        ArrayList<Integer> listOfClasses = new ArrayList<>(mlDataset.getTrainingEntities().keySet());
         
         Attribute[] attributes = new Attribute[dimensionality];
         FastVector fvClassVal = new FastVector(n_classes);
@@ -73,18 +73,17 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         Instances instances = new Instances("Rel", fvWekaAttributes, n_entities);
         instances.setClassIndex(dimensionality);
         
-        ArrayList<gpsiFeatureVector> entities = mlDataset.getTrainingEntities();
-        ArrayList<Integer> labels = mlDataset.getTrainingLabels();
-        
         Instance iExample;
         double[] features;
-        for(i = 0; i < n_entities; i++){
-            iExample = new Instance(dimensionality + 1);
-            features = entities.get(i).getFeatures();
-            for(j = 0; j < dimensionality; j++)
-                iExample.setValue(j, features[j]);
-            iExample.setValue(dimensionality, labels.get(i));
-            instances.add(iExample);
+        for(int label : mlDataset.getTrainingEntities().keySet()){
+            for(gpsiFeatureVector featureVector : mlDataset.getTrainingEntities().get(label)){
+                iExample = new Instance(dimensionality + 1);
+                features = featureVector.getFeatures();
+                for(j = 0; j < dimensionality; j++)
+                    iExample.setValue(i, features[i]);
+                iExample.setValue(dimensionality, label);
+                instances.add(iExample);
+            }
         }
         
         int folds = 5;
