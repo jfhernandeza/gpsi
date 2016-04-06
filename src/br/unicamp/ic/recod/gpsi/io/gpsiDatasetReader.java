@@ -6,14 +6,13 @@
 package br.unicamp.ic.recod.gpsi.io;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
-import br.unicamp.ic.recod.gpsi.img.gpsiHyperspectralImage;
-import java.io.IOException;
 
 /**
  *
  * @author jfhernandeza
  * @param <R>
  * @param <D>
+ * @param <E>
  */
 public abstract class gpsiDatasetReader <R extends gpsiFileReader, D extends gpsiRawDataset, E> {
     
@@ -24,11 +23,6 @@ public abstract class gpsiDatasetReader <R extends gpsiFileReader, D extends gps
     
     public gpsiDatasetReader(R fileReader) {
         this.fileReader = fileReader;
-    }
-    
-    protected void loadHiperspectralImage(D rawDataset, String path) throws IOException{
-        double[][][] hiperspectralImage = this.fileReader.read3dStructure(path);
-        rawDataset.setHyperspectralImage(new gpsiHyperspectralImage(hiperspectralImage));
     }
     
     public abstract D readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath, String[] classLabels ) throws Exception;

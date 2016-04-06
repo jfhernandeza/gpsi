@@ -5,8 +5,6 @@
  */
 package br.unicamp.ic.recod.gpsi.data;
 
-import br.unicamp.ic.recod.gpsi.img.gpsiHyperspectralImage;
-
 /**
  *
  * @author juan
@@ -14,15 +12,4 @@ import br.unicamp.ic.recod.gpsi.img.gpsiHyperspectralImage;
  * @param <L>
  */
 public class gpsiRawDataset<E, L> extends gpsiDataset {
-    
-    private gpsiHyperspectralImage hyperspectralImage;
-    
-    public gpsiHyperspectralImage getHyperspectralImage() {
-        return hyperspectralImage;
-    }
-
-    public void setHyperspectralImage(gpsiHyperspectralImage hyperspectralImage) {
-        this.hyperspectralImage = hyperspectralImage;
-    }
-    
 }

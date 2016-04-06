@@ -9,28 +9,18 @@ package br.unicamp.ic.recod.gpsi.img;
  *
  * @author jfhernandeza
  */
-public class gpsiMask {
+public class gpsiRoi {
     
-    private boolean[][] mask;
+    private final gpsiVoxel[][] roi;
     public int min_x, min_y, max_x, max_y;
-    private int height, width;
 
-    public gpsiMask(boolean[][] mask) {
-        this.mask = mask;
-        this.height = mask.length;
-        this.width = mask[0].length;
-        calculateBoundingBox();
-    }
-
-    public gpsiMask(double[][] mask){
-        this.height = mask.length;
-        this.width = mask[0].length;
+    public gpsiRoi(double[][] mask, double[][][] hyperspectralImage){
         
-        this.mask = new boolean[this.height][this.width];
+        this.roi = new gpsiVoxel[mask.length][mask[0].length];
         
-        for(int x = 0; x < this.width; x++)
-            for(int y = 0; y < this.height; y++)
-                this.mask[y][x] = !(mask[y][x] == 0.0);
+        for(int x = 0; x < this.roi[0].length; x++)
+            for(int y = 0; y < this.roi.length; y++)
+                    this.roi[y][x] = mask[y][x] != 0.0 ? new gpsiVoxel(hyperspectralImage[y][x]): null;
         
         calculateBoundingBox();
     }
@@ -42,9 +32,9 @@ public class gpsiMask {
         this.max_x = Integer.MIN_VALUE;
         this.max_y = Integer.MIN_VALUE;
         
-        for(int y = 0; y < this.height; y++)
-            for(int x = 0; x < this.width; x++)
-                if(this.mask[y][x]){
+        for(int y = 0; y < this.roi.length; y++)
+            for(int x = 0; x < this.roi[0].length; x++)
+                if(this.roi[y][x] != null){
                     this.min_x = Math.min(this.min_x, x);
                     this.min_y = Math.min(this.min_y, y);
                     this.max_x = Math.max(this.max_x, x);
@@ -53,8 +43,8 @@ public class gpsiMask {
         
     }
     
-    public boolean[][] getMask() {
-        return mask;
+    public gpsiVoxel[][] getRoi() {
+        return this.roi;
     }
     
 }

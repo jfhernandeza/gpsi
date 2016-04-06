@@ -5,8 +5,8 @@
  */
 package br.unicamp.ic.recod.gpsi.features;
 
-import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
-import br.unicamp.ic.recod.gpsi.img.gpsiMask;
+import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
+import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -46,33 +46,32 @@ public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescript
     }
     
     @Override
-    public gpsiFeatureVector getFeatureVector(gpsiCombinedImage combinedImage, gpsiMask roi) {
+    public gpsiFeatureVector getFeatureVector(gpsiRoi roi) {
         
         double[] vector = new double[(int) Math.pow(2, this.neighborhood.size())];
         int binaryPattern;
         Arrays.fill(vector, 0.0);
         
-        double[][] img = combinedImage.img;
-        boolean[][] mask = roi.getMask();
+        gpsiVoxel[][] img = roi.getRoi();
         
         boolean consider;
         
         int h, k;
-        for(int y = 1; y < combinedImage.getHeight() - 1; y++){
-            for(int x = 1; x < combinedImage.getWidth() - 1; x++){
+        for(int y = 1; y < img.length - 1; y++){
+            for(int x = 1; x < img[0].length - 1; x++){
                 
-                if(!mask[y][x]) continue;
+                if(img[y][x] == null) continue;
                 
                 consider = true;
                 for(int[] n : this.neighborhood)
-                    consider &= mask[y + n[0]][x + n[1]];
+                    consider &= img[y + n[0]][x + n[1]] != null;
                 if( !consider ) continue;
                 
                 binaryPattern = 0;
                 
                 int pow = 0;
                 for(int[] n : this.neighborhood){
-                    binaryPattern += (img[y][x] > img[y + n[0]][x + n[1]]) ? Math.pow(2, pow) : 0;
+                    binaryPattern += (img[y][x].getCombinedValue() > img[y + n[0]][x + n[1]].getCombinedValue()) ? Math.pow(2, pow) : 0;
                     pow++;
                 }
                 

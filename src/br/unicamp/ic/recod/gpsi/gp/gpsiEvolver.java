@@ -55,7 +55,7 @@ public abstract class gpsiEvolver<I> {
         
         this.dataset = this.datasetReader.readDataset(this.imgPath, this.trainingMasksPath, this.testMasksPath, this.classLabels);
         
-        System.out.println("Loaded " + this.dataset.getHyperspectralImage().getHeight() + "x" + this.dataset.getHyperspectralImage().getWidth() + " hyperspectral image with " + this.dataset.getHyperspectralImage().getN_bands() + " bands.");
+        System.out.println("Loaded dataset hyperspectral image with " + this.dataset.getnBands() + " bands.");
         System.out.println("Loaded " + this.dataset.getNumberOfTrainingEntities() + " examples for training.");
         System.out.println("Loaded " + this.dataset.getNumberOfTestEntities() + " examples for testing.");
         

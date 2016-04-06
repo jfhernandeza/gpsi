@@ -11,18 +11,27 @@ package br.unicamp.ic.recod.gpsi.img;
  */
 public class gpsiVoxel {
     
-    private int[] vector;
+    private double[] hyperspectralData;
+    private double combinedValue;
+
+    public gpsiVoxel(double[] hyperspectralData) {
+        this.hyperspectralData = hyperspectralData;
+    }
     
-    public gpsiVoxel(int[] vector){
-        this.vector = vector;
+    public double[] getHyperspectralData() {
+        return hyperspectralData;
     }
 
-    public int[] getVector() {
-        return vector;
+    public void setHyperspectralData(double[] hyperspectralData) {
+        this.hyperspectralData = hyperspectralData;
     }
 
-    public void setVector(int[] point) {
-        this.vector = point;
+    public double getCombinedValue() {
+        return combinedValue;
+    }
+
+    public void setCombinedValue(double combinedValue) {
+        this.combinedValue = combinedValue;
     }
     
 }

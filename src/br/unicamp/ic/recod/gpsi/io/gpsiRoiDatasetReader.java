@@ -6,7 +6,7 @@
 package br.unicamp.ic.recod.gpsi.io;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
-import br.unicamp.ic.recod.gpsi.img.gpsiMask;
+import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.HashMap;
  *
  * @author juan
  */
-public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsiRoiRawDataset, gpsiMask> {
+public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsiRoiRawDataset, gpsiRoi> {
     
     public gpsiRoiDatasetReader(gpsiFileReader fileReader) {
         super(fileReader);
@@ -26,7 +26,8 @@ public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsi
         
         gpsiRoiRawDataset rawDataset = new gpsiRoiRawDataset();
         
-        super.loadHiperspectralImage(rawDataset, HyperspectralImagePath);
+        double[][][] hyperspectralImage = this.fileReader.read3dStructure(HyperspectralImagePath);
+        rawDataset.setnBands(hyperspectralImage[0][0].length);
         
         File dir = new File(trainingMasksPath);
         String[] classes = dir.list((File current, String name) -> new File(current, name).isDirectory());
@@ -34,15 +35,15 @@ public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsi
         if(classes.length <= 0)
             throw new Exception("Directory has not the suggested structure.");
         
-        HashMap<String, ArrayList<gpsiMask>> trainingEntities = new HashMap<>();
-        HashMap<String, ArrayList<gpsiMask>> testEntities = new HashMap<>();
+        HashMap<String, ArrayList<gpsiRoi>> trainingEntities = new HashMap<>();
+        HashMap<String, ArrayList<gpsiRoi>> testEntities = new HashMap<>();
         
         String files[];
         for (String currentClass : classLabels) {
             files = (new File(trainingMasksPath + '/' + currentClass)).list((File current, String name) -> new File(current, name).getName().endsWith(".mat"));
             trainingEntities.put(currentClass, new ArrayList<>());
             for (String file : files)
-                trainingEntities.get(currentClass).add(new gpsiMask(super.fileReader.read2dStructure(trainingMasksPath + '/' + currentClass + '/' + file)));
+                trainingEntities.get(currentClass).add(new gpsiRoi(super.fileReader.read2dStructure(trainingMasksPath + '/' + currentClass + '/' + file), hyperspectralImage));
         }
         
         rawDataset.setTrainingEntities(trainingEntities);
@@ -57,7 +58,7 @@ public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsi
             files = (new File(trainingMasksPath + '/' + currentClass)).list((File current, String name) -> new File(current, name).getName().endsWith(".mat"));
             testEntities.put(currentClass, new ArrayList<>());
             for (String file : files)
-                testEntities.get(currentClass).add(new gpsiMask(super.fileReader.read2dStructure(trainingMasksPath + '/' + currentClass + '/' + file)));
+                testEntities.get(currentClass).add(new gpsiRoi(super.fileReader.read2dStructure(testMasksPath + '/' + currentClass + '/' + file), hyperspectralImage));
         }
         
         rawDataset.setTestEntities(testEntities);

@@ -5,11 +5,11 @@
  */
 package br.unicamp.ic.recod.gpsi.data;
 
-import br.unicamp.ic.recod.gpsi.img.gpsiMask;
+import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
 
 /**
  *
  * @author jfhernandeza
  */
-public class gpsiRoiRawDataset extends gpsiRawDataset<gpsiMask, String> {
+public class gpsiRoiRawDataset extends gpsiRawDataset<gpsiRoi, String> {
 }

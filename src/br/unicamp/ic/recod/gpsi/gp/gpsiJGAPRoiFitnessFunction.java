@@ -9,8 +9,8 @@ import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
 import br.unicamp.ic.recod.gpsi.features.gpsiFeatureVector;
-import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
-import br.unicamp.ic.recod.gpsi.img.gpsiJGAPImageCombinator;
+import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
+import br.unicamp.ic.recod.gpsi.img.gpsiRoiBandCombinator;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
@@ -43,10 +43,11 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         double mean_accuracy = 0.0;
         Object[] noargs = new Object[0];
         
-        gpsiCombinedImage combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(this.dataset.getHyperspectralImage(), super.b, igpp);
+        gpsiRoiBandCombinator roiBandCombinator = new gpsiRoiBandCombinator(new gpsiJGAPVoxelCombinator(super.b, igpp));
+        roiBandCombinator.combineEntity(this.dataset.getTrainingEntities());
         
         gpsiMLDataset mlDataset = new gpsiMLDataset(this.descriptor);
-        mlDataset.loadDataset(this.dataset, combinedImage);
+        mlDataset.loadDataset(this.dataset);
         
         int dimensionality = mlDataset.getDimensionality();
         int n_classes = mlDataset.getTrainingEntities().keySet().size();

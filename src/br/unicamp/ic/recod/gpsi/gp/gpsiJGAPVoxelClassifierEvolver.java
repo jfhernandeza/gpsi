@@ -7,8 +7,8 @@ package br.unicamp.ic.recod.gpsi.gp;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
-import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
-import br.unicamp.ic.recod.gpsi.img.gpsiJGAPImageCombinator;
+import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
+import br.unicamp.ic.recod.gpsi.img.gpsiVoxelBandCombinator;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
 import java.io.File;
@@ -57,7 +57,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         gpsiJGAPVoxelFitnessFunction fitness = new gpsiJGAPVoxelFitnessFunction(dataset, super.classLabels, new gpsiClusterSilhouetteScore());
         config.setFitnessFunction(fitness);
         
-        GPGenotype gp = create(config, dataset.getHyperspectralImage().getN_bands(), fitness);
+        GPGenotype gp = create(config, dataset.getnBands(), fitness);
         
         double[] fitnessCurveTrain = new double[super.numGenerations];
         double[] fitnessCurveVal = new double[super.numGenerations];
@@ -69,9 +69,9 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         
         Mean mean = new Mean();
         StandardDeviation sd = new StandardDeviation();
-        gpsiCombinedImage combinedImage;
-        double validationScore, trainScore, bestTestScore = -1.0, bestTrainScore = -1.0;
+        double validationScore, trainScore, bestValidationScore = -1.0, bestTrainScore = -1.0;
         ArrayList<double[]> samples;
+        gpsiVoxelBandCombinator voxelBandCombinator;
         for(int generation = 0; generation < super.numGenerations; generation++){
             gp.evolve(1);
             
@@ -84,11 +84,13 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
 
                 current = gp.getGPPopulation().getGPPrograms()[i];
                 
-                combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(dataset.getHyperspectralImage(), fitness.getB(), current);
+                voxelBandCombinator = new gpsiVoxelBandCombinator(new gpsiJGAPVoxelCombinator(fitness.getB(), current));
+                voxelBandCombinator.combineEntity(dataset.getValidationEntities());
+                
                 samples = new ArrayList<>();
                 
                 for(String classLabel : super.classLabels)
-                    samples.add(gpsiSampler.getInstance().sample(dataset.getValidationEntities(), classLabel, combinedImage));
+                    samples.add(gpsiSampler.getInstance().sample(dataset.getValidationEntities(), classLabel));
                 
                 validationScore = fitness.getScore().score(samples);
                 trainScore = current.getFitnessValue() - 1.0;
@@ -96,25 +98,28 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
                 currentScore = mean.evaluate(new double[] {trainScore, validationScore}) - sd.evaluate(new double[] {trainScore, validationScore});
                 
                 if(currentScore > bestScore){
-                    best = current;
+                    this.best = current;
                     bestScore = currentScore;
                     bestTrainScore = trainScore;
-                    bestTestScore = validationScore;
+                    bestValidationScore = validationScore;
                 }
                 
             }
             
             if(this.validation > 0){
                 fitnessCurveTrain[generation] = bestTrainScore;
-                fitnessCurveVal[generation] = bestTestScore;
-                System.out.println(bestTrainScore + "\t" + bestTestScore);
+                fitnessCurveVal[generation] = bestValidationScore;
+                System.out.println(bestTrainScore + "\t" + bestValidationScore);
             }else{
-                fitnessCurveTrain[generation] = best.getFitnessValue();
+                fitnessCurveTrain[generation] = best.getFitnessValue() - 1.0;
             }
             
         }
         
-        combinedImage = gpsiJGAPImageCombinator.getInstance().combineImage(dataset.getHyperspectralImage(), fitness.getB(), best);
+        voxelBandCombinator = new gpsiVoxelBandCombinator(new gpsiJGAPVoxelCombinator(fitness.getB(), best));
+        voxelBandCombinator.combineEntity(dataset.getTrainingEntities());
+        voxelBandCombinator.combineEntity(dataset.getValidationEntities());
+        voxelBandCombinator.combineEntity(dataset.getTestEntities());
         
         int[][] confusionMatrix = new int[this.classLabels.length][this.classLabels.length];
         
@@ -122,14 +127,14 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         
         samples = new ArrayList<>();
         for(String classLabel : super.classLabels)
-            samples.add(ArrayUtils.addAll(gpsiSampler.getInstance().sample(dataset.getTrainingEntities(), classLabel, combinedImage), gpsiSampler.getInstance().sample(dataset.getValidationEntities(), classLabel, combinedImage)));
+            samples.add(ArrayUtils.addAll(gpsiSampler.getInstance().sample(dataset.getTrainingEntities(), classLabel), gpsiSampler.getInstance().sample(dataset.getValidationEntities(), classLabel)));
                 
         for(i = 0; i < samples.size(); i++)
             means[i] = mean.evaluate(samples.get(i));
         
         samples = new ArrayList<>();
         for(String classLabel : super.classLabels)
-            samples.add(gpsiSampler.getInstance().sample(dataset.getTestEntities(), classLabel, combinedImage));
+            samples.add(gpsiSampler.getInstance().sample(dataset.getTestEntities(), classLabel));
         
         double value;
         int minDistanceIndex = 0, m = 0;
@@ -181,7 +186,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         outReport.close();
         
         outReport = new PrintWriter(outRoot + "results.out");
-        outReport.println("Best's fitness measure:\t" + best.getFitnessValue());
+        outReport.println("Best's fitness measure:\t" + (best.getFitnessValue() - 1.0));
         outReport.println("Total accuracy:\t" + accuracy);
         outReport.close();
         
@@ -223,7 +228,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
             new Divide(conf,CommandGene.FloatClass),
             // new Sine(conf, CommandGene.FloatClass),
             // new Cosine(conf, CommandGene.FloatClass),
-            // new Exp(conf, CommandGene.FloatClass),
+           //  new Exp(conf, CommandGene.FloatClass),
             new Terminal(conf,CommandGene.FloatClass, 1.0d, 1000000.0d, false)
         };
         

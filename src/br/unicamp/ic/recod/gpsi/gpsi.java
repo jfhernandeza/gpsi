@@ -22,8 +22,6 @@ public class gpsi {
         evolver.evolve();
         System.exit(0);
         
-        // TODO: Create classes gpsiEvolver, gpsiPixelClassifierEvolver and gpsiROIClassifierEvolver
-        // TODO: Test args4j
         // TODO: Generalize measures to support high dimensionalities
         // TODO: Make the best individual persist
 /*

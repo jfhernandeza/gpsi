@@ -25,7 +25,7 @@ public class gpsiClusterSilhouetteScore implements gpsiSampleSeparationScore{
         
         int[] clusterAssignment = new int[m];
         double[] values = new double[m];
-        
+                
         double[][] distances = new double[m - 1][];
         for(i = 0; i < m - 1; i++)
             distances[i] = new double[m - i - 1];

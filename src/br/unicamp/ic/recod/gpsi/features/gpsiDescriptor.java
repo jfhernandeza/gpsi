@@ -5,8 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.features;
 
-import br.unicamp.ic.recod.gpsi.img.gpsiCombinedImage;
-import br.unicamp.ic.recod.gpsi.img.gpsiMask;
+import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
 
 /**
  *
@@ -14,6 +13,6 @@ import br.unicamp.ic.recod.gpsi.img.gpsiMask;
  */
 public interface gpsiDescriptor {
     
-    public abstract gpsiFeatureVector getFeatureVector(gpsiCombinedImage combinedImage, gpsiMask mask);
+    public abstract gpsiFeatureVector getFeatureVector(gpsiRoi mask);
     
 }

@@ -26,7 +26,8 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         
         gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
         
-        super.loadHiperspectralImage(rawDataset, HyperspectralImagePath);
+        double[][][] hyperspectralImage = this.fileReader.read3dStructure(HyperspectralImagePath);
+        rawDataset.setnBands(hyperspectralImage[0][0].length);
         
         File dir = new File(trainingMasksPath);
         String[] classes = dir.list((File current, String name) -> new File(current, name).isFile());
@@ -46,7 +47,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
             for(int x = 0; x < mask[0].length; x++)
                 for(int y = 0; y < mask.length; y++)
                     if(mask[y][x] == 1.0)
-                        trainingEntities.get(classLabels[i]).add(new gpsiVoxel(new int[] {y,x}));
+                        trainingEntities.get(classLabels[i]).add(new gpsiVoxel(hyperspectralImage[y][x]));
             
         }
         
@@ -68,7 +69,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
             for(int x = 0; x < mask[0].length; x++)
                 for(int y = 0; y < mask.length; y++)
                     if(mask[y][x] == 1.0)
-                        testEntities.get(classLabels[i]).add(new gpsiVoxel(new int[] {y,x}));
+                        testEntities.get(classLabels[i]).add(new gpsiVoxel(hyperspectralImage[y][x]));
             
         }
         

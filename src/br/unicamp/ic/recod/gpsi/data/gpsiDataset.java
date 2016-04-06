@@ -20,6 +20,8 @@ public abstract class gpsiDataset<E, L> {
     protected HashMap<L, ArrayList<E>> trainingEntities = null;
     protected HashMap<L, ArrayList<E>> validationEntities = null;
     protected HashMap<L, ArrayList<E>> testEntities = null;
+    
+    private int nBands;
 
     public HashMap<L, ArrayList<E>> getTrainingEntities() {
         return trainingEntities;
@@ -64,6 +66,14 @@ public abstract class gpsiDataset<E, L> {
         for(L key : this.testEntities.keySet())
             m += this.testEntities.get(key).size();
         return m;
+    }
+
+    public int getnBands() {
+        return nBands;
+    }
+
+    public void setnBands(int nBands) {
+        this.nBands = nBands;
     }
     
     public void separateValidationSet(float validationRatio, long seed){
