@@ -22,5 +22,11 @@ public class gpsiJGAPRoiClassifierEvolver extends gpsiRoiClassifierEvolver<IGPPr
     public void evolve() {
         // TODO: Implement
     }
+
+    @Override
+    public void printResults() {
+        // TODO: Implement
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

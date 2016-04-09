@@ -7,7 +7,6 @@ package br.unicamp.ic.recod.gpsi.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 /**
  *
@@ -16,6 +15,8 @@ import java.util.Random;
  * @param <L>
  */
 public abstract class gpsiDataset<E, L> {
+    
+    protected ArrayList<HashMap<L, ArrayList<E>>> folds;
     
     protected HashMap<L, ArrayList<E>> trainingEntities = null;
     protected HashMap<L, ArrayList<E>> validationEntities = null;
@@ -27,24 +28,26 @@ public abstract class gpsiDataset<E, L> {
         return trainingEntities;
     }
 
-    public void setTrainingEntities(HashMap<L, ArrayList<E>> trainingEntities) {
-        this.trainingEntities = trainingEntities;
+    public void setFolds(ArrayList<HashMap<L, ArrayList<E>>> folds) {
+        this.folds = folds;
     }
 
     public HashMap<L, ArrayList<E>> getValidationEntities() {
         return validationEntities;
     }
 
-    public void setValidationEntities(HashMap<L, ArrayList<E>> testEtities) {
-        this.validationEntities = testEtities;
-    }
-
     public HashMap<L, ArrayList<E>> getTestEntities() {
         return testEntities;
     }
-
-    public void setTestEntities(HashMap<L, ArrayList<E>> testEntities) {
-        this.testEntities = testEntities;
+    
+    public int getNumberOfEntities(){
+        int m = 0;
+        for(int i = 0; i < this.folds.size(); i++){
+            for(L label : this.folds.get(i).keySet()){
+                m += this.folds.get(i).get(label).size();
+            }
+        }
+        return m;
     }
     
     public int getNumberOfTrainingEntities(){
@@ -72,26 +75,34 @@ public abstract class gpsiDataset<E, L> {
         return nBands;
     }
 
+    public int getnFolds(){
+        return folds.size();
+    }
+    
     public void setnBands(int nBands) {
         this.nBands = nBands;
     }
     
-    public void separateValidationSet(float validationRatio, long seed){
+    public void assignFolds(int[] trainingFolds, int[] validationFolds, int[] testFolds){
         
-        if(this.validationEntities != null)
-            return;
-        
-        Random randGen = new Random(seed);
+        this.trainingEntities = new HashMap<>();
         this.validationEntities = new HashMap<>();
-        int i, n, randomIndex;
+        this.testEntities = new HashMap<>();
         
-        for(L label : this.trainingEntities.keySet()){
-            n = (int) (this.trainingEntities.get(label).size() * validationRatio);
+        for(L label : this.folds.get(0).keySet()){
+            
+            this.trainingEntities.put(label, new ArrayList<>());
+            for(int index : trainingFolds)
+                this.trainingEntities.get(label).addAll(this.folds.get(index).get(label));
+            
             this.validationEntities.put(label, new ArrayList<>());
-            for(i = 0; i < n; i++){
-                randomIndex = randGen.nextInt(this.trainingEntities.get(label).size());
-                this.validationEntities.get(label).add(this.trainingEntities.get(label).remove(randomIndex));
-            }
+            for(int index : validationFolds)
+                this.validationEntities.get(label).addAll(this.folds.get(index).get(label));
+            
+            this.testEntities.put(label, new ArrayList<>());
+            for(int index : testFolds)
+                this.testEntities.get(label).addAll(this.folds.get(index).get(label));
+            
         }
         
     }

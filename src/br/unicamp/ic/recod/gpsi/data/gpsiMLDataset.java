@@ -27,6 +27,7 @@ public class gpsiMLDataset extends gpsiDataset<gpsiFeatureVector, Integer>{
         
     }
     
+    // TODO: Modify to consider folds
     public void loadDataset(gpsiRoiRawDataset rawDataset){
         
         this.encoder.loadLabels(rawDataset.getValidationEntities().keySet());

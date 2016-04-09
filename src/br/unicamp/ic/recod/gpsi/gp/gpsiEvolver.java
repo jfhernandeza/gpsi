@@ -7,6 +7,7 @@ package br.unicamp.ic.recod.gpsi.gp;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
+import java.io.FileNotFoundException;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -21,16 +22,9 @@ public abstract class gpsiEvolver<I> {
     
     protected gpsiDatasetReader datasetReader;
     protected gpsiRawDataset dataset;
-    protected I best = null;
     
-    @Option(name = "-imPath", usage = "Path for the hyperspectral image")
-    protected String imgPath;
-    
-    @Option(name = "-trMasksPath", usage = "Path for the trainning masks")
-    protected String trainingMasksPath;
-    
-    @Option(name = "-tsMasksPath", usage = "Path for the test masks")
-    protected String testMasksPath;
+    @Option(name = "-path", usage = "Path to the scene")
+    protected String path;
     
     @Option(name = "-popSize", usage = "Population size")
     protected int popSize = 10;
@@ -53,14 +47,19 @@ public abstract class gpsiEvolver<I> {
         CmdLineParser parser = new CmdLineParser(this);
         parser.parseArgument(args);
         
-        this.dataset = this.datasetReader.readDataset(this.imgPath, this.trainingMasksPath, this.testMasksPath, this.classLabels);
+        this.dataset = this.datasetReader.readDataset(this.path, this.classLabels);
         
         System.out.println("Loaded dataset hyperspectral image with " + this.dataset.getnBands() + " bands.");
-        System.out.println("Loaded " + this.dataset.getNumberOfTrainingEntities() + " examples for training.");
-        System.out.println("Loaded " + this.dataset.getNumberOfTestEntities() + " examples for testing.");
+        System.out.println("Loaded " + this.dataset.getNumberOfEntities() + " examples.");
         
+    }
+
+    public gpsiRawDataset getDataset() {
+        return dataset;
     }
     
     public abstract void evolve() throws Exception;
+    
+    public abstract void printResults() throws FileNotFoundException;
     
 }

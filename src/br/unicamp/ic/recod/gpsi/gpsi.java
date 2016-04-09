@@ -19,7 +19,18 @@ public class gpsi {
         
         //gpsiJGapVoxelClassifierEvolver evolver = new gpsiJGapVoxelClassifierEvolver(new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
         gpsiJGAPVoxelClassifierEvolver evolver = new gpsiJGAPVoxelClassifierEvolver(args, new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
-        evolver.evolve();
+        int startingFold = 0, nFolds = evolver.getDataset().getnFolds(), i;
+        
+        for(i = 0; i < 5; i++){
+            
+            System.out.println("\nRun " + (i + 1) + "\n");
+            evolver.getDataset().assignFolds(new int[]{i, (i + 1) % nFolds, (i + 2) % nFolds}, new int[]{(i + 3) % nFolds}, new int[]{(i + 4) % nFolds});
+            evolver.evolve();
+            
+            /* GUARDAR PROGRAMAS!!!*/
+            
+        }
+        evolver.printResults();
         System.exit(0);
         
         // TODO: Generalize measures to support high dimensionalities

@@ -12,6 +12,7 @@ import org.jgap.gp.terminal.Variable;
 /**
  *
  * @author juan
+ * @param <D>
  */
 public abstract class gpsiJGAPFitnessFunction <D extends gpsiRawDataset> extends GPFitnessFunction {
     

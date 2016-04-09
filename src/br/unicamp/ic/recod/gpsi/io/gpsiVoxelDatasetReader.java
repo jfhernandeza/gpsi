@@ -22,58 +22,35 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
     }
 
     @Override
-    public gpsiVoxelRawDataset readDataset(String HyperspectralImagePath, String trainingMasksPath, String testMasksPath, String[] classLabels) throws Exception {
+    public gpsiVoxelRawDataset readDataset(String path, String[] classLabels) throws Exception {
         
         gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
         
-        double[][][] hyperspectralImage = this.fileReader.read3dStructure(HyperspectralImagePath);
+        double[][][] hyperspectralImage = this.fileReader.read3dStructure(path + "img.mat");
         rawDataset.setnBands(hyperspectralImage[0][0].length);
         
-        File dir = new File(trainingMasksPath);
-        String[] classes = dir.list((File current, String name) -> new File(current, name).isFile());
+        File dir = new File(path);
+        String[] foldsFolders = dir.list((File current, String name) -> new File(current, name).isDirectory());
         
-        if(classes.length <= 0)
-            throw new Exception("Directory has not the suggested structure.");
+        ArrayList<HashMap<String, ArrayList<gpsiVoxel>>> folds = new ArrayList<>();
         
-        HashMap<String, ArrayList<gpsiVoxel>> trainingEntities = new HashMap<>();
-        HashMap<String, ArrayList<gpsiVoxel>> testEntities = new HashMap<>();
-        
-        for(int i = 0; i < classLabels.length; i++){
-            
-            double[][] mask = super.fileReader.read2dStructure(trainingMasksPath + classLabels[i] + ".mat");
-            
-            trainingEntities.put(classLabels[i], new ArrayList<>());
-            
-            for(int x = 0; x < mask[0].length; x++)
-                for(int y = 0; y < mask.length; y++)
-                    if(mask[y][x] == 1.0)
-                        trainingEntities.get(classLabels[i]).add(new gpsiVoxel(hyperspectralImage[y][x]));
-            
+        double[][] mask;
+        String files[];
+        HashMap<String, ArrayList<gpsiVoxel>> fold;
+        for(String foldFolder : foldsFolders){
+            fold = new HashMap<>();
+            for(String label : classLabels){
+                mask = super.fileReader.read2dStructure(path + foldFolder + "/" + label + ".mat");
+                fold.put(label, new ArrayList<>());
+                for(int x = 0; x < mask[0].length; x++)
+                    for(int y = 0; y < mask.length; y++)
+                        if(mask[y][x] == 1.0)
+                            fold.get(label).add(new gpsiVoxel(hyperspectralImage[y][x]));
+            }
+            folds.add(fold);
         }
         
-        rawDataset.setTrainingEntities(trainingEntities);
-        
-        
-        dir = new File(testMasksPath);
-        classes = dir.list((File current, String name) -> new File(current, name).isFile());
-        
-        if(classes.length <= 0)
-            throw new Exception("Directory has not the suggested structure.");
-        
-        for(int i = 0; i < classLabels.length; i++){
-            
-            double[][] mask = super.fileReader.read2dStructure(testMasksPath + classLabels[i] + ".mat");
-            
-            testEntities.put(classLabels[i], new ArrayList<>());
-            
-            for(int x = 0; x < mask[0].length; x++)
-                for(int y = 0; y < mask.length; y++)
-                    if(mask[y][x] == 1.0)
-                        testEntities.get(classLabels[i]).add(new gpsiVoxel(hyperspectralImage[y][x]));
-            
-        }
-        
-        rawDataset.setTestEntities(testEntities);
+        rawDataset.setFolds(folds);
         
         return rawDataset;
         
