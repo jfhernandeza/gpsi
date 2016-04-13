@@ -60,7 +60,6 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
 
         gpsiSampler sampler;
         sampler = (this.bootstrap > 0.0) ? new gpsiBootstrapper(this.bootstrap) : new gpsiWholeSampler();
-        
         fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) dataset, super.classLabels, new gpsiClusterSilhouetteScore(), sampler);
         config.setFitnessFunction(fitness);
         
@@ -94,8 +93,9 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         for (int generation = 0; generation < super.numGenerations; generation++) {
             
             gp.evolve(1);
-            gp.getGPPopulation().sortByFitness();
-
+            try{
+                gp.getGPPopulation().sortByFitness();
+            }catch(IllegalArgumentException e){}
             for (i = 0; i < super.validation; i++) {
 
                 current = gp.getGPPopulation().getGPPrograms()[i];

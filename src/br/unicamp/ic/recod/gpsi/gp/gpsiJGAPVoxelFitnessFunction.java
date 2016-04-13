@@ -6,7 +6,6 @@
 package br.unicamp.ic.recod.gpsi.gp;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
-import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxelBandCombinator;
@@ -41,7 +40,7 @@ public class gpsiJGAPVoxelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVo
         
         for(String classLabel : this.classLabels)
             samples.add(this.sampler.sample(super.dataset.getTrainingEntities(), classLabel));
-                
+        
         return this.score.score(samples) + 1.0;
         
     }

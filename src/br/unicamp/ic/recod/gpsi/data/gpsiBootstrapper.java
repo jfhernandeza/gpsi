@@ -30,7 +30,6 @@ public class gpsiBootstrapper implements gpsiSampler{
         
         double[] vector = new double[n];
         Random rand = new Random();
-        
         for(int i = 0; i < n; i++)
             vector[i] = samplingEntities.get(rand.nextInt(samplingEntities.size())).getCombinedValue();
         

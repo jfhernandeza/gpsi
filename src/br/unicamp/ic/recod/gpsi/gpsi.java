@@ -8,6 +8,8 @@ package br.unicamp.ic.recod.gpsi;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPVoxelClassifierEvolver;
 import br.unicamp.ic.recod.gpsi.io.gpsiMatlabFileReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiVoxelDatasetReader;
+import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
+import java.util.ArrayList;
 
 /**
  *

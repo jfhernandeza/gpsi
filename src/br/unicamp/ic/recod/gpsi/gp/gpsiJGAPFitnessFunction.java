@@ -6,7 +6,6 @@
 package br.unicamp.ic.recod.gpsi.gp;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
-import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import org.jgap.gp.GPFitnessFunction;
 import org.jgap.gp.terminal.Variable;
 
