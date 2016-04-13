@@ -7,6 +7,7 @@ package br.unicamp.ic.recod.gpsi.gp;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
+import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
 import br.unicamp.ic.recod.gpsi.features.gpsiFeatureVector;
 import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;

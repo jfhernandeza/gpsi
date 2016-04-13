@@ -6,6 +6,7 @@
 package br.unicamp.ic.recod.gpsi.gp;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
+import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import org.jgap.gp.GPFitnessFunction;
 import org.jgap.gp.terminal.Variable;
 
@@ -17,6 +18,7 @@ import org.jgap.gp.terminal.Variable;
 public abstract class gpsiJGAPFitnessFunction <D extends gpsiRawDataset> extends GPFitnessFunction {
     
     protected final D dataset;
+    
     protected Variable b[];
 
     public gpsiJGAPFitnessFunction(D dataset) {
@@ -30,5 +32,5 @@ public abstract class gpsiJGAPFitnessFunction <D extends gpsiRawDataset> extends
     public void setB(Variable[] b) {
         this.b = b;
     }
-    
+
 }

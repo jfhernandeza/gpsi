@@ -38,6 +38,9 @@ public abstract class gpsiEvolver<I> {
     @Option(name = "-val", usage = "Number of individuals used for validation")
     protected int validation = 0;
     
+    @Option(name = "-bootstrap", usage = "Number of boostrapped samples during evolution")
+    protected double bootstrap = 0;
+    
     @Argument
     protected String[] classLabels;
 

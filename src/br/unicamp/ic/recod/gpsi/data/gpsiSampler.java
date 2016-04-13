@@ -13,31 +13,8 @@ import java.util.HashMap;
  *
  * @author juan
  */
-public class gpsiSampler {
+public interface gpsiSampler {
     
-    private gpsiSampler() {
-    }
-    
-    public static gpsiSampler getInstance() {
-        return gpsiSamplerHolder.INSTANCE;
-    }
-    
-    private static class gpsiSamplerHolder {
-        private static final gpsiSampler INSTANCE = new gpsiSampler();
-    }
-    
-    public double[] sample(HashMap<String, ArrayList<gpsiVoxel>> entities, String className){
-                
-        ArrayList<gpsiVoxel> samplingEntities = entities.get(className);
-        
-        double[] vector = new double[samplingEntities.size()];
-        
-        int i = 0;
-        for(gpsiVoxel voxel : samplingEntities)
-            vector[i++] = voxel.getCombinedValue();
-        
-        return vector;
-        
-    }
+    public double[] sample(HashMap<String, ArrayList<gpsiVoxel>> entities, String label);
     
 }

@@ -5,7 +5,9 @@
  */
 package br.unicamp.ic.recod.gpsi.gp;
 
+import br.unicamp.ic.recod.gpsi.data.gpsiBootstrapper;
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
+import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxelBandCombinator;
@@ -17,7 +19,6 @@ import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
@@ -57,7 +58,10 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         config.setMaxInitDepth(super.maxInitDepth);
         config.setPopulationSize(super.popSize);
 
-        fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) dataset, super.classLabels, new gpsiClusterSilhouetteScore());
+        gpsiSampler sampler;
+        sampler = (this.bootstrap > 0.0) ? new gpsiBootstrapper(this.bootstrap) : new gpsiWholeSampler();
+        
+        fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) dataset, super.classLabels, new gpsiClusterSilhouetteScore(), sampler);
         config.setFitnessFunction(fitness);
         
         curves = new ArrayList<>();
@@ -101,7 +105,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
 
                 samples = new ArrayList<>();
                 for (String classLabel : super.classLabels)
-                    samples.add(gpsiSampler.getInstance().sample(dataset.getValidationEntities(), classLabel));
+                    samples.add(this.fitness.getSampler().sample(dataset.getValidationEntities(), classLabel));
 
                 validationScore = fitness.getScore().score(samples);
                 trainScore = current.getFitnessValue() - 1.0;
@@ -141,16 +145,18 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
             confusionMatrix = new int[this.classLabels.length][this.classLabels.length];
             means = new double[this.classLabels.length];
 
+            gpsiSampler sampler = new gpsiWholeSampler();
+            
             samples = new ArrayList<>();
             for (String classLabel : super.classLabels)
-                samples.add(gpsiSampler.getInstance().sample(dataset.getTrainingEntities(), classLabel));
+                samples.add(sampler.sample(dataset.getTrainingEntities(), classLabel));
 
             for (i = 0; i < samples.size(); i++)
                 means[i] = mean.evaluate(samples.get(i));
 
             samples = new ArrayList<>();
             for (String classLabel : super.classLabels)
-                samples.add(gpsiSampler.getInstance().sample(dataset.getTestEntities(), classLabel));
+                samples.add(sampler.sample(dataset.getTestEntities(), classLabel));
 
             double value;
             accuracy[l] = 0.0;

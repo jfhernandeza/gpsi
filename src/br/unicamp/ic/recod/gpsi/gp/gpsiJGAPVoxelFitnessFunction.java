@@ -6,6 +6,7 @@
 package br.unicamp.ic.recod.gpsi.gp;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
+import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxelBandCombinator;
@@ -20,10 +21,12 @@ import org.jgap.gp.IGPProgram;
 public class gpsiJGAPVoxelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVoxelRawDataset> {
 
     private final String[] classLabels;
+    protected final gpsiSampler sampler;
     private final gpsiSampleSeparationScore score;
 
-    public gpsiJGAPVoxelFitnessFunction(gpsiVoxelRawDataset dataset, String[] classLabels, gpsiSampleSeparationScore score) {
+    public gpsiJGAPVoxelFitnessFunction(gpsiVoxelRawDataset dataset, String[] classLabels, gpsiSampleSeparationScore score, gpsiSampler sampler) {
         super(dataset);
+        this.sampler = sampler;
         this.classLabels = classLabels;
         this.score = score;
     }
@@ -37,7 +40,7 @@ public class gpsiJGAPVoxelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVo
         ArrayList<double[]> samples = new ArrayList<>();
         
         for(String classLabel : this.classLabels)
-            samples.add(gpsiSampler.getInstance().sample(super.dataset.getTrainingEntities(), classLabel));
+            samples.add(this.sampler.sample(super.dataset.getTrainingEntities(), classLabel));
                 
         return this.score.score(samples) + 1.0;
         
@@ -50,5 +53,8 @@ public class gpsiJGAPVoxelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVo
     public gpsiSampleSeparationScore getScore() {
         return score;
     }
-    
+
+    public gpsiSampler getSampler() {
+        return sampler;
+    }
 }
