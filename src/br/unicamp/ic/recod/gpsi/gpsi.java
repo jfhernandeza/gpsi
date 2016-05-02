@@ -8,8 +8,6 @@ package br.unicamp.ic.recod.gpsi;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPVoxelClassifierEvolver;
 import br.unicamp.ic.recod.gpsi.io.gpsiMatlabFileReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiVoxelDatasetReader;
-import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
-import java.util.ArrayList;
 
 /**
  *
@@ -21,7 +19,7 @@ public class gpsi {
         
         //gpsiJGapVoxelClassifierEvolver evolver = new gpsiJGapVoxelClassifierEvolver(new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
         gpsiJGAPVoxelClassifierEvolver evolver = new gpsiJGAPVoxelClassifierEvolver(args, new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
-        int startingFold = 0, nFolds = evolver.getDataset().getnFolds(), i;
+        int nFolds = evolver.getDataset().getnFolds(), i;
         
         for(i = 0; i < 5; i++){
             

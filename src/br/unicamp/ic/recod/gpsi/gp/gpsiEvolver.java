@@ -41,6 +41,9 @@ public abstract class gpsiEvolver<I> {
     @Option(name = "-bootstrap", usage = "Number of boostrapped samples during evolution")
     protected double bootstrap = 0;
     
+    @Option(name = "-dumpGens", usage = "Whether to save the distribution of samples through generations")
+    protected boolean dumpGens;
+    
     @Argument
     protected String[] classLabels;
 
