@@ -21,15 +21,15 @@ public class gpsi {
         gpsiJGAPVoxelClassifierEvolver evolver = new gpsiJGAPVoxelClassifierEvolver(args, new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
         int nFolds = evolver.getDataset().getnFolds(), i;
         
+        boolean dumpGens = evolver.isDumpGens();
+        
         for(i = 0; i < 5; i++){
-            
             System.out.println("\nRun " + (i + 1) + "\n");
             evolver.getDataset().assignFolds(new int[]{i, (i + 1) % nFolds, (i + 2) % nFolds}, new int[]{(i + 3) % nFolds}, new int[]{(i + 4) % nFolds});
             evolver.evolve();
-            
-            /* GUARDAR PROGRAMAS!!!*/
-            
+            evolver.setDumpGens(false);
         }
+        evolver.setDumpGens(dumpGens);
         evolver.printResults();
         System.exit(0);
         

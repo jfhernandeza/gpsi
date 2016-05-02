@@ -63,6 +63,14 @@ public abstract class gpsiEvolver<I> {
     public gpsiRawDataset getDataset() {
         return dataset;
     }
+
+    public void setDumpGens(boolean dumpGens) {
+        this.dumpGens = dumpGens;
+    }
+
+    public boolean isDumpGens() {
+        return dumpGens;
+    }
     
     public abstract void evolve() throws Exception;
     

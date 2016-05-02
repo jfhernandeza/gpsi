@@ -9,6 +9,7 @@ import br.unicamp.ic.recod.gpsi.data.gpsiBootstrapper;
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
+import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedDivision;
 import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxelBandCombinator;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
@@ -28,7 +29,6 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
 import org.jgap.gp.IGPProgram;
 import org.jgap.gp.function.Add;
-import org.jgap.gp.function.Divide;
 import org.jgap.gp.function.Multiply;
 import org.jgap.gp.function.Subtract;
 import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
@@ -211,31 +211,30 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         accuracies.put(accuracyMedian);
         System.out.println("Total accuracy for mean: " + accuracyMean[0] + "\t" + accuracyMean[1]);
         System.out.println("Total accuracy for median: " + accuracyMedian[0] + "\t" + accuracyMedian[1]);
-
-        this.dumpGens = false;
         
     }
 
     private GPGenotype create(GPConfiguration conf, int n_bands, gpsiJGAPFitnessFunction fitness) throws InvalidConfigurationException {
 
-        Class[] types = {CommandGene.FloatClass};
+        Class[] types = {CommandGene.DoubleClass};
         Class[][] argTypes = {{}};
 
         CommandGene[] variables = new CommandGene[n_bands];
         Variable[] b = new Variable[n_bands];
         CommandGene[] functions = {
-            new Add(conf, CommandGene.FloatClass),
-            new Subtract(conf, CommandGene.FloatClass),
-            new Multiply(conf, CommandGene.FloatClass),
-            new Divide(conf, CommandGene.FloatClass),
-            // new Sine(conf, CommandGene.FloatClass),
-            // new Cosine(conf, CommandGene.FloatClass),
-            //  new Exp(conf, CommandGene.FloatClass),
-            new Terminal(conf, CommandGene.FloatClass, 1.0d, 1000000.0d, false)
+            new Add(conf, CommandGene.DoubleClass),
+            new Subtract(conf, CommandGene.DoubleClass),
+            new Multiply(conf, CommandGene.DoubleClass),
+            new gpsiJGAPProtectedDivision(conf, CommandGene.DoubleClass),
+            //new Divide(conf, CommandGene.DoubleClass),
+            // new Sine(conf, CommandGene.DoubleClass),
+            // new Cosine(conf, CommandGene.DoubleClass),
+            //  new Exp(conf, CommandGene.DoubleClass),
+            new Terminal(conf, CommandGene.DoubleClass, 1.0d, 1000000.0d, false)
         };
 
         for (int i = 0; i < n_bands; i++) {
-            b[i] = Variable.create(conf, "b" + i, CommandGene.FloatClass);
+            b[i] = Variable.create(conf, "b" + i, CommandGene.DoubleClass);
             variables[i] = b[i];
         }
 
@@ -251,8 +250,6 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
     public void printResults() throws FileNotFoundException {
 
         String outRoot = "results/" + (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(Calendar.getInstance().getTime()) + "/";
-
-        
         
         (new File(outRoot)).mkdir();
         (new File(outRoot + "programs/")).mkdir();
@@ -260,9 +257,11 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         (new File(outRoot + "confusion_matrices/mean/")).mkdir();
         (new File(outRoot + "confusion_matrices/median/")).mkdir();
         
-        (new File(outRoot + "gens/")).mkdir();
-        for(String label : this.classLabels)
-            (new File(outRoot + "gens/" + label + "/")).mkdir();
+        if(this.dumpGens){
+            (new File(outRoot + "gens/")).mkdir();
+            for(String label : this.classLabels)
+                (new File(outRoot + "gens/" + label + "/")).mkdir();
+        }
 
         PrintWriter outR = new PrintWriter(outRoot + "report.out");
         
@@ -289,7 +288,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         
         k = 1;
         double[][] dist;
-        while(!this.distributions.isEmpty()){
+        while(this.dumpGens && !this.distributions.isEmpty()){
             dist = this.distributions.poll();
             for(i = 0; i < this.classLabels.length; i++){
                 outR = new PrintWriter(outRoot + "gens/" + this.classLabels[i] + "/" + k + ".csv");
