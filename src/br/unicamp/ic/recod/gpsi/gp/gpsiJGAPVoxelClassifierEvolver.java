@@ -29,7 +29,10 @@ import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
 import org.jgap.gp.IGPProgram;
 import org.jgap.gp.function.Add;
+import org.jgap.gp.function.Cosine;
+import org.jgap.gp.function.Exp;
 import org.jgap.gp.function.Multiply;
+import org.jgap.gp.function.Sine;
 import org.jgap.gp.function.Subtract;
 import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
 import org.jgap.gp.impl.GPConfiguration;
@@ -176,7 +179,6 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
                 samples.add(sampler.sample(dataset.getTestEntities(), classLabel));
 
             double value;
-            accuracyMean[l] = 0.0;
             int minMeanDistanceIndex, minMedianDistanceIndex, m = 0;
             for (i = 0; i < samples.size(); i++) {
                 for (j = 0; j < samples.get(i).length; j++) {
@@ -194,7 +196,8 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
                     confusionMatrixMedian[i][minMedianDistanceIndex]++;
                 }
             }
-
+            accuracyMean[l] = 0.0;
+            accuracyMedian[l] = 0.0;
             for(i = 0; i < samples.size(); i++){
                 accuracyMean[l] += confusionMatrixMean[i][i];
                 accuracyMedian[l] += confusionMatrixMedian[i][i];
@@ -227,9 +230,9 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
             new Multiply(conf, CommandGene.DoubleClass),
             new gpsiJGAPProtectedDivision(conf, CommandGene.DoubleClass),
             //new Divide(conf, CommandGene.DoubleClass),
-            // new Sine(conf, CommandGene.DoubleClass),
-            // new Cosine(conf, CommandGene.DoubleClass),
-            //  new Exp(conf, CommandGene.DoubleClass),
+            new Sine(conf, CommandGene.DoubleClass),
+            new Cosine(conf, CommandGene.DoubleClass),
+            new Exp(conf, CommandGene.DoubleClass),
             new Terminal(conf, CommandGene.DoubleClass, 1.0d, 1000000.0d, false)
         };
 
