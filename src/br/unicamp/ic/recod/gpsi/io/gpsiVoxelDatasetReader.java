@@ -8,7 +8,6 @@ package br.unicamp.ic.recod.gpsi.io;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         if((new File(path + "img.mat")).exists())
             return readOneSceneDataset(path, classLabels);
         
-        return readMultipleScenesDataset(path, classLabels);
+        return readMultipleScenesDataset_(path, classLabels);
         
     }
     
@@ -100,6 +99,42 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         rawDataset.setFolds(folds);
         rawDataset.setnBands(folds.get(0).get(classLabels[0]).get(0).getHyperspectralData().length);
         
+        
+        return rawDataset;
+    }
+    
+    private gpsiVoxelRawDataset readMultipleScenesDataset_(String path, String[] classLabels) throws IOException{
+        
+        //TODO: QUIT!
+        
+        gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
+        
+        double[][][] hyperspectralImage;
+        
+        File dir = new File(path);
+        String[] scenesFiles;
+        
+        ArrayList<HashMap<String, ArrayList<gpsiVoxel>>> folds = new ArrayList<>();
+        
+        HashMap<String, ArrayList<gpsiVoxel>> fold;
+        fold = new HashMap<>();
+        for(String label : classLabels){
+            dir = new File(path + label);
+            scenesFiles = dir.list((File dir1, String name) -> name.toLowerCase().endsWith(".mat"));
+            fold.put(label, new ArrayList<>());
+            
+            for(String scene : scenesFiles){
+                hyperspectralImage = super.fileReader.read3dStructure(path + label + "/" + scene);
+                for(int x = 0; x < hyperspectralImage[0].length; x++)
+                    for(int y = 0; y < hyperspectralImage.length; y++)
+                        fold.get(label).add(new gpsiVoxel(hyperspectralImage[y][x]));
+            }
+
+        }
+        folds.add(fold);
+        
+        rawDataset.setFolds(folds);
+        rawDataset.setnBands(folds.get(0).get(classLabels[0]).get(0).getHyperspectralData().length);
         
         return rawDataset;
     }

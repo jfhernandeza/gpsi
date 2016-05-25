@@ -44,6 +44,9 @@ public abstract class gpsiEvolver<I> {
     @Option(name = "-dumpGens", usage = "Whether to save the distribution of samples through generations")
     protected boolean dumpGens;
     
+    @Option(name = "-out", usage = "Path where the results must be saved")
+    protected String outputPath = "";
+    
     @Argument
     protected String[] classLabels;
 

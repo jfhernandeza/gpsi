@@ -91,17 +91,23 @@ public abstract class gpsiDataset<E, L> {
         
         for(L label : this.folds.get(0).keySet()){
             
-            this.trainingEntities.put(label, new ArrayList<>());
-            for(int index : trainingFolds)
-                this.trainingEntities.get(label).addAll(this.folds.get(index).get(label));
+            if(trainingFolds != null){
+                this.trainingEntities.put(label, new ArrayList<>());
+                for(int index : trainingFolds)
+                    this.trainingEntities.get(label).addAll(this.folds.get(index).get(label));
+            }
             
-            this.validationEntities.put(label, new ArrayList<>());
-            for(int index : validationFolds)
-                this.validationEntities.get(label).addAll(this.folds.get(index).get(label));
+            if(validationFolds != null){
+                this.validationEntities.put(label, new ArrayList<>());
+                for(int index : validationFolds)
+                    this.validationEntities.get(label).addAll(this.folds.get(index).get(label));
+            }
             
-            this.testEntities.put(label, new ArrayList<>());
-            for(int index : testFolds)
-                this.testEntities.get(label).addAll(this.folds.get(index).get(label));
+            if(testFolds != null){
+                this.testEntities.put(label, new ArrayList<>());
+                for(int index : testFolds)
+                    this.testEntities.get(label).addAll(this.folds.get(index).get(label));
+            }
             
         }
         

@@ -56,7 +56,7 @@ public class gpsiClusterSilhouetteScore implements gpsiSampleSeparationScore{
                 if(clusterAssignment[i] != j)
                     b = Math.min(b, dissimilarity[j] / samples.get(j).length);
             
-            score += (b - a) / Math.max(a, b);
+            score += Math.max(a, b) == 0.0 ? -1.0 : (b - a) / Math.max(a, b);
             
         }
         

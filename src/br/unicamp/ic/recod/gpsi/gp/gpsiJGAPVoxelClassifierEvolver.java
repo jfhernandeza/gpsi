@@ -279,6 +279,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         outR.println("\nML configuration\n");
 
         outR.println("Number of individuals used for validation\t" + super.validation);
+        outR.println("Bootstrapping\t" + super.bootstrap);
         outR.print("Classes considered:\t");
         for (String label : this.classLabels) {
             outR.print(label + " ");
