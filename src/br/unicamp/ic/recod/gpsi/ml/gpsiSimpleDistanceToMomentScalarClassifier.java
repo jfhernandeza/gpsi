@@ -6,7 +6,9 @@
 package br.unicamp.ic.recod.gpsi.ml;
 
 import java.util.HashMap;
-import org.apache.commons.math3.stat.descriptive.AbstractStorelessUnivariateStatistic;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;
 
 /**
  *
@@ -14,43 +16,65 @@ import org.apache.commons.math3.stat.descriptive.AbstractStorelessUnivariateStat
  */
 public class gpsiSimpleDistanceToMomentScalarClassifier {
     
-    // TODO: Use only integer numbers to identify classes and generalize classifiers
-    
-    private final AbstractStorelessUnivariateStatistic moment;
-    private double[] centroids;
+    private final AbstractUnivariateStatistic moment;
+    private double[][] centroids;
+    private int dimensionality, nClasses;
 
-    public gpsiSimpleDistanceToMomentScalarClassifier(AbstractStorelessUnivariateStatistic moment) {
+    public gpsiSimpleDistanceToMomentScalarClassifier(AbstractUnivariateStatistic moment) {
         this.moment = moment;
     }
 
-    public void fit(HashMap<String, double[]> X, String[] classLabels) {
+    public void fit(HashMap<Byte, double[][]> x) {
         
-        this.centroids = new double[classLabels.length];
-        for(int i = 0; i < classLabels.length; i++)
-            centroids[i] = this.moment.evaluate(X.get(classLabels[i]));
+        int i;
+        RealMatrix entities;
+        
+        this.nClasses = x.keySet().size();
+        for(byte label : x.keySet()){
+
+            entities = MatrixUtils.createRealMatrix(x.get(label));
+            if(dimensionality <= 0){
+                this.dimensionality = entities.getColumnDimension();
+                this.centroids = new double[this.nClasses][this.dimensionality];
+            }
+            
+            for(i = 0; i < this.dimensionality; i++)
+                this.centroids[label][i] = this.moment.evaluate(entities.getColumn(i));
+               
+        }
         
     }
 
-    public String[] predict(double[] X, String[] classLabels) {
+    public int[][] predictAndCompare(HashMap<Byte, double[][]> x) {
         
         if(this.centroids == null)
             return null;
         
-        String[] labels = new String[X.length];
+        int confusionMatrix[][] = new int [this.nClasses][this.nClasses];
+        int minDistanceIndex, i, j, k;
+        double minDistance, distance;
         
-        int minDistanceIndex, i ,j;
-        for(i = 0; i < X.length; i++){
-            minDistanceIndex = 0;
-            for(j = 1; j < classLabels.length; j++){
-                if(Math.abs(X[i] - this.centroids[j]) < Math.abs(X[i] - this.centroids[minDistanceIndex]))
-                    minDistanceIndex = j;
+        double[][] entities;
+        for(byte label : x.keySet()){
+            entities = x.get(label);
+            for(i = 0; i < entities.length; i++){
+                minDistanceIndex = 0;
+                minDistance = Double.POSITIVE_INFINITY;
+                for(j = 0; j < this.nClasses; j++){
+                    distance = 0.0;
+                    for(k = 0; k < this.dimensionality; k++)
+                        distance += Math.abs(entities[i][k] - this.centroids[j][k]);
+                    if(distance < minDistance){
+                        minDistanceIndex = j;
+                        minDistance = distance;
+                    }
+                }
+                confusionMatrix[label][minDistanceIndex]++;
             }
-            labels[i] = classLabels[minDistanceIndex];
         }
         
-        return labels;
+        return confusionMatrix;
+        
     }
-    
-    
     
 }

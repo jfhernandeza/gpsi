@@ -14,12 +14,14 @@ import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxelBandCombinator;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
+import br.unicamp.ic.recod.gpsi.ml.gpsiSimpleDistanceToMomentScalarClassifier;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
@@ -214,6 +216,53 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         accuracies.put(accuracyMedian);
         System.out.println("Total accuracy for mean: " + accuracyMean[0] + "\t" + accuracyMean[1]);
         System.out.println("Total accuracy for median: " + accuracyMedian[0] + "\t" + accuracyMedian[1]);
+        
+        
+        
+        
+        
+        
+        
+        gpsiSimpleDistanceToMomentScalarClassifier classifierMean = new gpsiSimpleDistanceToMomentScalarClassifier(mean);
+        gpsiSimpleDistanceToMomentScalarClassifier classifierMedian = new gpsiSimpleDistanceToMomentScalarClassifier(median);
+        
+        double[][] points;
+        gpsiSampler sampler = new gpsiWholeSampler();
+        
+        HashMap<Byte, double[][]> trainSample = new HashMap<>();
+        HashMap<Byte, double[][]> testSample = new HashMap<>();
+        
+        samples = new ArrayList<>();
+        for(String className : super.classLabels)
+            samples.add(sampler.sample(dataset.getTrainingEntities(), className));
+        byte kk = 0;
+        for(double[] s : samples){
+            points = new double[s.length][1];
+            for(i = 0; i < s.length; i++)
+                points[i][0] = s[i];
+            trainSample.put(kk, points);
+            kk++;
+        }
+        
+        samples = new ArrayList<>();
+        for(String className : super.classLabels)
+            samples.add(sampler.sample(dataset.getTestEntities(), className));
+        kk = 0;
+        for(double[] s : samples){
+            points = new double[s.length][1];
+            for(i = 0; i < s.length; i++)
+                points[i][0] = s[i];
+            testSample.put(kk, points);
+            kk++;
+        }
+        
+        classifierMean.fit(trainSample);
+        int[][] cm_mean = classifierMean.predictAndCompare(testSample);
+        
+        classifierMedian.fit(trainSample);
+        int[][] cm_median = classifierMedian.predictAndCompare(testSample);
+        
+        System.out.println("Hey!");
         
     }
 

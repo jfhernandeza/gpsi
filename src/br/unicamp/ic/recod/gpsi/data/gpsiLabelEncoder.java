@@ -6,7 +6,6 @@
 package br.unicamp.ic.recod.gpsi.data;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.TreeMap;
 
 /**
@@ -15,9 +14,9 @@ import java.util.TreeMap;
  */
 public class gpsiLabelEncoder {
     
-    private final TreeMap<Integer, String> decoder;
-    private final TreeMap<String, Integer> encoder;
-    private int lastKey;
+    private final TreeMap<Byte, String> decoder;
+    private final TreeMap<String, Byte> encoder;
+    private Byte lastKey;
 
     public gpsiLabelEncoder() {
         this.decoder = new TreeMap<>();
@@ -29,7 +28,7 @@ public class gpsiLabelEncoder {
         rawLabels.stream().forEach((label) -> { addLabel(label); });
     }
     
-    public int addLabel(String label){
+    public byte addLabel(String label){
         
         if(encoder.containsKey(label))
             return encoder.get(label);
@@ -39,7 +38,7 @@ public class gpsiLabelEncoder {
         
         this.lastKey++;
         
-        return this.lastKey - 1;
+        return (byte) (this.lastKey - 1);
         
     }
     
@@ -47,7 +46,7 @@ public class gpsiLabelEncoder {
         return encoder.get(label);
     }
     
-    public String getLabel(int code){
+    public String getLabel(byte code){
         return decoder.get(code);
     }
 

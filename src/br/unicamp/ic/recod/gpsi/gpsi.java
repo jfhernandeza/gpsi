@@ -18,14 +18,13 @@ public class gpsi {
 
     public static void main(String[] args) throws Exception {
         
-        //gpsiJGapVoxelClassifierEvolver evolver = new gpsiJGapVoxelClassifierEvolver(new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
         
-        gpsiJGAPVoxelSeparatorEvolver evolver = new gpsiJGAPVoxelSeparatorEvolver(args, new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
+        /*gpsiJGAPVoxelSeparatorEvolver evolver = new gpsiJGAPVoxelSeparatorEvolver(args, new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
         evolver.getDataset().assignFolds(new int[]{0}, null, null);
         evolver.evolve();
-        evolver.printResults();
+        evolver.printResults();*/
         
-        /*
+        
         gpsiJGAPVoxelClassifierEvolver evolver = new gpsiJGAPVoxelClassifierEvolver(args, new gpsiVoxelDatasetReader(new gpsiMatlabFileReader()));
         int nFolds = evolver.getDataset().getnFolds(), i;
         
@@ -40,7 +39,7 @@ public class gpsi {
         evolver.setDumpGens(dumpGens);
         evolver.printResults();
         System.exit(0);
-        */
+        
         
         // TODO: Generalize measures to support high dimensionalities
         // TODO: Make the best individual persist
