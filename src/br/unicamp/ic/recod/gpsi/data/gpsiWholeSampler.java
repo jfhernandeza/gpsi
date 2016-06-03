@@ -19,7 +19,7 @@ public class gpsiWholeSampler implements gpsiSampler{
     }
     
     @Override
-    public double[] sample(HashMap<String, ArrayList<gpsiVoxel>> entities, String label) {
+    public double[] sample(HashMap<Byte, ArrayList<gpsiVoxel>> entities, Byte label) {
         
         ArrayList<gpsiVoxel> samplingEntities = entities.get(label);
         double[] vector = new double[samplingEntities.size()];

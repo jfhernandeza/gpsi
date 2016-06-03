@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.img;
+package br.unicamp.ic.recod.gpsi.combine;
 
+import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -19,9 +20,9 @@ public class gpsiVoxelBandCombinator extends gpsiBandCombinator<gpsiVoxel>{
     }
 
     @Override
-    public void combineEntity(HashMap<String, ArrayList<gpsiVoxel>> entities) {
+    public void combineEntity(HashMap<Byte, ArrayList<gpsiVoxel>> entities) {
         
-        for(String label : entities.keySet())
+        for(Byte label : entities.keySet())
             for(gpsiVoxel v : entities.get(label))
                 this.voxelCombinator.combineVoxel(v);
         

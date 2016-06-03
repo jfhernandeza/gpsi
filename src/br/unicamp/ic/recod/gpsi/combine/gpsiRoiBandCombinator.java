@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.img;
+package br.unicamp.ic.recod.gpsi.combine;
 
+import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
+import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -19,10 +21,10 @@ public class gpsiRoiBandCombinator extends gpsiBandCombinator<gpsiRoi>{
     }
 
     @Override
-    public void combineEntity(HashMap<String, ArrayList<gpsiRoi>> entities) {
+    public void combineEntity(HashMap<Byte, ArrayList<gpsiRoi>> entities){
         int i, j;
         gpsiVoxel[][] mask;
-        for(String label : entities.keySet())
+        for(Byte label : entities.keySet())
             for(gpsiRoi roi : entities.get(label)){
                 mask = roi.getRoi();
                 for(i = 0; i< mask.length; i++)

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.img;
+package br.unicamp.ic.recod.gpsi.combine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,6 +21,6 @@ public abstract class gpsiBandCombinator<D> {
         this.voxelCombinator = voxelCombinator;
     }
     
-    public abstract void combineEntity(HashMap<String, ArrayList<D>> entities);
+    public abstract void combineEntity(HashMap<Byte, ArrayList<D>> entities);
     
 }

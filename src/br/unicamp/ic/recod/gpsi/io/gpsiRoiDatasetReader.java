@@ -17,12 +17,14 @@ import java.util.HashMap;
  */
 public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsiRoiRawDataset, gpsiRoi> {
     
+    // TODO: Consider multiple scenes too
+    
     public gpsiRoiDatasetReader(gpsiFileReader fileReader) {
         super(fileReader);
     }
 
     @Override
-    public gpsiRoiRawDataset readDataset(String path, String[] classLabels) throws Exception {
+    public gpsiRoiRawDataset readDataset(String path, Byte[] classLabels) throws Exception {
         
         gpsiRoiRawDataset rawDataset = new gpsiRoiRawDataset();
         

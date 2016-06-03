@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.img;
+package br.unicamp.ic.recod.gpsi.combine;
 
+import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import org.jgap.gp.IGPProgram;
 import org.jgap.gp.terminal.Variable;
 
@@ -22,7 +23,7 @@ public class gpsiJGAPVoxelCombinator extends gpsiVoxelCombinator<Variable[], IGP
     public void combineVoxel(gpsiVoxel voxel) {
         for(int i = 0; i < voxel.getHyperspectralData().length; i++)
             this.b[i].set(voxel.getHyperspectralData()[i]);
-        voxel.setCombinedValue(this.individual.execute_double(0, new Object[0]));
+        voxel.setCombinedValue(this.expression.execute_double(0, new Object[0]));
     }
     
 }

@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.data;
-
-import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
+package br.unicamp.ic.recod.gpsi.applications;
 
 /**
  *
- * @author jfhernandeza
+ * @author juan
+ * @param <I>
  */
-public class gpsiRoiRawDataset extends gpsiRawDataset<gpsiRoi> {
+public abstract class gpsiVoxelClassifierEvolver<I> {
+    
 }

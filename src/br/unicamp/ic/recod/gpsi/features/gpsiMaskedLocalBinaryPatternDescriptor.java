@@ -46,7 +46,7 @@ public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescript
     }
     
     @Override
-    public gpsiFeatureVector getFeatureVector(gpsiRoi roi) {
+    public double[] getFeatureVector(gpsiRoi roi) {
         
         double[] vector = new double[(int) Math.pow(2, this.neighborhood.size())];
         int binaryPattern;
@@ -89,7 +89,7 @@ public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescript
         for(h = 0; h < vector.length; h++)
             vector[h] /= norm;
         
-        return new gpsiFeatureVector(vector);
+        return vector;
     }
     
 }

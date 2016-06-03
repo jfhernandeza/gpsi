@@ -13,6 +13,6 @@ import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
  */
 public interface gpsiDescriptor {
     
-    public abstract gpsiFeatureVector getFeatureVector(gpsiRoi mask);
+    public abstract double[] getFeatureVector(gpsiRoi mask);
     
 }

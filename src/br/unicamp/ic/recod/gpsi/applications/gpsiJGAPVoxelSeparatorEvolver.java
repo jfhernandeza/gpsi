@@ -3,14 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.gp;
+package br.unicamp.ic.recod.gpsi.applications;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
 import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedDivision;
-import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
-import br.unicamp.ic.recod.gpsi.img.gpsiVoxelBandCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelBandCombinator;
+import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
+import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPVoxelFitnessFunction;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
 import java.io.File;
@@ -37,8 +39,8 @@ import org.jgap.gp.terminal.Variable;
  *
  * @author juan
  */
-public class gpsiJGAPVoxelSeparatorEvolver extends gpsiVoxelClassifierEvolver<IGPProgram> {
-
+public class gpsiJGAPVoxelSeparatorEvolver extends gpsiVoxelClassifierEvolver {
+/*
     private final GPConfiguration config;
     private final gpsiJGAPVoxelFitnessFunction fitness;
     
@@ -47,7 +49,6 @@ public class gpsiJGAPVoxelSeparatorEvolver extends gpsiVoxelClassifierEvolver<IG
     private final LinkedBlockingQueue<double[][]> distributions;
     
     public gpsiJGAPVoxelSeparatorEvolver(String[] args, gpsiDatasetReader datasetReader) throws Exception {
-        super(args, datasetReader);
         
         config = new GPConfiguration();
         config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator());
@@ -65,7 +66,6 @@ public class gpsiJGAPVoxelSeparatorEvolver extends gpsiVoxelClassifierEvolver<IG
         
     }
 
-    @Override
     public void evolve() throws Exception {
         gpsiVoxelRawDataset dataset = (gpsiVoxelRawDataset) super.dataset;
 
@@ -132,7 +132,6 @@ public class gpsiJGAPVoxelSeparatorEvolver extends gpsiVoxelClassifierEvolver<IG
         return GPGenotype.randomInitialGenotype(conf, types, argTypes, nodeSets, 100, true);
     }
     
-    @Override
     public void printResults() throws FileNotFoundException {
         
         String outRoot = "results/" + this.outputPath + (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(Calendar.getInstance().getTime()) + "/";
@@ -141,7 +140,7 @@ public class gpsiJGAPVoxelSeparatorEvolver extends gpsiVoxelClassifierEvolver<IG
         
         if(this.dumpGens){
             (new File(outRoot + "gens/")).mkdir();
-            for(String label : this.classLabels)
+            for(Byte label : this.classLabels)
                 (new File(outRoot + "gens/" + label + "/")).mkdir();
         }
 
@@ -160,7 +159,7 @@ public class gpsiJGAPVoxelSeparatorEvolver extends gpsiVoxelClassifierEvolver<IG
         outR.println("Number of individuals used for validation\t" + super.validation);
         outR.println("Bootstrapping\t" + super.bootstrap);
         outR.print("Classes considered:\t");
-        for (String label : this.classLabels) {
+        for (Byte label : this.classLabels) {
             outR.print(label + " ");
         }
         outR.print("\n");
@@ -194,5 +193,5 @@ public class gpsiJGAPVoxelSeparatorEvolver extends gpsiVoxelClassifierEvolver<IG
         outR.close();
         
     }
-    
+    */
 }

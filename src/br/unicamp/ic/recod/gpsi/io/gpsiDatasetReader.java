@@ -25,7 +25,7 @@ public abstract class gpsiDatasetReader <R extends gpsiFileReader, D extends gps
         this.fileReader = fileReader;
     }
     
-    public abstract D readDataset(String path, String[] classLabels ) throws Exception;
+    public abstract D readDataset(String path, Byte[] classLabels ) throws Exception;
 
     public void setFileReader(R fileReader) {
         this.fileReader = fileReader;

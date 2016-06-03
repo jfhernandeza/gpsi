@@ -11,5 +11,5 @@ import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
  *
  * @author juan
  */
-public class gpsiVoxelRawDataset extends gpsiRawDataset<gpsiVoxel, String> {
+public class gpsiVoxelRawDataset extends gpsiRawDataset<gpsiVoxel> {
 }

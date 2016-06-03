@@ -7,11 +7,9 @@ package br.unicamp.ic.recod.gpsi.gp;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
-import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
-import br.unicamp.ic.recod.gpsi.features.gpsiFeatureVector;
-import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
-import br.unicamp.ic.recod.gpsi.img.gpsiRoiBandCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiRoiBandCombinator;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
@@ -53,7 +51,7 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         int dimensionality = mlDataset.getDimensionality();
         int n_classes = mlDataset.getTrainingEntities().keySet().size();
         int n_entities = mlDataset.getNumberOfTrainingEntities();
-        ArrayList<Integer> listOfClasses = new ArrayList<>(mlDataset.getTrainingEntities().keySet());
+        ArrayList<Byte> listOfClasses = new ArrayList<>(mlDataset.getTrainingEntities().keySet());
         
         Attribute[] attributes = new Attribute[dimensionality];
         FastVector fvClassVal = new FastVector(n_classes);
@@ -76,13 +74,11 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         instances.setClassIndex(dimensionality);
         
         Instance iExample;
-        double[] features;
-        for(int label : mlDataset.getTrainingEntities().keySet()){
-            for(gpsiFeatureVector featureVector : mlDataset.getTrainingEntities().get(label)){
+        for(byte label : mlDataset.getTrainingEntities().keySet()){
+            for(double[] featureVector : mlDataset.getTrainingEntities().get(label)){
                 iExample = new Instance(dimensionality + 1);
-                features = featureVector.getFeatures();
                 for(j = 0; j < dimensionality; j++)
-                    iExample.setValue(i, features[i]);
+                    iExample.setValue(i, featureVector[i]);
                 iExample.setValue(dimensionality, label);
                 instances.add(iExample);
             }

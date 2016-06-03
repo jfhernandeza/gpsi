@@ -3,7 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.img;
+package br.unicamp.ic.recod.gpsi.combine;
+
+import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 
 /**
  *
@@ -14,11 +16,11 @@ package br.unicamp.ic.recod.gpsi.img;
 public abstract class gpsiVoxelCombinator<V, I> {
     
     protected final V b;
-    protected final I individual;
+    protected final I expression;
 
-    public gpsiVoxelCombinator(V b, I individual) {
+    public gpsiVoxelCombinator(V b, I expression) {
         this.b = b;
-        this.individual = individual;
+        this.expression = expression;
     }
     
     public abstract void combineVoxel(gpsiVoxel voxel);

@@ -9,7 +9,6 @@ package br.unicamp.ic.recod.gpsi.data;
  *
  * @author juan
  * @param <E>
- * @param <L>
  */
-public class gpsiRawDataset<E, L> extends gpsiDataset {
+public class gpsiRawDataset<E> extends gpsiDataset {
 }

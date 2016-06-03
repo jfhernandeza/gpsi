@@ -6,6 +6,8 @@
 package br.unicamp.ic.recod.gpsi.ml;
 
 import java.util.HashMap;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;
@@ -45,7 +47,7 @@ public class gpsiSimpleDistanceToMomentScalarClassifier {
         
     }
 
-    public int[][] predictAndCompare(HashMap<Byte, double[][]> x) {
+    public int[][] predictAndEval(HashMap<Byte, double[][]> x) {
         
         if(this.centroids == null)
             return null;

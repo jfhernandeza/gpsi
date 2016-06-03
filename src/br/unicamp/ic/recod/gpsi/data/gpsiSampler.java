@@ -15,6 +15,6 @@ import java.util.HashMap;
  */
 public interface gpsiSampler {
     
-    public double[] sample(HashMap<String, ArrayList<gpsiVoxel>> entities, String label);
+    public double[] sample(HashMap<Byte, ArrayList<gpsiVoxel>> entities, Byte label);
     
 }

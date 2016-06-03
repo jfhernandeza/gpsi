@@ -3,15 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.gp;
+package br.unicamp.ic.recod.gpsi.applications;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiBootstrapper;
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedDivision;
-import br.unicamp.ic.recod.gpsi.img.gpsiJGAPVoxelCombinator;
-import br.unicamp.ic.recod.gpsi.img.gpsiVoxelBandCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelBandCombinator;
+import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
+import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPVoxelFitnessFunction;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
 import br.unicamp.ic.recod.gpsi.ml.gpsiSimpleDistanceToMomentScalarClassifier;
@@ -46,8 +48,8 @@ import org.jgap.gp.terminal.Variable;
  *
  * @author juan
  */
-public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<IGPProgram> {
-
+public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver {
+/*
     private final GPConfiguration config;
     private final gpsiJGAPVoxelFitnessFunction fitness;
     
@@ -58,7 +60,6 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
     private final LinkedBlockingQueue<double[][]> distributions;
     
     public gpsiJGAPVoxelClassifierEvolver(String[] args, gpsiDatasetReader datasetReader) throws Exception {
-        super(args, datasetReader);
         config = new GPConfiguration();
         config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator());
 
@@ -78,7 +79,6 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         
     }
 
-    @Override
     public void evolve() throws Exception {
 
         gpsiVoxelRawDataset dataset = (gpsiVoxelRawDataset) super.dataset;
@@ -122,7 +122,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
                 voxelBandCombinator.combineEntity(dataset.getValidationEntities());
 
                 samples = new ArrayList<>();
-                for (String classLabel : super.classLabels)
+                for (Byte classLabel : super.classLabels)
                     samples.add(this.fitness.getSampler().sample(dataset.getValidationEntities(), classLabel));
 
                 validationScore = fitness.getScore().score(samples);
@@ -168,7 +168,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
             gpsiSampler sampler = new gpsiWholeSampler();
             
             samples = new ArrayList<>();
-            for(String className : super.classLabels)
+            for(Byte className : super.classLabels)
                 samples.add(sampler.sample(dataset.getTrainingEntities(), className));
 
             for (i = 0; i < samples.size(); i++){
@@ -177,7 +177,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
             }
 
             samples = new ArrayList<>();
-            for (String classLabel : super.classLabels)
+            for (Byte classLabel : super.classLabels)
                 samples.add(sampler.sample(dataset.getTestEntities(), classLabel));
 
             double value;
@@ -233,7 +233,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         HashMap<Byte, double[][]> testSample = new HashMap<>();
         
         samples = new ArrayList<>();
-        for(String className : super.classLabels)
+        for(Byte className : super.classLabels)
             samples.add(sampler.sample(dataset.getTrainingEntities(), className));
         byte kk = 0;
         for(double[] s : samples){
@@ -245,7 +245,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         }
         
         samples = new ArrayList<>();
-        for(String className : super.classLabels)
+        for(Byte className : super.classLabels)
             samples.add(sampler.sample(dataset.getTestEntities(), className));
         kk = 0;
         for(double[] s : samples){
@@ -257,10 +257,10 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         }
         
         classifierMean.fit(trainSample);
-        int[][] cm_mean = classifierMean.predictAndCompare(testSample);
+        int[][] cm_mean = classifierMean.predictAndEval(testSample);
         
         classifierMedian.fit(trainSample);
-        int[][] cm_median = classifierMedian.predictAndCompare(testSample);
+        int[][] cm_median = classifierMedian.predictAndEval(testSample);
         
         System.out.println("Hey!");
         
@@ -298,7 +298,6 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         return GPGenotype.randomInitialGenotype(conf, types, argTypes, nodeSets, 100, true);
     }
 
-    @Override
     public void printResults() throws FileNotFoundException {
 
         String outRoot = "results/" + (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(Calendar.getInstance().getTime()) + "/";
@@ -311,7 +310,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         
         if(this.dumpGens){
             (new File(outRoot + "gens/")).mkdir();
-            for(String label : this.classLabels)
+            for(Byte label : this.classLabels)
                 (new File(outRoot + "gens/" + label + "/")).mkdir();
         }
 
@@ -330,7 +329,7 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         outR.println("Number of individuals used for validation\t" + super.validation);
         outR.println("Bootstrapping\t" + super.bootstrap);
         outR.print("Classes considered:\t");
-        for (String label : this.classLabels) {
+        for (Byte label : this.classLabels) {
             outR.print(label + " ");
         }
         outR.print("\n");
@@ -406,5 +405,5 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver<I
         }
 
     }
-
+*/
 }

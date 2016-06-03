@@ -12,38 +12,44 @@ import java.util.HashMap;
  *
  * @author jfhernandeza
  * @param <E>
- * @param <L>
  */
-public abstract class gpsiDataset<E, L> {
+public abstract class gpsiDataset<E> {
     
-    protected ArrayList<HashMap<L, ArrayList<E>>> folds;
+    protected ArrayList<HashMap<Byte, ArrayList<E>>> folds;
     
-    protected HashMap<L, ArrayList<E>> trainingEntities = null;
-    protected HashMap<L, ArrayList<E>> validationEntities = null;
-    protected HashMap<L, ArrayList<E>> testEntities = null;
+    protected HashMap<Byte, ArrayList<E>> trainingEntities = null;
+    protected HashMap<Byte, ArrayList<E>> validationEntities = null;
+    protected HashMap<Byte, ArrayList<E>> testEntities = null;
+    
+    private Byte[] classLabels;
     
     private int nBands;
 
-    public HashMap<L, ArrayList<E>> getTrainingEntities() {
+    public HashMap<Byte, ArrayList<E>> getTrainingEntities() {
         return trainingEntities;
     }
 
-    public void setFolds(ArrayList<HashMap<L, ArrayList<E>>> folds) {
+    public void setFolds(ArrayList<HashMap<Byte, ArrayList<E>>> folds) {
         this.folds = folds;
+        Object[] labels = folds.get(0).keySet().toArray();
+        classLabels = new Byte[folds.get(0).keySet().size()];
+        for(int i = 0; i < classLabels.length; i++)
+            classLabels[i] = (Byte) labels[i];
+            
     }
 
-    public HashMap<L, ArrayList<E>> getValidationEntities() {
+    public HashMap<Byte, ArrayList<E>> getValidationEntities() {
         return validationEntities;
     }
 
-    public HashMap<L, ArrayList<E>> getTestEntities() {
+    public HashMap<Byte, ArrayList<E>> getTestEntities() {
         return testEntities;
     }
     
     public int getNumberOfEntities(){
         int m = 0;
         for(int i = 0; i < this.folds.size(); i++){
-            for(L label : this.folds.get(i).keySet()){
+            for(Byte label : this.folds.get(i).keySet()){
                 m += this.folds.get(i).get(label).size();
             }
         }
@@ -52,21 +58,21 @@ public abstract class gpsiDataset<E, L> {
     
     public int getNumberOfTrainingEntities(){
         int m = 0;
-        for(L key : this.trainingEntities.keySet())
+        for(Byte key : this.trainingEntities.keySet())
             m += this.trainingEntities.get(key).size();
         return m;
     }
     
     public int getNumberOfValidationEntities(){
         int m = 0;
-        for(L key : this.validationEntities.keySet())
+        for(Byte key : this.validationEntities.keySet())
             m += this.validationEntities.get(key).size();
         return m;
     }
     
     public int getNumberOfTestEntities(){
         int m = 0;
-        for(L key : this.testEntities.keySet())
+        for(Byte key : this.testEntities.keySet())
             m += this.testEntities.get(key).size();
         return m;
     }
@@ -83,13 +89,13 @@ public abstract class gpsiDataset<E, L> {
         this.nBands = nBands;
     }
     
-    public void assignFolds(int[] trainingFolds, int[] validationFolds, int[] testFolds){
+    public void assignFolds(byte[] trainingFolds, byte[] validationFolds, byte[] testFolds){
         
         this.trainingEntities = new HashMap<>();
         this.validationEntities = new HashMap<>();
         this.testEntities = new HashMap<>();
         
-        for(L label : this.folds.get(0).keySet()){
+        for(Byte label : this.folds.get(0).keySet()){
             
             if(trainingFolds != null){
                 this.trainingEntities.put(label, new ArrayList<>());
@@ -111,6 +117,10 @@ public abstract class gpsiDataset<E, L> {
             
         }
         
+    }
+
+    public Byte[] getClassLabels() {
+        return classLabels;
     }
     
 }
