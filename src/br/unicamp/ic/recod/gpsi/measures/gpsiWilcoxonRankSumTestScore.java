@@ -5,7 +5,8 @@
  */
 package br.unicamp.ic.recod.gpsi.measures;
 
-import java.util.ArrayList;
+import org.apache.commons.math3.linear.MatrixUtils;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
 
 /**
@@ -15,11 +16,14 @@ import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
 public class gpsiWilcoxonRankSumTestScore implements gpsiSampleSeparationScore {
     
     @Override
-    public double score(ArrayList<double[]> samples) {
+    public double score(double[][][] samples) {
         double p_value;
         
+        RealMatrix m0 = MatrixUtils.createRealMatrix(samples[0]);
+        RealMatrix m1 = MatrixUtils.createRealMatrix(samples[1]);
+        
         MannWhitneyUTest t = new MannWhitneyUTest();
-        p_value = t.mannWhitneyUTest(samples.get(0), samples.get(1));
+        p_value = t.mannWhitneyUTest(m0.getColumn(0), m1.getColumn(0));
         
         return p_value;
     }

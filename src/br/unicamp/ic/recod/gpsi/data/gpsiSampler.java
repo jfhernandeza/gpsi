@@ -5,7 +5,6 @@
  */
 package br.unicamp.ic.recod.gpsi.data;
 
-import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,6 +14,6 @@ import java.util.HashMap;
  */
 public interface gpsiSampler {
     
-    public double[] sample(HashMap<Byte, ArrayList<gpsiVoxel>> entities, Byte label);
+    public double[][][] sample(HashMap<Byte, ArrayList<double[]>> entities, Byte[] labels);
     
 }

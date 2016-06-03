@@ -9,10 +9,9 @@ package br.unicamp.ic.recod.gpsi.img;
  *
  * @author juan
  */
-public class gpsiVoxel {
+public class gpsiVoxel implements gpsiEntity{
     
     private double[] hyperspectralData;
-    private double combinedValue;
 
     public gpsiVoxel(double[] hyperspectralData) {
         this.hyperspectralData = hyperspectralData;
@@ -24,14 +23,6 @@ public class gpsiVoxel {
 
     public void setHyperspectralData(double[] hyperspectralData) {
         this.hyperspectralData = hyperspectralData;
-    }
-
-    public double getCombinedValue() {
-        return combinedValue;
-    }
-
-    public void setCombinedValue(double combinedValue) {
-        this.combinedValue = combinedValue;
     }
     
 }

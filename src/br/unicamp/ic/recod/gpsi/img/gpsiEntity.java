@@ -3,8 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.features;
+package br.unicamp.ic.recod.gpsi.img;
 
-
-public interface gpsiLocalDescriptor extends gpsiDescriptor {
+/**
+ *
+ * @author juan
+ */
+public interface gpsiEntity {
+    
 }

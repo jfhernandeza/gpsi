@@ -6,7 +6,7 @@
 package br.unicamp.ic.recod.gpsi.data;
 
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
-import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
+import br.unicamp.ic.recod.gpsi.img.gpsiEntity;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -24,31 +24,36 @@ public class gpsiMLDataset extends gpsiDataset<double[]>{
         
     }
     
-    // TODO: Modify to consider folds
-    public void loadDataset(gpsiRoiRawDataset rawDataset){
+    public void loadDataset(gpsiRawDataset rawDataset, boolean override){
         
-        HashMap<Byte, ArrayList<gpsiRoi>> trainingSet = rawDataset.getTrainingEntities();
-        HashMap<Byte, ArrayList<gpsiRoi>> validationSet = rawDataset.getValidationEntities();
-        HashMap<Byte, ArrayList<gpsiRoi>> testSet = rawDataset.getTestEntities();
+        HashMap<Byte, ArrayList<gpsiEntity>> trainingSet = rawDataset.getTrainingEntities();
+        HashMap<Byte, ArrayList<gpsiEntity>> validationSet = rawDataset.getValidationEntities();
+        HashMap<Byte, ArrayList<gpsiEntity>> testSet = rawDataset.getTestEntities();
+        
+        if(override){
+            this.trainingEntities = new HashMap<>();
+            this.validationEntities = new HashMap<>();
+            this.testEntities = new HashMap<>();
+        }
         
         for(Byte label : trainingSet.keySet()){
             this.trainingEntities.put(label, new ArrayList<>());
-            for(gpsiRoi mask : trainingSet.get(label)){
-                this.trainingEntities.get(label).add(this.descriptor.getFeatureVector(mask));
+            for(gpsiEntity entity : trainingSet.get(label)){
+                this.trainingEntities.get(label).add(this.descriptor.getFeatureVector(entity));
             }
         }
         
         for(Byte label : validationSet.keySet()){
             this.validationEntities.put(label, new ArrayList<>());
-            for(gpsiRoi mask : validationSet.get(label)){
-                this.validationEntities.get(label).add(this.descriptor.getFeatureVector(mask));
+            for(gpsiEntity entity : validationSet.get(label)){
+                this.validationEntities.get(label).add(this.descriptor.getFeatureVector(entity));
             }
         }
         
         for(Byte label : testSet.keySet()){
             this.testEntities.put(label, new ArrayList<>());
-            for(gpsiRoi mask : testSet.get(label)){
-                this.testEntities.get(label).add(this.descriptor.getFeatureVector(mask));
+            for(gpsiEntity entity : testSet.get(label)){
+                this.testEntities.get(label).add(this.descriptor.getFeatureVector(entity));
             }
         }
         

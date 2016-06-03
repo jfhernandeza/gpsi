@@ -5,11 +5,9 @@
  */
 package br.unicamp.ic.recod.gpsi.measures;
 
-import java.util.ArrayList;
-
 /**
  *
  * @author ra163128
  */
-public interface gpsiSampleSeparationScore extends gpsiScore<ArrayList<double[]>>{
+public interface gpsiSampleSeparationScore extends gpsiScore<double[][][]>{
 }

@@ -20,10 +20,10 @@ public class gpsiJGAPVoxelCombinator extends gpsiVoxelCombinator<Variable[], IGP
     }
 
     @Override
-    public void combineVoxel(gpsiVoxel voxel) {
+    public double combineVoxel(gpsiVoxel voxel) {
         for(int i = 0; i < voxel.getHyperspectralData().length; i++)
             this.b[i].set(voxel.getHyperspectralData()[i]);
-        voxel.setCombinedValue(this.expression.execute_double(0, new Object[0]));
+        return this.expression.execute_double(0, new Object[0]);
     }
     
 }

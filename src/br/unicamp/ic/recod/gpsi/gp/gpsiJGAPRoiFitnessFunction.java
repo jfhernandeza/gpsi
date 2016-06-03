@@ -43,10 +43,11 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         Object[] noargs = new Object[0];
         
         gpsiRoiBandCombinator roiBandCombinator = new gpsiRoiBandCombinator(new gpsiJGAPVoxelCombinator(super.b, igpp));
-        roiBandCombinator.combineEntity(this.dataset.getTrainingEntities());
+        // TODO: The ROI descriptors must combine the images first
+        //roiBandCombinator.combineEntity(this.dataset.getTrainingEntities());
         
         gpsiMLDataset mlDataset = new gpsiMLDataset(this.descriptor);
-        mlDataset.loadDataset(this.dataset);
+        mlDataset.loadDataset(this.dataset, true);
         
         int dimensionality = mlDataset.getDimensionality();
         int n_classes = mlDataset.getTrainingEntities().keySet().size();

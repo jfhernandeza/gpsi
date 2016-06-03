@@ -21,7 +21,10 @@ public class gpsiRoiBandCombinator extends gpsiBandCombinator<gpsiRoi>{
     }
 
     @Override
-    public void combineEntity(HashMap<Byte, ArrayList<gpsiRoi>> entities){
+    public HashMap<Byte, double[][]> combineEntities(HashMap<Byte, ArrayList<gpsiRoi>> entities){
+        
+        HashMap<Byte, double[][]> combinedEntities = new HashMap<>();
+        
         int i, j;
         gpsiVoxel[][] mask;
         for(Byte label : entities.keySet())
@@ -31,6 +34,9 @@ public class gpsiRoiBandCombinator extends gpsiBandCombinator<gpsiRoi>{
                     for(j = 0; j < mask[0].length; j++)
                         this.voxelCombinator.combineVoxel(mask[i][j]);
             }
+        
+        return combinedEntities;
+        
     }
     
 }

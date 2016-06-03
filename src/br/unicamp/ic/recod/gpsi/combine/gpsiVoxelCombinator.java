@@ -23,6 +23,6 @@ public abstract class gpsiVoxelCombinator<V, I> {
         this.expression = expression;
     }
     
-    public abstract void combineVoxel(gpsiVoxel voxel);
+    public abstract double combineVoxel(gpsiVoxel voxel);
     
 }

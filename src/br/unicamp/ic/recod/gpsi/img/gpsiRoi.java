@@ -9,7 +9,7 @@ package br.unicamp.ic.recod.gpsi.img;
  *
  * @author jfhernandeza
  */
-public class gpsiRoi {
+public class gpsiRoi implements gpsiEntity{
     
     private final gpsiVoxel[][] roi;
     public int min_x, min_y, max_x, max_y;

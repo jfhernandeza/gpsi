@@ -8,20 +8,21 @@ package br.unicamp.ic.recod.gpsi.applications;
 import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombinator;
 import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelBandCombinator;
 import br.unicamp.ic.recod.gpsi.data.gpsiBootstrapper;
+import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
+import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
+import br.unicamp.ic.recod.gpsi.features.gpsiScalarSpectralIndexDescriptor;
 import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedDivision;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPVoxelFitnessFunction;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
-import java.util.ArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.jgap.InvalidConfigurationException;
 import org.jgap.gp.CommandGene;
 import org.jgap.gp.IGPProgram;
@@ -48,7 +49,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
     
     private final double[] curve;
     private String program;
-    private final LinkedBlockingQueue<double[][]> distributions;
+    private final LinkedBlockingQueue<double[][][]> distributions;
 
     
     public gpsiJGAPEvolver(
@@ -85,8 +86,10 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
     
     
     @Override
-    public void run() throws InvalidConfigurationException {
+    public void run() throws InvalidConfigurationException, InterruptedException {
         
+        gpsiDescriptor descriptor;
+        gpsiMLDataset mlDataset;
         gpsiVoxelRawDataset dataset = (gpsiVoxelRawDataset) rawDataset;
 
         GPGenotype gp = create(config, dataset.getnBands(), fitness);
@@ -99,10 +102,9 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
 
         int i, j, k;
         Mean mean = new Mean();
-        Median median = new Median();
         StandardDeviation sd = new StandardDeviation();
         double validationScore, trainScore, bestValidationScore = -1.0, bestTrainScore = -1.0;
-        ArrayList<double[]> samples;
+        double[][][] samples;
         gpsiVoxelBandCombinator voxelBandCombinator;
         
         for (int generation = 0; generation < super.numGenerations; generation++) {
@@ -111,26 +113,22 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
             gp.getGPPopulation().sortByFitness();
             
             if(this.dumpGens){
-                double[][] dists = new double[this.classLabels.length][];
-                voxelBandCombinator = new gpsiVoxelBandCombinator(new gpsiJGAPVoxelCombinator(fitness.getB(), gp.getGPPopulation().getGPPrograms()[0]));
-                voxelBandCombinator.combineEntity(dataset.getTestEntities());
-                for(j = 0; j < this.classLabels.length; j++){
-                    dists[j] = this.fitness.getSampler().sample(dataset.getTrainingEntities(), this.classLabels[j]);
-                }
-                //this.distributions.put(dists);
+                double[][][] dists = new double[this.classLabels.length][][];
+                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombinator(fitness.getB(), gp.getGPPopulation().getGPPrograms()[0]));
+                mlDataset = new gpsiMLDataset(descriptor);
+                mlDataset.loadDataset(rawDataset, true);
+                this.distributions.put(this.fitness.getSampler().sample(dataset.getTrainingEntities(), this.classLabels));
             }
             
             for (i = 0; i < super.validation; i++) {
 
                 current = gp.getGPPopulation().getGPPrograms()[i];
 
-                voxelBandCombinator = new gpsiVoxelBandCombinator(new gpsiJGAPVoxelCombinator(fitness.getB(), current));
-                voxelBandCombinator.combineEntity(dataset.getValidationEntities());
-
-                samples = new ArrayList<>();
-                for (Byte classLabel : super.classLabels)
-                    samples.add(this.fitness.getSampler().sample(dataset.getValidationEntities(), classLabel));
-
+                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombinator(fitness.getB(), current));
+                mlDataset = new gpsiMLDataset(descriptor);
+                
+                samples = this.fitness.getSampler().sample(dataset.getValidationEntities(), classLabels);
+                
                 validationScore = fitness.getScore().score(samples);
                 trainScore = current.getFitnessValue() - 1.0;
 

@@ -5,6 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.features;
 
+import br.unicamp.ic.recod.gpsi.img.gpsiEntity;
 import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.Arrays;
  *
  * @author juan
  */
-public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescriptor{
+public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiDescriptor{
     
     private ArrayList<int[]> neighborhood;
 
@@ -46,7 +47,9 @@ public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescript
     }
     
     @Override
-    public double[] getFeatureVector(gpsiRoi roi) {
+    public double[] getFeatureVector(gpsiEntity entity) {
+        
+        gpsiRoi roi = (gpsiRoi) entity;
         
         double[] vector = new double[(int) Math.pow(2, this.neighborhood.size())];
         int binaryPattern;
@@ -71,7 +74,8 @@ public class gpsiMaskedLocalBinaryPatternDescriptor implements gpsiLocalDescript
                 
                 int pow = 0;
                 for(int[] n : this.neighborhood){
-                    binaryPattern += (img[y][x].getCombinedValue() > img[y + n[0]][x + n[1]].getCombinedValue()) ? Math.pow(2, pow) : 0;
+                    //TODO: Fix this, since gpsiVoxel doesn't store the combined value anymore
+                    //binaryPattern += (img[y][x].getCombinedValue() > img[y + n[0]][x + n[1]].getCombinedValue()) ? Math.pow(2, pow) : 0;
                     pow++;
                 }
                 

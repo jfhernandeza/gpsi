@@ -6,8 +6,6 @@
 package br.unicamp.ic.recod.gpsi.ml;
 
 import java.util.HashMap;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;

@@ -7,9 +7,6 @@ package br.unicamp.ic.recod.gpsi;
 
 import br.unicamp.ic.recod.gpsi.applications.gpsiApplication;
 import br.unicamp.ic.recod.gpsi.applications.gpsiApplicationFactory;
-import br.unicamp.ic.recod.gpsi.applications.gpsiJGAPVoxelClassifierEvolver;
-import br.unicamp.ic.recod.gpsi.io.gpsiMatlabFileReader;
-import br.unicamp.ic.recod.gpsi.io.gpsiVoxelDatasetReader;
 import org.kohsuke.args4j.CmdLineParser;
 
 /**

@@ -20,11 +20,20 @@ public class gpsiVoxelBandCombinator extends gpsiBandCombinator<gpsiVoxel>{
     }
 
     @Override
-    public void combineEntity(HashMap<Byte, ArrayList<gpsiVoxel>> entities) {
+    public HashMap<Byte, double[][]> combineEntities(HashMap<Byte, ArrayList<gpsiVoxel>> entities) {
         
-        for(Byte label : entities.keySet())
-            for(gpsiVoxel v : entities.get(label))
-                this.voxelCombinator.combineVoxel(v);
+        HashMap<Byte, double[][]> combinedEntities = new HashMap<>();
+        double[][] vectors;
+        
+        for(Byte label : entities.keySet()){
+            vectors = new double[entities.get(label).size()][1];
+            for(int i = 0; i < entities.get(label).size(); i++){
+                vectors[i][1] = this.voxelCombinator.combineVoxel(entities.get(label).get(i));
+            }
+            combinedEntities.put(label, vectors);
+        }
+        
+        return combinedEntities;
         
     }
 

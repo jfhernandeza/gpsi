@@ -5,7 +5,6 @@
  */
 package br.unicamp.ic.recod.gpsi.data;
 
-import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -23,15 +22,19 @@ public class gpsiBootstrapper implements gpsiSampler{
     }
     
     @Override
-    public double[] sample(HashMap<Byte, ArrayList<gpsiVoxel>> entities, Byte label) {
-        ArrayList<gpsiVoxel> samplingEntities = entities.get(label);
+    public double[][][] sample(HashMap<Byte, ArrayList<double[]>> entities, Byte[] labels) {
         
-        int n = (int) (samplingEntities.size() * p);
-        
-        double[] vector = new double[n];
+        double[][][] vector = new double[labels.length][][];
+        ArrayList<double[]> samplingEntities;
         Random rand = new Random();
-        for(int i = 0; i < n; i++)
-            vector[i] = samplingEntities.get(rand.nextInt(samplingEntities.size())).getCombinedValue();
+        int n;
+        
+        for(int i = 0; i < labels.length; i++){
+            samplingEntities = entities.get(labels[i]);
+            n = (int) (samplingEntities.size() * p);
+            for(int j = 0; j < n; j++)
+                vector[i][j] = samplingEntities.get(rand.nextInt(samplingEntities.size()));
+        }
         
         return vector;
     }

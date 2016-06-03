@@ -5,8 +5,8 @@
  */
 package br.unicamp.ic.recod.gpsi.measures;
 
-import java.util.ArrayList;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
+import org.apache.commons.math3.ml.distance.EuclideanDistance;
+import org.apache.commons.math3.stat.descriptive.moment.VectorialMean;
 
 /**
  *
@@ -15,18 +15,26 @@ import org.apache.commons.math3.stat.descriptive.moment.Mean;
 public class gpsiClusterDistortionScore implements gpsiSampleSeparationScore {
 
     @Override
-    public double score(ArrayList<double[]> samples) {
+    public double score(double[][][] samples) {
         
-        double score = 0.0, centroid;
-        int nClasses = samples.size(), m = 0, m_i = 0;
+        double score = 0.0;
+        double[] centroid;
+        double[][] vectors;
+        int nClasses = samples.length, m = 0, m_i = 0, i;
         
-        Mean meanOperator = new Mean();
+        VectorialMean meanOperator;
+        EuclideanDistance distance = new EuclideanDistance();
         
-        for(int i = 0; i < nClasses; i++){
-            centroid = meanOperator.evaluate(samples.get(i));
-            m_i = samples.get(i).length;
-            for(int j = 0; j < m_i; j++){
-                score += Math.pow(samples.get(i)[j] - centroid, 2.0);
+        for(int label = 0; label < samples.length; label++){
+            vectors = samples[label];
+            meanOperator = new VectorialMean(vectors[0].length);
+            for(i = 0; i < vectors.length; i++)
+                meanOperator.increment(vectors[i]);
+            centroid = meanOperator.getResult();       
+            
+            m_i = vectors.length;
+            for(i = 0; i < m_i; i++){
+                score += distance.compute(centroid, vectors[i]);
             }
             m += m_i;
         }

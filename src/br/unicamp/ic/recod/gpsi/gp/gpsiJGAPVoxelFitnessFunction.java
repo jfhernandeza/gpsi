@@ -8,9 +8,9 @@ package br.unicamp.ic.recod.gpsi.gp;
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombinator;
-import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelBandCombinator;
+import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
+import br.unicamp.ic.recod.gpsi.features.gpsiScalarSpectralIndexDescriptor;
 import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
-import java.util.ArrayList;
 import org.jgap.gp.IGPProgram;
 
 /**
@@ -32,17 +32,11 @@ public class gpsiJGAPVoxelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVo
     
     @Override
     protected double evaluate(IGPProgram igpp) {
-        
-        gpsiVoxelBandCombinator voxelBandCombinator = new gpsiVoxelBandCombinator(new gpsiJGAPVoxelCombinator(super.b, igpp));
-        voxelBandCombinator.combineEntity(super.dataset.getTrainingEntities());
-        
-        ArrayList<double[]> samples = new ArrayList<>();
-        
-        for(Byte classLabel : this.classLabels)
-            samples.add(this.sampler.sample(super.dataset.getTrainingEntities(), classLabel));
-            
+        gpsiScalarSpectralIndexDescriptor descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombinator(super.b, igpp));
+        gpsiMLDataset mlDataset = new gpsiMLDataset(descriptor);
+        mlDataset.loadDataset(super.dataset, true);
+        double[][][] samples = this.sampler.sample(mlDataset.getTrainingEntities(), classLabels);
         return this.score.score(samples) + 1.0;
-        
     }
 
     public Byte[] getClassLabels() {

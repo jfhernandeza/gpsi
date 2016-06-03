@@ -5,36 +5,6 @@
  */
 package br.unicamp.ic.recod.gpsi.applications;
 
-import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
-import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
-import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
-import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedDivision;
-import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombinator;
-import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelBandCombinator;
-import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
-import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPVoxelFitnessFunction;
-import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
-import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.concurrent.LinkedBlockingQueue;
-import org.apache.commons.lang.ArrayUtils;
-import org.jgap.InvalidConfigurationException;
-import org.jgap.gp.CommandGene;
-import org.jgap.gp.IGPProgram;
-import org.jgap.gp.function.Add;
-import org.jgap.gp.function.Multiply;
-import org.jgap.gp.function.Subtract;
-import org.jgap.gp.impl.DefaultGPFitnessEvaluator;
-import org.jgap.gp.impl.GPConfiguration;
-import org.jgap.gp.impl.GPGenotype;
-import org.jgap.gp.terminal.Terminal;
-import org.jgap.gp.terminal.Variable;
-
 /**
  *
  * @author juan

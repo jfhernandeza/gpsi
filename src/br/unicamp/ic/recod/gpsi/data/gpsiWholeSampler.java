@@ -5,7 +5,6 @@
  */
 package br.unicamp.ic.recod.gpsi.data;
 
-import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,21 +13,23 @@ import java.util.HashMap;
  * @author juan
  */
 public class gpsiWholeSampler implements gpsiSampler{
-    
-    public gpsiWholeSampler() {
-    }
-    
+
     @Override
-    public double[] sample(HashMap<Byte, ArrayList<gpsiVoxel>> entities, Byte label) {
+    public double[][][] sample(HashMap<Byte, ArrayList<double[]>> entities, Byte[] labels) {
         
-        ArrayList<gpsiVoxel> samplingEntities = entities.get(label);
-        double[] vector = new double[samplingEntities.size()];
+        double[][][] sample = new double[entities.size()][][];
         
-        int i = 0;
-        for(gpsiVoxel voxel : samplingEntities)
-            vector[i++] = voxel.getCombinedValue();
+        int i = 0, j;
+        for(byte label : entities.keySet()){
+            sample[i] = new double[entities.get(label).size()][];
+            for(j = 0; j < entities.get(label).size(); j++){
+                sample[i][j] = entities.get(label).get(j);
+            }
+            i++;
+        }
         
-        return vector;
+        return sample;
+        
     }
     
 }

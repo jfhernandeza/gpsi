@@ -5,7 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.features;
 
-import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
+import br.unicamp.ic.recod.gpsi.img.gpsiEntity;
 
 /**
  *
@@ -13,6 +13,6 @@ import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
  */
 public interface gpsiDescriptor {
     
-    public abstract double[] getFeatureVector(gpsiRoi mask);
+    public abstract double[] getFeatureVector(gpsiEntity entity);
     
 }

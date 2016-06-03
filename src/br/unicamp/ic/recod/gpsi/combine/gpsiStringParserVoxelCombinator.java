@@ -9,8 +9,6 @@ import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import bsh.EvalError;
 import bsh.Interpreter;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +19,7 @@ import java.util.regex.Pattern;
 public class gpsiStringParserVoxelCombinator extends gpsiVoxelCombinator<double[], String>{
 
     private String exp;
-    private Interpreter interpreter;
+    private final Interpreter interpreter;
     
     public gpsiStringParserVoxelCombinator(double[] b, String expression) throws EvalError, IOException {
         super(b, expression);
@@ -74,13 +72,13 @@ public class gpsiStringParserVoxelCombinator extends gpsiVoxelCombinator<double[
     }
 
     @Override
-    public void combineVoxel(gpsiVoxel voxel){
+    public double combineVoxel(gpsiVoxel voxel){
         try {
             interpreter.set("b", voxel.getHyperspectralData());
             interpreter.eval("val = " + exp);
-            voxel.setCombinedValue((double) interpreter.get("val"));
+            return (double) interpreter.get("val");
         } catch (EvalError ex) {
-            voxel.setCombinedValue(Double.NaN);
+            return Double.NaN;
         }
     }
     
