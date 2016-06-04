@@ -5,6 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.ml;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -14,30 +15,32 @@ import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;
  *
  * @author juan
  */
-public class gpsiSimpleDistanceToMomentScalarClassifier {
+public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm implements gpsiClassificationAlgorithm {
     
     private final AbstractUnivariateStatistic moment;
     private double[][] centroids;
     private int dimensionality, nClasses;
 
-    public gpsiSimpleDistanceToMomentScalarClassifier(AbstractUnivariateStatistic moment) {
+    public gpsiSimpleDistanceToMomentScalarClassificationAlgorithm(AbstractUnivariateStatistic moment) {
         this.moment = moment;
     }
 
-    public void fit(HashMap<Byte, double[][]> x) {
+    @Override
+    public void fit(HashMap<Byte, ArrayList<double[]>> x) {
         
         int i;
         RealMatrix entities;
         
         this.nClasses = x.keySet().size();
+        this.dimensionality = Integer.MIN_VALUE;
+        for(byte label : x.keySet())
+            if(this.dimensionality < label)
+                this.dimensionality = label;
+        
+        this.centroids = new double[this.nClasses][this.dimensionality];
+        
         for(byte label : x.keySet()){
-
-            entities = MatrixUtils.createRealMatrix(x.get(label));
-            if(dimensionality <= 0){
-                this.dimensionality = entities.getColumnDimension();
-                this.centroids = new double[this.nClasses][this.dimensionality];
-            }
-            
+            entities = MatrixUtils.createRealMatrix(x.get(label).toArray(new double[0][]));
             for(i = 0; i < this.dimensionality; i++)
                 this.centroids[label][i] = this.moment.evaluate(entities.getColumn(i));
                
@@ -45,7 +48,8 @@ public class gpsiSimpleDistanceToMomentScalarClassifier {
         
     }
 
-    public int[][] predictAndEval(HashMap<Byte, double[][]> x) {
+    @Override
+    public int[][] predictAndEval(HashMap<Byte, ArrayList<double[]>> x) {
         
         if(this.centroids == null)
             return null;
@@ -56,7 +60,7 @@ public class gpsiSimpleDistanceToMomentScalarClassifier {
         
         double[][] entities;
         for(byte label : x.keySet()){
-            entities = x.get(label);
+            entities = x.get(label).toArray(new double[0][]);
             for(i = 0; i < entities.length; i++){
                 minDistanceIndex = 0;
                 minDistance = Double.POSITIVE_INFINITY;

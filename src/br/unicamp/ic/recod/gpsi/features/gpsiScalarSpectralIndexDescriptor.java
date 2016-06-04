@@ -27,7 +27,7 @@ public class gpsiScalarSpectralIndexDescriptor implements gpsiDescriptor{
         gpsiVoxel voxel = (gpsiVoxel) entity;
         double[] vector = new double[1];
         
-        vector[1] = combinator.combineVoxel(voxel);
+        vector[0] = combinator.combineVoxel(voxel);
         
         return vector;
         

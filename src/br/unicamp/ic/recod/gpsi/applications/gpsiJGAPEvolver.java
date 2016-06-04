@@ -126,8 +126,9 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
 
                 descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombinator(fitness.getB(), current));
                 mlDataset = new gpsiMLDataset(descriptor);
+                mlDataset.loadDataset(rawDataset, true);
                 
-                samples = this.fitness.getSampler().sample(dataset.getValidationEntities(), classLabels);
+                samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
                 
                 validationScore = fitness.getScore().score(samples);
                 trainScore = current.getFitnessValue() - 1.0;
