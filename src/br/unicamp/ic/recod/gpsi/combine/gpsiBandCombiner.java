@@ -13,11 +13,11 @@ import java.util.HashMap;
  * @author juan
  * @param <D>
  */
-public abstract class gpsiBandCombinator<D> {
+public abstract class gpsiBandCombiner<D> {
     
-    protected gpsiVoxelCombinator voxelCombinator;
+    protected gpsiVoxelCombiner voxelCombinator;
 
-    public gpsiBandCombinator(gpsiVoxelCombinator voxelCombinator) {
+    public gpsiBandCombiner(gpsiVoxelCombiner voxelCombinator) {
         this.voxelCombinator = voxelCombinator;
     }
     

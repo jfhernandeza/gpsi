@@ -12,9 +12,19 @@ import java.util.HashMap;
  *
  * @author juan
  */
-public interface gpsiClassificationAlgorithm {
+public abstract class gpsiClassificationAlgorithm {
     
-    public void fit(HashMap<Byte, ArrayList<double[]>> x);
-    public int[][] predictAndEval(HashMap<Byte, ArrayList<double[]>> x);
+    protected int dimensionality, nClasses;
+
+    public int getDimensionality() {
+        return dimensionality;
+    }
+
+    public int getnClasses() {
+        return nClasses;
+    }
+    
+    public abstract void fit(HashMap<Byte, ArrayList<double[]>> x);
+    public abstract byte predict(double[] x);
     
 }

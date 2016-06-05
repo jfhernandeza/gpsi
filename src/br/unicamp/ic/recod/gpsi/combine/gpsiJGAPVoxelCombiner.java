@@ -13,9 +13,9 @@ import org.jgap.gp.terminal.Variable;
  *
  * @author juan
  */
-public class gpsiJGAPVoxelCombinator extends gpsiVoxelCombinator<Variable[], IGPProgram> {
+public class gpsiJGAPVoxelCombiner extends gpsiVoxelCombiner<Variable[], IGPProgram> {
 
-    public gpsiJGAPVoxelCombinator(Variable[] b, IGPProgram individual) {
+    public gpsiJGAPVoxelCombiner(Variable[] b, IGPProgram individual) {
         super(b, individual);
     }
 

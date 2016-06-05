@@ -8,8 +8,8 @@ package br.unicamp.ic.recod.gpsi.gp;
 import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiRoiRawDataset;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
-import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombinator;
-import br.unicamp.ic.recod.gpsi.combine.gpsiRoiBandCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombiner;
+import br.unicamp.ic.recod.gpsi.combine.gpsiRoiBandCombiner;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
@@ -42,12 +42,12 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         double mean_accuracy = 0.0;
         Object[] noargs = new Object[0];
         
-        gpsiRoiBandCombinator roiBandCombinator = new gpsiRoiBandCombinator(new gpsiJGAPVoxelCombinator(super.b, igpp));
+        gpsiRoiBandCombiner roiBandCombinator = new gpsiRoiBandCombiner(new gpsiJGAPVoxelCombiner(super.b, igpp));
         // TODO: The ROI descriptors must combine the images first
         //roiBandCombinator.combineEntity(this.dataset.getTrainingEntities());
         
         gpsiMLDataset mlDataset = new gpsiMLDataset(this.descriptor);
-        mlDataset.loadDataset(this.dataset, true);
+        mlDataset.loadWholeDataset(this.dataset, true);
         
         int dimensionality = mlDataset.getDimensionality();
         int n_classes = mlDataset.getTrainingEntities().keySet().size();

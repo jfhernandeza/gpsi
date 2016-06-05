@@ -16,12 +16,12 @@ import java.util.regex.Pattern;
  *
  * @author juan
  */
-public class gpsiStringParserVoxelCombinator extends gpsiVoxelCombinator<double[], String>{
+public class gpsiStringParserVoxelCombiner extends gpsiVoxelCombiner<double[], String>{
 
     private String exp;
     private final Interpreter interpreter;
     
-    public gpsiStringParserVoxelCombinator(double[] b, String expression) throws EvalError, IOException {
+    public gpsiStringParserVoxelCombiner(double[] b, String expression) throws EvalError, IOException {
         super(b, expression);
         this.exp = expression;
         

@@ -13,9 +13,9 @@ import java.util.HashMap;
  *
  * @author juan
  */
-public class gpsiVoxelBandCombinator extends gpsiBandCombinator<gpsiVoxel>{
+public class gpsiVoxelBandCombiner extends gpsiBandCombiner<gpsiVoxel>{
     
-    public gpsiVoxelBandCombinator(gpsiVoxelCombinator voxelCombinator) {
+    public gpsiVoxelBandCombiner(gpsiVoxelCombiner voxelCombinator) {
         super(voxelCombinator);
     }
 
@@ -37,7 +37,7 @@ public class gpsiVoxelBandCombinator extends gpsiBandCombinator<gpsiVoxel>{
         
     }
 
-    public void setVoxelCombinator(gpsiVoxelCombinator voxelCombinator) {
+    public void setVoxelCombinator(gpsiVoxelCombiner voxelCombinator) {
         this.voxelCombinator = voxelCombinator;
     }
     

@@ -123,4 +123,16 @@ public abstract class gpsiDataset<E> {
         return classLabels;
     }
     
+    public void freeTrainingEntities(){
+        this.trainingEntities = null;
+    }
+    
+    public void freeValidationEntities(){
+        this.validationEntities = null;
+    }
+    
+    public void freeTestEntities(){
+        this.testEntities = null;
+    }
+    
 }

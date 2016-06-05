@@ -5,7 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.features;
 
-import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelCombiner;
 import br.unicamp.ic.recod.gpsi.img.gpsiEntity;
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 
@@ -15,9 +15,9 @@ import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
  */
 public class gpsiScalarSpectralIndexDescriptor implements gpsiDescriptor{
 
-    private gpsiVoxelCombinator combinator;
+    private gpsiVoxelCombiner combinator;
 
-    public gpsiScalarSpectralIndexDescriptor(gpsiVoxelCombinator combinator) {
+    public gpsiScalarSpectralIndexDescriptor(gpsiVoxelCombiner combinator) {
         this.combinator = combinator;
     }
     
@@ -33,7 +33,7 @@ public class gpsiScalarSpectralIndexDescriptor implements gpsiDescriptor{
         
     }
 
-    public void setCombinator(gpsiVoxelCombinator combinator) {
+    public void setCombinator(gpsiVoxelCombiner combinator) {
         this.combinator = combinator;
     }
     

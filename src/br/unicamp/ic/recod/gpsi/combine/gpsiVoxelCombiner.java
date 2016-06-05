@@ -13,12 +13,12 @@ import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
  * @param <V>
  * @param <I>
  */
-public abstract class gpsiVoxelCombinator<V, I> {
+public abstract class gpsiVoxelCombiner<V, I> {
     
     protected final V b;
     protected final I expression;
 
-    public gpsiVoxelCombinator(V b, I expression) {
+    public gpsiVoxelCombiner(V b, I expression) {
         this.b = b;
         this.expression = expression;
     }

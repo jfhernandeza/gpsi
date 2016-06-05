@@ -5,8 +5,8 @@
  */
 package br.unicamp.ic.recod.gpsi.applications;
 
-import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombinator;
-import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelBandCombinator;
+import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombiner;
+import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelBandCombiner;
 import br.unicamp.ic.recod.gpsi.data.gpsiBootstrapper;
 import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
@@ -105,7 +105,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
         StandardDeviation sd = new StandardDeviation();
         double validationScore, trainScore, bestValidationScore = -1.0, bestTrainScore = -1.0;
         double[][][] samples;
-        gpsiVoxelBandCombinator voxelBandCombinator;
+        gpsiVoxelBandCombiner voxelBandCombinator;
         
         for (int generation = 0; generation < super.numGenerations; generation++) {
             
@@ -114,9 +114,9 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
             
             if(this.dumpGens){
                 double[][][] dists = new double[this.classLabels.length][][];
-                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombinator(fitness.getB(), gp.getGPPopulation().getGPPrograms()[0]));
+                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), gp.getGPPopulation().getGPPrograms()[0]));
                 mlDataset = new gpsiMLDataset(descriptor);
-                mlDataset.loadDataset(rawDataset, true);
+                mlDataset.loadWholeDataset(rawDataset, true);
                 this.distributions.put(this.fitness.getSampler().sample(dataset.getTrainingEntities(), this.classLabels));
             }
             
@@ -124,9 +124,9 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
 
                 current = gp.getGPPopulation().getGPPrograms()[i];
 
-                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombinator(fitness.getB(), current));
+                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), current));
                 mlDataset = new gpsiMLDataset(descriptor);
-                mlDataset.loadDataset(rawDataset, true);
+                mlDataset.loadWholeDataset(rawDataset, true);
                 
                 samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
                 

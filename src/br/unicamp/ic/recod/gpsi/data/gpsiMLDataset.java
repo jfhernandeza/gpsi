@@ -24,17 +24,10 @@ public class gpsiMLDataset extends gpsiDataset<double[]>{
         
     }
     
-    public void loadDataset(gpsiRawDataset rawDataset, boolean override){
-        
-        HashMap<Byte, ArrayList<gpsiEntity>> trainingSet = rawDataset.getTrainingEntities();
-        HashMap<Byte, ArrayList<gpsiEntity>> validationSet = rawDataset.getValidationEntities();
-        HashMap<Byte, ArrayList<gpsiEntity>> testSet = rawDataset.getTestEntities();
-        
-        if(override){
+    public void loadTrainingSet(HashMap<Byte, ArrayList<gpsiEntity>> trainingSet, boolean override){
+
+        if(override)
             this.trainingEntities = new HashMap<>();
-            this.validationEntities = new HashMap<>();
-            this.testEntities = new HashMap<>();
-        }
         
         for(Byte label : trainingSet.keySet()){
             this.trainingEntities.put(label, new ArrayList<>());
@@ -43,6 +36,13 @@ public class gpsiMLDataset extends gpsiDataset<double[]>{
             }
         }
         
+    }
+    
+    public void loadValidationSet(HashMap<Byte, ArrayList<gpsiEntity>> validationSet, boolean override){
+        
+        if(override)
+            this.validationEntities = new HashMap<>();
+        
         for(Byte label : validationSet.keySet()){
             this.validationEntities.put(label, new ArrayList<>());
             for(gpsiEntity entity : validationSet.get(label)){
@@ -50,12 +50,26 @@ public class gpsiMLDataset extends gpsiDataset<double[]>{
             }
         }
         
+    }
+    
+    public void loadTestSet(HashMap<Byte, ArrayList<gpsiEntity>> testSet, boolean override){
+        
+        if(override)
+            this.testEntities = new HashMap<>();
+        
         for(Byte label : testSet.keySet()){
             this.testEntities.put(label, new ArrayList<>());
             for(gpsiEntity entity : testSet.get(label)){
                 this.testEntities.get(label).add(this.descriptor.getFeatureVector(entity));
             }
         }
+    }
+    
+    public void loadWholeDataset(gpsiRawDataset rawDataset, boolean override){
+        
+        loadTrainingSet(rawDataset.getTrainingEntities(), override);
+        loadValidationSet(rawDataset.getValidationEntities(), override);
+        loadTestSet(rawDataset.getTestEntities(), override);
         
     }
     

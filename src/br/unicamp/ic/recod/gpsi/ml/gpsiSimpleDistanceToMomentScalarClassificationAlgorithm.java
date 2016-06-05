@@ -15,11 +15,10 @@ import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;
  *
  * @author juan
  */
-public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm implements gpsiClassificationAlgorithm {
+public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm extends gpsiClassificationAlgorithm {
     
     private final AbstractUnivariateStatistic moment;
     private double[][] centroids;
-    private int dimensionality, nClasses;
 
     public gpsiSimpleDistanceToMomentScalarClassificationAlgorithm(AbstractUnivariateStatistic moment) {
         this.moment = moment;
@@ -49,36 +48,23 @@ public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm implements 
     }
 
     @Override
-    public int[][] predictAndEval(HashMap<Byte, ArrayList<double[]>> x) {
+    public byte predict(double[] x) {
         
-        if(this.centroids == null)
-            return null;
+        byte minDistanceIndex = 0;
+        double distance, minDistance = Double.POSITIVE_INFINITY;
         
-        int confusionMatrix[][] = new int [this.nClasses][this.nClasses];
-        int minDistanceIndex, i, j, k;
-        double minDistance, distance;
-        
-        double[][] entities;
-        for(byte label : x.keySet()){
-            entities = x.get(label).toArray(new double[0][]);
-            for(i = 0; i < entities.length; i++){
-                minDistanceIndex = 0;
-                minDistance = Double.POSITIVE_INFINITY;
-                for(j = 0; j < this.nClasses; j++){
-                    distance = 0.0;
-                    for(k = 0; k < this.dimensionality; k++)
-                        distance += Math.abs(entities[i][k] - this.centroids[j][k]);
-                    if(distance < minDistance){
-                        minDistanceIndex = j;
-                        minDistance = distance;
-                    }
-                }
-                confusionMatrix[label][minDistanceIndex]++;
+        for(byte j = 0; j < this.nClasses; j++){
+            distance = 0.0;
+            for(int k = 0; k < this.dimensionality; k++)
+                distance += Math.abs(x[k] - this.centroids[j][k]);
+            if(distance < minDistance){
+                minDistanceIndex = j;
+                minDistance = distance;
             }
         }
         
-        return confusionMatrix;
-        
+        return minDistanceIndex;
+                
     }
     
 }

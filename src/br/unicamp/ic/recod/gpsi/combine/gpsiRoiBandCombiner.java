@@ -14,9 +14,9 @@ import java.util.HashMap;
  *
  * @author juan
  */
-public class gpsiRoiBandCombinator extends gpsiBandCombinator<gpsiRoi>{
+public class gpsiRoiBandCombiner extends gpsiBandCombiner<gpsiRoi>{
 
-    public gpsiRoiBandCombinator(gpsiVoxelCombinator voxelCombinator) {
+    public gpsiRoiBandCombiner(gpsiVoxelCombiner voxelCombinator) {
         super(voxelCombinator);
     }
 
