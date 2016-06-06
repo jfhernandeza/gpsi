@@ -11,6 +11,11 @@ import bsh.Interpreter;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 /**
  *
@@ -19,67 +24,60 @@ import java.util.regex.Pattern;
 public class gpsiStringParserVoxelCombiner extends gpsiVoxelCombiner<double[], String>{
 
     private String exp;
-    private final Interpreter interpreter;
+    ScriptEngine engine;
     
-    public gpsiStringParserVoxelCombiner(double[] b, String expression) throws EvalError, IOException {
+    public gpsiStringParserVoxelCombiner(double[] b, String expression) throws EvalError, IOException, ScriptException {
         super(b, expression);
-        this.exp = expression;
+        
+        StringBuilder expBuilder = new StringBuilder(expression);
         
         int in, st;
-        int[] iPre = new int[2], iPos = new int[2];
-        while(exp.contains("%")){
-            in = exp.indexOf('%');
-            iPre[0] = iPre[1] = in - 2;
-            iPos[0] = iPos[1] = in + 2;
-            if(exp.charAt(in - 2) == ')'){
-                st = 1;
-                while(st > 0){
-                    iPre[0]--;
-                    if(exp.charAt(iPre[0]) == '(')
-                        st--;
-                    else if(exp.charAt(iPre[0]) == ')')
-                        st++;
-                }
-                iPre[0]--;
-            }else
-                while(exp.charAt(iPre[0]) != '(')
-                    iPre[0]--;
-            if(exp.charAt(in + 2) == '('){
-                st = 1;
-                while(st > 0){
-                    iPos[1]++;
-                    if(exp.charAt(iPos[1]) == ')')
-                        st--;
-                    else if(exp.charAt(iPos[1]) == '(')
-                        st++;
-                }
-                iPos[1]++;
-            }else
-                while(exp.charAt(iPos[1]) != ')')
-                    iPos[1]++;
+        
+        while(expBuilder.indexOf("%") >= 0){
             
-            exp = exp.substring(0, iPre[0]) + "pd(" + exp.substring(iPre[0] + 1, iPre[1] + 1) + "," + exp.substring(iPos[0], iPos[1]) + ")" + exp.substring(iPos[1] + 1, exp.length());
+            in = expBuilder.indexOf("%");
             
+            int pos = in;
+            st = 0;
+            while(pos >= 0){
+                if(st == 0 && expBuilder.charAt(pos) == '(')
+                    break;
+                if(expBuilder.charAt(pos) == ')')
+                    st++;
+                if(expBuilder.charAt(pos) == '(')
+                    st--;
+                pos--;
+            }
+            
+            expBuilder.setCharAt(in, ',');
+            
+            if(pos < 0){
+                expBuilder.insert(0, "pd(");
+                expBuilder.append(')');
+            }else
+                expBuilder.insert(pos, "pd");
+
         }
         
+        exp = expBuilder.toString();
+        
         Pattern p = Pattern.compile("b(\\d+)");
-        Matcher m = p.matcher(exp);
+        Matcher m = p.matcher(expBuilder);
         exp = m.replaceAll("b[$1]");
         
-        interpreter = new Interpreter();
-        interpreter.source("scripts/pd.js");
+        ScriptEngineManager manager = new ScriptEngineManager();
+        engine = manager.getEngineByName("JavaScript");
+        engine.eval("function pd(a, b) { return b == 0.0 ? 1.0 : a / b; }");
         
     }
 
     @Override
-    public double combineVoxel(gpsiVoxel voxel){
-        try {
-            interpreter.set("b", voxel.getHyperspectralData());
-            interpreter.eval("val = " + exp);
-            return (double) interpreter.get("val");
-        } catch (EvalError ex) {
-            return Double.NaN;
-        }
+    public double combineVoxel(gpsiVoxel voxel) throws EvalError, ScriptException{
+        
+        engine.getBindings(ScriptContext.ENGINE_SCOPE).put("b", voxel.getHyperspectralData());
+        double r = (double)engine.eval(exp);
+        return r;
+
     }
     
 }

@@ -48,6 +48,9 @@ public class gpsiApplicationFactory {
     @Option(name = "-dataType", usage = "Type of dataset: (v) Voxel or (r) Roi")
     protected String dataType = "v";
     
+    @Option(name = "-programs", usage = "Path to stored programs")
+    protected String programsPath;
+    
     @Argument
     protected Byte[] classLabels;
     
@@ -69,6 +72,8 @@ public class gpsiApplicationFactory {
         switch(type){
             case "JGAPEvolver":
                 return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, validation, bootstrap, dumpGens, maxInitDepth);
+            case "OVOFromFiles":
+                return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath);
         }
         return null;
     }

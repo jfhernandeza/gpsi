@@ -27,14 +27,14 @@ public class gpsiClassifier {
         this.dataset = new gpsiMLDataset(descriptor);
     }
     
-    public void fit(HashMap<Byte, ArrayList<gpsiEntity>> X){
+    public void fit(HashMap<Byte, ArrayList<gpsiEntity>> X) throws Exception{
         
         dataset.loadTrainingSet(X, true);
         algorithm.fit(dataset.getTrainingEntities());
         
     }
     
-    public HashMap<Byte, byte[]> predict(HashMap<Byte, ArrayList<gpsiEntity>> X){
+    public HashMap<Byte, byte[]> predict(HashMap<Byte, ArrayList<gpsiEntity>> X) throws Exception{
         
         dataset.loadTestSet(X, true);
         

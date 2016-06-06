@@ -20,7 +20,7 @@ public class gpsiVoxelBandCombiner extends gpsiBandCombiner<gpsiVoxel>{
     }
 
     @Override
-    public HashMap<Byte, double[][]> combineEntities(HashMap<Byte, ArrayList<gpsiVoxel>> entities) {
+    public HashMap<Byte, double[][]> combineEntities(HashMap<Byte, ArrayList<gpsiVoxel>> entities) throws Exception  {
         
         HashMap<Byte, double[][]> combinedEntities = new HashMap<>();
         double[][] vectors;

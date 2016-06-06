@@ -18,7 +18,7 @@ import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;
 public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm extends gpsiClassificationAlgorithm {
     
     private final AbstractUnivariateStatistic moment;
-    private double[][] centroids;
+    private HashMap<Byte, double[]> centroids;
 
     public gpsiSimpleDistanceToMomentScalarClassificationAlgorithm(AbstractUnivariateStatistic moment) {
         this.moment = moment;
@@ -28,21 +28,20 @@ public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm extends gps
     public void fit(HashMap<Byte, ArrayList<double[]>> x) {
         
         int i;
+        double[] centroid;
         RealMatrix entities;
         
-        this.nClasses = x.keySet().size();
-        this.dimensionality = Integer.MIN_VALUE;
-        for(byte label : x.keySet())
-            if(this.dimensionality < label)
-                this.dimensionality = label;
-        
-        this.centroids = new double[this.nClasses][this.dimensionality];
-        
+        this.centroids = new HashMap<>();
+        this.nClasses = x.size();
+        this.dimensionality = 0;
         for(byte label : x.keySet()){
+            if(this.dimensionality <= 0)
+                this.dimensionality = x.get(label).get(0).length;
             entities = MatrixUtils.createRealMatrix(x.get(label).toArray(new double[0][]));
+            centroid = new double[this.dimensionality];
             for(i = 0; i < this.dimensionality; i++)
-                this.centroids[label][i] = this.moment.evaluate(entities.getColumn(i));
-               
+                centroid[i] = this.moment.evaluate(entities.getColumn(i));
+            this.centroids.put(label, centroid);
         }
         
     }
@@ -53,10 +52,10 @@ public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm extends gps
         byte minDistanceIndex = 0;
         double distance, minDistance = Double.POSITIVE_INFINITY;
         
-        for(byte j = 0; j < this.nClasses; j++){
+        for(byte j : this.centroids.keySet()){
             distance = 0.0;
             for(int k = 0; k < this.dimensionality; k++)
-                distance += Math.abs(x[k] - this.centroids[j][k]);
+                distance += Math.abs(x[k] - this.centroids.get(j)[k]);
             if(distance < minDistance){
                 minDistanceIndex = j;
                 minDistance = distance;

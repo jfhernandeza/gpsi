@@ -47,7 +47,11 @@ public class gpsiJGAPRoiFitnessFunction extends gpsiJGAPFitnessFunction<gpsiRoiR
         //roiBandCombinator.combineEntity(this.dataset.getTrainingEntities());
         
         gpsiMLDataset mlDataset = new gpsiMLDataset(this.descriptor);
-        mlDataset.loadWholeDataset(this.dataset, true);
+        try {
+            mlDataset.loadWholeDataset(this.dataset, true);
+        } catch (Exception ex) {
+            Logger.getLogger(gpsiJGAPRoiFitnessFunction.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         int dimensionality = mlDataset.getDimensionality();
         int n_classes = mlDataset.getTrainingEntities().keySet().size();

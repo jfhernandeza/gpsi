@@ -22,7 +22,7 @@ public class gpsiScalarSpectralIndexDescriptor implements gpsiDescriptor{
     }
     
     @Override
-    public double[] getFeatureVector(gpsiEntity entity) {
+    public double[] getFeatureVector(gpsiEntity entity) throws Exception {
         
         gpsiVoxel voxel = (gpsiVoxel) entity;
         double[] vector = new double[1];

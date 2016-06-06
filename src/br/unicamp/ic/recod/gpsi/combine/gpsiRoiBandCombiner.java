@@ -21,7 +21,7 @@ public class gpsiRoiBandCombiner extends gpsiBandCombiner<gpsiRoi>{
     }
 
     @Override
-    public HashMap<Byte, double[][]> combineEntities(HashMap<Byte, ArrayList<gpsiRoi>> entities){
+    public HashMap<Byte, double[][]> combineEntities(HashMap<Byte, ArrayList<gpsiRoi>> entities) throws Exception{
         
         HashMap<Byte, double[][]> combinedEntities = new HashMap<>();
         

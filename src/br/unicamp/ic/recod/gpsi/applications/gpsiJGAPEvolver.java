@@ -86,7 +86,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
     
     
     @Override
-    public void run() throws InvalidConfigurationException, InterruptedException {
+    public void run() throws InvalidConfigurationException, InterruptedException, Exception {
         
         gpsiDescriptor descriptor;
         gpsiMLDataset mlDataset;

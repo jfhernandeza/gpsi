@@ -24,7 +24,7 @@ public class gpsiMLDataset extends gpsiDataset<double[]>{
         
     }
     
-    public void loadTrainingSet(HashMap<Byte, ArrayList<gpsiEntity>> trainingSet, boolean override){
+    public void loadTrainingSet(HashMap<Byte, ArrayList<gpsiEntity>> trainingSet, boolean override) throws Exception{
 
         if(override)
             this.trainingEntities = new HashMap<>();
@@ -38,7 +38,7 @@ public class gpsiMLDataset extends gpsiDataset<double[]>{
         
     }
     
-    public void loadValidationSet(HashMap<Byte, ArrayList<gpsiEntity>> validationSet, boolean override){
+    public void loadValidationSet(HashMap<Byte, ArrayList<gpsiEntity>> validationSet, boolean override) throws Exception{
         
         if(override)
             this.validationEntities = new HashMap<>();
@@ -52,7 +52,7 @@ public class gpsiMLDataset extends gpsiDataset<double[]>{
         
     }
     
-    public void loadTestSet(HashMap<Byte, ArrayList<gpsiEntity>> testSet, boolean override){
+    public void loadTestSet(HashMap<Byte, ArrayList<gpsiEntity>> testSet, boolean override) throws Exception{
         
         if(override)
             this.testEntities = new HashMap<>();
@@ -65,7 +65,7 @@ public class gpsiMLDataset extends gpsiDataset<double[]>{
         }
     }
     
-    public void loadWholeDataset(gpsiRawDataset rawDataset, boolean override){
+    public void loadWholeDataset(gpsiRawDataset rawDataset, boolean override) throws Exception{
         
         loadTrainingSet(rawDataset.getTrainingEntities(), override);
         loadValidationSet(rawDataset.getValidationEntities(), override);

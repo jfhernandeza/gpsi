@@ -25,8 +25,6 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
     @Override
     public gpsiVoxelRawDataset readDataset(String path, Byte[] classLabels) throws Exception {
         
-        //TODO: In case no labels provided, consider all classes
-        
         if((new File(path + "img.mat")).exists())
             return readOneSceneDataset(path, classLabels);
         

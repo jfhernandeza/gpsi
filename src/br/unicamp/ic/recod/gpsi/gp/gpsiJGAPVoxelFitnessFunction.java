@@ -11,6 +11,8 @@ import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombiner;
 import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.features.gpsiScalarSpectralIndexDescriptor;
 import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jgap.gp.IGPProgram;
 
 /**
@@ -34,7 +36,11 @@ public class gpsiJGAPVoxelFitnessFunction extends gpsiJGAPFitnessFunction<gpsiVo
     protected double evaluate(IGPProgram igpp) {
         gpsiScalarSpectralIndexDescriptor descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(super.b, igpp));
         gpsiMLDataset mlDataset = new gpsiMLDataset(descriptor);
-        mlDataset.loadWholeDataset(super.dataset, true);
+        try {
+            mlDataset.loadWholeDataset(super.dataset, true);
+        } catch (Exception ex) {
+            Logger.getLogger(gpsiJGAPVoxelFitnessFunction.class.getName()).log(Level.SEVERE, null, ex);
+        }
         double[][][] samples = this.sampler.sample(mlDataset.getTrainingEntities(), classLabels);
         return this.score.score(samples) + 1.0;
     }

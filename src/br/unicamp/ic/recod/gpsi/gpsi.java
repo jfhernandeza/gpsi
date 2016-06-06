@@ -30,7 +30,7 @@ public class gpsi {
         parser.parseArgument(args);
         
         gpsiApplication app = factory.create();
-        app.getRawDataset().assignFolds(new byte[] {0, 1, 2}, new byte[] {3}, new byte[] {4});
+        app.getRawDataset().assignFolds(new byte[] {4, 0, 1}, null, new byte[] {3});
         app.run();
         
         System.exit(0);

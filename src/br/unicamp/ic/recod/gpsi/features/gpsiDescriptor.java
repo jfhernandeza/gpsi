@@ -13,6 +13,6 @@ import br.unicamp.ic.recod.gpsi.img.gpsiEntity;
  */
 public interface gpsiDescriptor {
     
-    public abstract double[] getFeatureVector(gpsiEntity entity);
+    public abstract double[] getFeatureVector(gpsiEntity entity) throws Exception;
     
 }

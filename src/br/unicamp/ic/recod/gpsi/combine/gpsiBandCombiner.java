@@ -21,6 +21,6 @@ public abstract class gpsiBandCombiner<D> {
         this.voxelCombinator = voxelCombinator;
     }
     
-    public abstract HashMap<Byte, double[][]> combineEntities(HashMap<Byte, ArrayList<D>> entities);
+    public abstract HashMap<Byte, double[][]> combineEntities(HashMap<Byte, ArrayList<D>> entities) throws Exception;
     
 }
