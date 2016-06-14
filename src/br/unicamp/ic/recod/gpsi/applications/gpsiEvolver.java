@@ -5,6 +5,7 @@
  */
 package br.unicamp.ic.recod.gpsi.applications;
 
+import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 
 /**

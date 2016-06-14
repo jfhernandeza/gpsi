@@ -6,7 +6,10 @@
 package br.unicamp.ic.recod.gpsi.applications;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
+import br.unicamp.ic.recod.gpsi.io.element.gpsiIOStream;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  *
@@ -15,8 +18,10 @@ import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 public abstract class gpsiApplication {
     
     protected final gpsiRawDataset rawDataset;
-    protected final String datsetPath, outputPath;
+    protected final String datsetPath;
     protected final Byte[] classLabels;
+    protected final gpsiIOStream stream;
+    protected String outputPath;
 
     public gpsiApplication(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath) throws Exception {
         
@@ -30,16 +35,20 @@ public abstract class gpsiApplication {
         else
             this.classLabels = classLabels;
         
+        this.stream = new gpsiIOStream();
+        
         System.out.println("Loaded dataset hyperspectral image with " + rawDataset.getnBands() + " bands.");
         System.out.println("Loaded " + rawDataset.getNumberOfEntities() + " examples.");
         
     }
-
-    public gpsiRawDataset getRawDataset() {
-        return rawDataset;
+    
+    public void report() throws Exception{
+        if(this.outputPath == null)
+            this.outputPath = (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(Calendar.getInstance().getTime());
+        this.stream.setRoot("results/" + this.outputPath + "/");
+        this.stream.flush();
     }
     
     public abstract void run() throws Exception;
-    public abstract void report();
     
 }

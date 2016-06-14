@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.applications;
+package br.unicamp.ic.recod.gpsi.ml;
 
 import br.unicamp.ic.recod.gpsi.img.gpsiEntity;
 import java.util.ArrayList;

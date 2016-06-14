@@ -19,40 +19,40 @@ import org.kohsuke.args4j.Option;
 public class gpsiApplicationFactory {
     
     @Option(name = "-type", usage = "Path to the scene")
-    private String type;
+    public String type;
     
     @Option(name = "-dataset", usage = "Path to the scene")
-    protected String datasetPath;
+    public String datasetPath;
     
     @Option(name = "-popSize", usage = "Population size")
-    protected int popSize = 10;
+    public int popSize = 10;
     
     @Option(name = "-numGens", usage = "Number of generations")
-    protected int numGenerations = 50;
+    public int numGenerations = 50;
     
     @Option(name = "-maxInitDepth", usage = "Max initial depth of trees")
-    protected int maxInitDepth = 6;
+    public int maxInitDepth = 6;
     
     @Option(name = "-val", usage = "Number of individuals used for validation")
-    protected int validation = 0;
+    public int validation = 0;
     
     @Option(name = "-bootstrap", usage = "Number of boostrapped samples during evolution")
-    protected double bootstrap = 0;
+    public double bootstrap = 0;
     
     @Option(name = "-dumpGens", usage = "Whether to save the distribution of samples through generations")
-    protected boolean dumpGens;
+    public boolean dumpGens;
     
     @Option(name = "-out", usage = "Path where the results must be saved")
-    protected String outputPath = "";
+    public String outputPath;
     
     @Option(name = "-dataType", usage = "Type of dataset: (v) Voxel or (r) Roi")
-    protected String dataType = "v";
+    public String dataType = "v";
     
     @Option(name = "-programs", usage = "Path to stored programs")
-    protected String programsPath;
+    public String programsPath;
     
     @Argument
-    protected Byte[] classLabels;
+    public Byte[] classLabels;
     
     public gpsiApplication create() throws Exception{
         
@@ -74,8 +74,21 @@ public class gpsiApplicationFactory {
                 return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, validation, bootstrap, dumpGens, maxInitDepth);
             case "OVOFromFiles":
                 return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath);
+            case "JGAPClassifier":
+                return new gpsiJGAPClassifier(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, validation, bootstrap, dumpGens, maxInitDepth);
         }
         return null;
     }
     
+    private gpsiApplicationFactory() {
+    }
+    
+    public static gpsiApplicationFactory getInstance() {
+        return gpsiApplicationFactoryHolder.INSTANCE;
+    }
+    
+    private static class gpsiApplicationFactoryHolder {
+
+        private static final gpsiApplicationFactory INSTANCE = new gpsiApplicationFactory();
+    }
 }

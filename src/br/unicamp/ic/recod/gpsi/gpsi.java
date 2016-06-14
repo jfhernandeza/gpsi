@@ -24,14 +24,14 @@ public class gpsi {
     
     public static void main(String[] args) throws Exception {
         
-        gpsiApplicationFactory factory = new gpsiApplicationFactory();
+        gpsiApplicationFactory factory = gpsiApplicationFactory.getInstance();
         
         CmdLineParser parser = new CmdLineParser(factory);
         parser.parseArgument(args);
         
         gpsiApplication app = factory.create();
-        app.getRawDataset().assignFolds(new byte[] {4, 0, 1}, null, new byte[] {3});
         app.run();
+        app.report();
         
         System.exit(0);
         

@@ -13,27 +13,17 @@ import java.util.Random;
  *
  * @author juan
  */
-public class gpsiBootstrapper implements gpsiSampler{
-
-    private double p;
-
-    public gpsiBootstrapper(double p) {
-        this.p = p;
-    }
+public abstract class gpsiBootstrapper implements gpsiSampler{
     
-    @Override
-    public double[][][] sample(HashMap<Byte, ArrayList<double[]>> entities, Byte[] labels) {
-        
+    protected double[][][] bootstrap(HashMap<Byte, ArrayList<double[]>> entities, Byte[] labels, int[] n){
         double[][][] vector = new double[labels.length][][];
         ArrayList<double[]> samplingEntities;
         Random rand = new Random();
-        int n;
         
         for(int i = 0; i < labels.length; i++){
             samplingEntities = entities.get(labels[i]);
-            n = (int) (samplingEntities.size() * p);
-            vector[i] = new double[n][];
-            for(int j = 0; j < n; j++)
+            vector[i] = new double[n[i % n.length]][];
+            for(int j = 0; j < n[i % n.length]; j++)
                 vector[i][j] = samplingEntities.get(rand.nextInt(samplingEntities.size()));
         }
         

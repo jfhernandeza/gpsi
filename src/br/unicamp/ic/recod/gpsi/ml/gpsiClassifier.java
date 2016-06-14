@@ -3,12 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package br.unicamp.ic.recod.gpsi.applications;
+package br.unicamp.ic.recod.gpsi.ml;
 
 import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
 import br.unicamp.ic.recod.gpsi.img.gpsiEntity;
-import br.unicamp.ic.recod.gpsi.ml.gpsiClassificationAlgorithm;
 import java.util.ArrayList;
 import java.util.HashMap;
 

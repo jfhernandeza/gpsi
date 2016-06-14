@@ -227,38 +227,6 @@ public class gpsiJGAPVoxelClassifierEvolver extends gpsiVoxelClassifierEvolver {
         
     }
 
-    private GPGenotype create(GPConfiguration conf, int n_bands, gpsiJGAPFitnessFunction fitness) throws InvalidConfigurationException {
-
-        Class[] types = {CommandGene.DoubleClass};
-        Class[][] argTypes = {{}};
-
-        CommandGene[] variables = new CommandGene[n_bands];
-        Variable[] b = new Variable[n_bands];
-        CommandGene[] functions = {
-            new Add(conf, CommandGene.DoubleClass),
-            new Subtract(conf, CommandGene.DoubleClass),
-            new Multiply(conf, CommandGene.DoubleClass),
-            new gpsiJGAPProtectedDivision(conf, CommandGene.DoubleClass),
-            //new Divide(conf, CommandGene.DoubleClass),
-            new Sine(conf, CommandGene.DoubleClass),
-            new Cosine(conf, CommandGene.DoubleClass),
-            new Exp(conf, CommandGene.DoubleClass),
-            new Terminal(conf, CommandGene.DoubleClass, 1.0d, 1000000.0d, false)
-        };
-
-        for (int i = 0; i < n_bands; i++) {
-            b[i] = Variable.create(conf, "b" + i, CommandGene.DoubleClass);
-            variables[i] = b[i];
-        }
-
-        CommandGene[][] nodeSets = new CommandGene[1][];
-        nodeSets[0] = (CommandGene[]) ArrayUtils.addAll(variables, functions);
-
-        fitness.setB(b);
-
-        return GPGenotype.randomInitialGenotype(conf, types, argTypes, nodeSets, 100, true);
-    }
-
     public void printResults() throws FileNotFoundException {
 
         String outRoot = "results/" + (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(Calendar.getInstance().getTime()) + "/";

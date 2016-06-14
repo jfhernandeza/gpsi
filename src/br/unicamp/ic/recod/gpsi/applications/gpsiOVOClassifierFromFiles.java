@@ -5,6 +5,8 @@
  */
 package br.unicamp.ic.recod.gpsi.applications;
 
+import br.unicamp.ic.recod.gpsi.ml.gpsiOVOEnsembleMethod;
+import br.unicamp.ic.recod.gpsi.ml.gpsiClassifier;
 import br.unicamp.ic.recod.gpsi.combine.gpsiStringParserVoxelCombiner;
 import br.unicamp.ic.recod.gpsi.features.gpsiScalarSpectralIndexDescriptor;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;

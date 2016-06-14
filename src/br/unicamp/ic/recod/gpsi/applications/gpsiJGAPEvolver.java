@@ -6,20 +6,24 @@
 package br.unicamp.ic.recod.gpsi.applications;
 
 import br.unicamp.ic.recod.gpsi.combine.gpsiJGAPVoxelCombiner;
-import br.unicamp.ic.recod.gpsi.combine.gpsiVoxelBandCombiner;
-import br.unicamp.ic.recod.gpsi.data.gpsiBootstrapper;
+import br.unicamp.ic.recod.gpsi.data.gpsiConstantBootstrapper;
 import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
+import br.unicamp.ic.recod.gpsi.data.gpsiProbabilisticBootstrapper;
 import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
 import br.unicamp.ic.recod.gpsi.data.gpsiVoxelRawDataset;
 import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
 import br.unicamp.ic.recod.gpsi.features.gpsiScalarSpectralIndexDescriptor;
 import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedDivision;
+import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedNaturalLogarithm;
+import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedSquareRoot;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPVoxelFitnessFunction;
+import br.unicamp.ic.recod.gpsi.io.element.gpsiConfigurationIOElement;
+import br.unicamp.ic.recod.gpsi.io.element.gpsiCsvIOElement;
+import br.unicamp.ic.recod.gpsi.io.element.gpsiStringIOElement;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
-import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
@@ -39,19 +43,15 @@ import org.jgap.gp.terminal.Variable;
  *
  * @author juan
  */
-public class gpsiJGAPEvolver extends gpsiEvolver{
-    
-    
+public class gpsiJGAPEvolver extends gpsiEvolver {
+
     private final int maxInitDepth;
-    
+
     private final GPConfiguration config;
     private final gpsiJGAPVoxelFitnessFunction fitness;
-    
-    private final double[] curve;
-    private String program;
-    private final LinkedBlockingQueue<double[][][]> distributions;
 
-    
+    private IGPProgram[] best;
+
     public gpsiJGAPEvolver(
             String dataSetPath,
             gpsiDatasetReader datasetReader,
@@ -63,106 +63,133 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
             double bootstrap,
             boolean dumpGens,
             int maxInitDepth) throws InvalidConfigurationException, Exception {
-        
+
         super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, validation, bootstrap, dumpGens);
         this.maxInitDepth = maxInitDepth;
-        
+
         config = new GPConfiguration();
         config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator());
 
         config.setMaxInitDepth(this.maxInitDepth);
         config.setPopulationSize(popSize);
 
-        gpsiSampler sampler = (bootstrap > 0.0) ? new gpsiBootstrapper(bootstrap) : new gpsiWholeSampler();
-        
+        gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap) : new gpsiConstantBootstrapper((int) bootstrap);
+
         fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, new gpsiClusterSilhouetteScore(), sampler);
         config.setFitnessFunction(fitness);
-        
-        curve = new double[super.numGenerations];
-        distributions = new LinkedBlockingQueue<>();
-        
+
+        stream.register(new gpsiConfigurationIOElement(null, "report.out"));
+
     }
 
-    
-    
     @Override
     public void run() throws InvalidConfigurationException, InterruptedException, Exception {
-        
-        gpsiDescriptor descriptor;
-        gpsiMLDataset mlDataset;
-        gpsiVoxelRawDataset dataset = (gpsiVoxelRawDataset) rawDataset;
-
-        GPGenotype gp = create(config, dataset.getnBands(), fitness);
-
-        // 0: train, 1: train_val, 2: val
-        double[][] fitnessCurves = new double[super.numGenerations][3];
-        
-        IGPProgram current, best = null;
-        double bestScore = -Double.MAX_VALUE, currentScore;
 
         int i, j, k;
+        byte nFolds = 5;
+        gpsiDescriptor descriptor;
+        gpsiMLDataset mlDataset;
+        gpsiVoxelRawDataset dataset;
+        GPGenotype gp;
+        double[][] fitnessCurves;
+        String[] curveLabels = new String[]{"train", "train_val", "val"};
+        double bestScore, currentScore;
+        IGPProgram current, bestVal;
+
         Mean mean = new Mean();
         StandardDeviation sd = new StandardDeviation();
-        double validationScore, trainScore, bestValidationScore = -1.0, bestTrainScore = -1.0;
+
+        double validationScore, trainScore, bestValidationScore, bestTrainScore;
         double[][][] samples;
-        gpsiVoxelBandCombiner voxelBandCombinator;
-        
-        for (int generation = 0; generation < super.numGenerations; generation++) {
+
+        for (byte f = 0; f < nFolds; f++) {
             
-            gp.evolve(1);
-            gp.getGPPopulation().sortByFitness();
-            
-            if(this.dumpGens){
-                double[][][] dists = new double[this.classLabels.length][][];
-                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), gp.getGPPopulation().getGPPrograms()[0]));
-                mlDataset = new gpsiMLDataset(descriptor);
-                mlDataset.loadWholeDataset(rawDataset, true);
-                this.distributions.put(this.fitness.getSampler().sample(dataset.getTrainingEntities(), this.classLabels));
-            }
-            
-            for (i = 0; i < super.validation; i++) {
+            System.out.println("\nRun " + (f + 1) + "\n");
 
-                current = gp.getGPPopulation().getGPPrograms()[i];
+            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, new byte[]{(byte) ((f + 4) % nFolds)});
+            dataset = (gpsiVoxelRawDataset) rawDataset;
+            gp = create(config, dataset.getnBands(), fitness);
 
-                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), current));
-                mlDataset = new gpsiMLDataset(descriptor);
-                mlDataset.loadWholeDataset(rawDataset, true);
-                
-                samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
-                
-                validationScore = fitness.getScore().score(samples);
-                trainScore = current.getFitnessValue() - 1.0;
+            // 0: train, 1: train_val, 2: val
+            fitnessCurves = new double[super.numGenerations][];
+            current = null;
+            bestVal = null;
+            bestScore = -Double.MAX_VALUE;
+            bestValidationScore = -1.0;
+            bestTrainScore = -1.0;
 
-                currentScore = mean.evaluate(new double[]{trainScore, validationScore}) - sd.evaluate(new double[]{trainScore, validationScore});
+            for (int generation = 0; generation < super.numGenerations; generation++) {
 
-                if (currentScore > bestScore) {
-                    best = current;
-                    bestScore = currentScore;
-                    bestTrainScore = trainScore;
-                    bestValidationScore = validationScore;
+                gp.evolve(1);
+                gp.getGPPopulation().sortByFitness();
+
+                if (this.dumpGens) {
+                    
+                    double[][][] dists;
+                    descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), gp.getGPPopulation().getGPPrograms()[0]));
+                    mlDataset = new gpsiMLDataset(descriptor);
+                    mlDataset.loadWholeDataset(rawDataset, true);
+
+                    dists = (new gpsiWholeSampler()).sample(mlDataset.getTrainingEntities(), this.classLabels);;
+                    for (i = 0; i < this.classLabels.length; i++) {
+                        stream.register(new gpsiCsvIOElement(dists[i], null, "gens/" + classLabels[i] + "/" + (generation + 1) + ".csv"));
+                    }
+
+                }
+
+                for (i = 0; i < super.validation; i++) {
+
+                    current = gp.getGPPopulation().getGPPrograms()[i];
+
+                    descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), current));
+                    mlDataset = new gpsiMLDataset(descriptor);
+                    mlDataset.loadWholeDataset(rawDataset, true);
+
+                    samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
+
+                    validationScore = fitness.getScore().score(samples);
+                    trainScore = current.getFitnessValue() - 1.0;
+
+                    currentScore = mean.evaluate(new double[]{trainScore, validationScore}) - sd.evaluate(new double[]{trainScore, validationScore});
+
+                    if (currentScore > bestScore) {
+                        bestVal = current;
+                        bestScore = currentScore;
+                        bestTrainScore = trainScore;
+                        bestValidationScore = validationScore;
+                    }
+
+                }
+
+                if (validation > 0) {
+                    best = new IGPProgram[2];
+                    best[0] = gp.getAllTimeBest();
+                    best[1] = bestVal;
+                    fitnessCurves[generation] = new double[]{best[0].getFitnessValue() - 1.0, bestTrainScore, bestValidationScore};
+                    System.out.printf("Gen %d:\t%.5f\t%.5f\t%.5f\n", generation + 1, fitnessCurves[generation][0], fitnessCurves[generation][1], fitnessCurves[generation][2]);
+                } else {
+                    best = new IGPProgram[1];
+                    best[0] = gp.getAllTimeBest();
+                    fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
+                    System.out.printf("Gen %d:\t%.5f\n", generation + 1, fitnessCurves[generation][0]);
                 }
 
             }
 
-            fitnessCurves[generation] = new double[] {gp.getAllTimeBest().getFitnessValue() - 1.0, bestTrainScore, bestValidationScore};
-            System.out.printf("Gen %d:\t%.5f\t%.5f\t%.5f\n", generation + 1, fitnessCurves[generation][0], fitnessCurves[generation][1] ,fitnessCurves[generation][2]);
+            stream.register(new gpsiCsvIOElement(fitnessCurves, curveLabels, "curves/f" + (f + 1) + ".csv"));
+
+            System.out.println("Best solution for trainning: " + gp.getAllTimeBest().toStringNorm(0));
+            stream.register(new gpsiStringIOElement(gp.getAllTimeBest().toStringNorm(0), "programs/f" + (f + 1) + "train.program"));
+
+            if (validation > 0) {
+                System.out.println("Best solution for trainning and validation: " + bestVal.toStringNorm(0));
+                stream.register(new gpsiStringIOElement(bestVal.toStringNorm(0), "programs/f" + (f + 1) + "train_val.program"));
+            }
 
         }
-        
-        //curves.add(fitnessCurves);
-        //programs.put(gp.getAllTimeBest().toStringNorm(0));
-        //programs.put(best.toStringNorm(0));
-        
-        System.out.println("Best solution for trainning: " + gp.getAllTimeBest().toStringNorm(0));
-        System.out.println("Best solution for trainning and validation: " + best.toStringNorm(0));
-        
+
     }
 
-    @Override
-    public void report() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
     private GPGenotype create(GPConfiguration conf, int n_bands, gpsiJGAPFitnessFunction fitness) throws InvalidConfigurationException {
 
         Class[] types = {CommandGene.DoubleClass};
@@ -175,10 +202,8 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
             new Subtract(conf, CommandGene.DoubleClass),
             new Multiply(conf, CommandGene.DoubleClass),
             new gpsiJGAPProtectedDivision(conf, CommandGene.DoubleClass),
-            //new Divide(conf, CommandGene.DoubleClass),
-            //new Sine(conf, CommandGene.DoubleClass),
-            //new Cosine(conf, CommandGene.DoubleClass),
-            //new Exp(conf, CommandGene.DoubleClass),
+            new gpsiJGAPProtectedNaturalLogarithm(conf, CommandGene.DoubleClass),
+            new gpsiJGAPProtectedSquareRoot(conf, CommandGene.DoubleClass),
             new Terminal(conf, CommandGene.DoubleClass, 1.0d, 1000000.0d, false)
         };
 
@@ -194,5 +219,9 @@ public class gpsiJGAPEvolver extends gpsiEvolver{
 
         return GPGenotype.randomInitialGenotype(conf, types, argTypes, nodeSets, 100, true);
     }
-    
+
+    public IGPProgram[] getBest() {
+        return best;
+    }
+
 }
