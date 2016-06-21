@@ -33,6 +33,12 @@ public class gpsiApplicationFactory {
     @Option(name = "-maxInitDepth", usage = "Max initial depth of trees")
     public int maxInitDepth = 6;
     
+    @Option(name = "-crossRate", usage = "Crossover probability")
+    public double crossRate = 0.9;
+    
+    @Option(name = "-mutRate", usage = "Mutation probability")
+    public double mutRate = 0.1;
+    
     @Option(name = "-val", usage = "Number of individuals used for validation")
     public int validation = 0;
     
@@ -71,11 +77,11 @@ public class gpsiApplicationFactory {
         
         switch(type){
             case "JGAPEvolver":
-                return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, validation, bootstrap, dumpGens, maxInitDepth);
+                return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth);
             case "OVOFromFiles":
                 return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath);
             case "JGAPClassifier":
-                return new gpsiJGAPClassifier(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, validation, bootstrap, dumpGens, maxInitDepth);
+                return new gpsiJGAPClassifier(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth);
         }
         return null;
     }

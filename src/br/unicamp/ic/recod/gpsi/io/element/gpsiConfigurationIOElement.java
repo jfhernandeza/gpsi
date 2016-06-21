@@ -41,7 +41,9 @@ public class gpsiConfigurationIOElement extends gpsiIOElement<Object> {
         
         outR.println("maxInitDepth=" + element.maxInitDepth);
         outR.println("numGenerations=" + element.numGenerations);
-        outR.println("popSIze=" + element.popSize);
+        outR.println("popSize=" + element.popSize);
+        outR.println("crossRate=" + element.crossRate);
+        outR.println("mutRate=" + element.mutRate);
         outR.println("validation=" + element.validation);
         outR.println("bootstrap=" + element.bootstrap);
         

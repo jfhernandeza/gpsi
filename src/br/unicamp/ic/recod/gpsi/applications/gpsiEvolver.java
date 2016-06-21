@@ -5,7 +5,6 @@
  */
 package br.unicamp.ic.recod.gpsi.applications;
 
-import br.unicamp.ic.recod.gpsi.data.gpsiRawDataset;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 
 /**
@@ -17,6 +16,8 @@ public abstract class gpsiEvolver extends gpsiApplication{
     protected int popSize;
     protected int numGenerations;
     protected int validation;
+    protected double crossRate;
+    protected double mutRate;
     protected double bootstrap;
     protected boolean dumpGens;
 
@@ -27,12 +28,16 @@ public abstract class gpsiEvolver extends gpsiApplication{
             String outputPath,
             int popSize,
             int numGenerations,
+            double crossRate,
+            double mutRate,
             int validation,
             double bootstrap,
             boolean dumpGens) throws Exception {
         super(dataSetPath, datasetReader, classLabels, outputPath);
         this.popSize = popSize;
         this.numGenerations = numGenerations;
+        this.crossRate = crossRate;
+        this.mutRate = mutRate;
         this.validation = validation;
         this.bootstrap = bootstrap;
         this.dumpGens = dumpGens;

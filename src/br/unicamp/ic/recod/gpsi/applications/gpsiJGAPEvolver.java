@@ -59,12 +59,14 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             String outputPath,
             int popSize,
             int numGenerations,
+            double crossRate,
+            double mutRate,
             int validation,
             double bootstrap,
             boolean dumpGens,
             int maxInitDepth) throws InvalidConfigurationException, Exception {
 
-        super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, validation, bootstrap, dumpGens);
+        super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens);
         this.maxInitDepth = maxInitDepth;
 
         config = new GPConfiguration();
@@ -72,7 +74,9 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
 
         config.setMaxInitDepth(this.maxInitDepth);
         config.setPopulationSize(popSize);
-
+        config.setCrossoverProb((float) crossRate);
+        config.setMutationProb((float) mutRate);
+        
         gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap) : new gpsiConstantBootstrapper((int) bootstrap);
 
         fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, new gpsiClusterSilhouetteScore(), sampler);
@@ -86,7 +90,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
     public void run() throws InvalidConfigurationException, InterruptedException, Exception {
 
         int i, j, k;
-        byte nFolds = 5;
+        byte nFolds = 1;
         gpsiDescriptor descriptor;
         gpsiMLDataset mlDataset;
         gpsiVoxelRawDataset dataset;
@@ -106,7 +110,8 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             
             System.out.println("\nRun " + (f + 1) + "\n");
 
-            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, new byte[]{(byte) ((f + 4) % nFolds)});
+            //rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, new byte[]{(byte) ((f + 4) % nFolds)});
+            rawDataset.assignFolds(new byte[]{0, 1, 2}, null, null);
             dataset = (gpsiVoxelRawDataset) rawDataset;
             gp = create(config, dataset.getnBands(), fitness);
 
