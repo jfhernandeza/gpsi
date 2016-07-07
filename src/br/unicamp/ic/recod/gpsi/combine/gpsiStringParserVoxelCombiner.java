@@ -7,11 +7,9 @@ package br.unicamp.ic.recod.gpsi.combine;
 
 import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import bsh.EvalError;
-import bsh.Interpreter;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -68,6 +66,8 @@ public class gpsiStringParserVoxelCombiner extends gpsiVoxelCombiner<double[], S
         ScriptEngineManager manager = new ScriptEngineManager();
         engine = manager.getEngineByName("JavaScript");
         engine.eval("function pd(a, b) { return b == 0.0 ? 1.0 : a / b; }");
+        engine.eval("function srt(a) { return a == 0.0 ? 0.0 : Math.log(Math.abs(a)); }");
+        engine.eval("function rlog(a) { return Math.sqrt(Math.abs(a)); }");
         
     }
 

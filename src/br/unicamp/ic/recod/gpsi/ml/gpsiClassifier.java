@@ -9,6 +9,7 @@ import br.unicamp.ic.recod.gpsi.data.gpsiMLDataset;
 import br.unicamp.ic.recod.gpsi.features.gpsiDescriptor;
 import br.unicamp.ic.recod.gpsi.img.gpsiEntity;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -56,11 +57,20 @@ public class gpsiClassifier {
     
     public int[][] getConfusionMatrix(){
         
+        HashMap<Byte, Integer> indices = new HashMap<>();
+        
         int confusionMatrix[][] = new int [algorithm.getnClasses()][algorithm.getnClasses()];
+        
+        Byte[] labels = prediction.keySet().toArray(new Byte[] {});
+        Arrays.sort(labels);
+        
+        for(int i = 0; i < labels.length; i++){
+            indices.put(labels[i], i);
+        }
         
         for(byte label : prediction.keySet())
             for(byte predictedLabel : prediction.get(label))
-                confusionMatrix[label][predictedLabel]++;
+                confusionMatrix[indices.get(label)][indices.get(predictedLabel)]++;
         
         return confusionMatrix;
                 

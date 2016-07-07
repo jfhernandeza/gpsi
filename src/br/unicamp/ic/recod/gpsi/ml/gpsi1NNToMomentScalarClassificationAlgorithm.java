@@ -15,12 +15,12 @@ import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;
  *
  * @author juan
  */
-public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm extends gpsiClassificationAlgorithm {
+public class gpsi1NNToMomentScalarClassificationAlgorithm extends gpsiClassificationAlgorithm {
     
     private final AbstractUnivariateStatistic moment;
     private HashMap<Byte, double[]> centroids;
 
-    public gpsiSimpleDistanceToMomentScalarClassificationAlgorithm(AbstractUnivariateStatistic moment) {
+    public gpsi1NNToMomentScalarClassificationAlgorithm(AbstractUnivariateStatistic moment) {
         this.moment = moment;
     }
 
@@ -48,6 +48,8 @@ public class gpsiSimpleDistanceToMomentScalarClassificationAlgorithm extends gps
 
     @Override
     public byte predict(double[] x) {
+        
+        //TODO: consider Euclidean disance instead of Manhattan for higher dimensionalities.
         
         byte minDistanceIndex = 0;
         double distance, minDistance = Double.POSITIVE_INFINITY;

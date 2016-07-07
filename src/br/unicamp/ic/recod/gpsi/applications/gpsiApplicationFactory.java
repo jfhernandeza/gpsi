@@ -82,6 +82,8 @@ public class gpsiApplicationFactory {
                 return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath);
             case "JGAPClassifier":
                 return new gpsiJGAPClassifier(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth);
+            case "BaselineComparator":
+                return new gpsiBaselineIndexComparator(datasetPath, reader, classLabels, outputPath, programsPath);
         }
         return null;
     }

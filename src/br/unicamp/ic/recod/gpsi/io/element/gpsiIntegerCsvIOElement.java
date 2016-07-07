@@ -12,17 +12,17 @@ import java.io.PrintWriter;
  *
  * @author juan
  */
-public class gpsiCsvIOElement extends gpsiIOElement<double[][]>{
+public class gpsiIntegerCsvIOElement extends gpsiIOElement<int[][]>{
 
     String[] columnNames;
     
-    public gpsiCsvIOElement(double[][] element, String[] columnNames, String path) {
+    public gpsiIntegerCsvIOElement(int[][] element, String[] columnNames, String path) {
         super(element, path);
         this.columnNames = columnNames;
     }
     
     @Override
-    public double[][] read() throws FileNotFoundException {
+    public int[][] read() throws FileNotFoundException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

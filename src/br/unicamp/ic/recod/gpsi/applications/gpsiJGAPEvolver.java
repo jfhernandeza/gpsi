@@ -20,10 +20,14 @@ import br.unicamp.ic.recod.gpsi.genotype.gpsiJGAPProtectedSquareRoot;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPFitnessFunction;
 import br.unicamp.ic.recod.gpsi.gp.gpsiJGAPVoxelFitnessFunction;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiConfigurationIOElement;
-import br.unicamp.ic.recod.gpsi.io.element.gpsiCsvIOElement;
+import br.unicamp.ic.recod.gpsi.io.element.gpsiDoubleCsvIOElement;
+import br.unicamp.ic.recod.gpsi.io.element.gpsiIntegerCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiStringIOElement;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiMeanAndStandardDeviationDistanceScore;
+import br.unicamp.ic.recod.gpsi.ml.gpsi1NNToMomentScalarClassificationAlgorithm;
+import br.unicamp.ic.recod.gpsi.ml.gpsiClassifier;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
@@ -79,7 +83,8 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         
         gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap) : new gpsiConstantBootstrapper((int) bootstrap);
 
-        fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, new gpsiClusterSilhouetteScore(), sampler);
+        //fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, new gpsiClusterSilhouetteScore(), sampler);
+        fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, new gpsiMeanAndStandardDeviationDistanceScore(), sampler);
         config.setFitnessFunction(fitness);
 
         stream.register(new gpsiConfigurationIOElement(null, "report.out"));
@@ -90,7 +95,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
     public void run() throws InvalidConfigurationException, InterruptedException, Exception {
 
         int i, j, k;
-        byte nFolds = 1;
+        byte nFolds = 5;
         gpsiDescriptor descriptor;
         gpsiMLDataset mlDataset;
         gpsiVoxelRawDataset dataset;
@@ -110,8 +115,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             
             System.out.println("\nRun " + (f + 1) + "\n");
 
-            //rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, new byte[]{(byte) ((f + 4) % nFolds)});
-            rawDataset.assignFolds(new byte[]{0, 1, 2}, null, null);
+            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, new byte[]{(byte) ((f + 4) % nFolds)});
             dataset = (gpsiVoxelRawDataset) rawDataset;
             gp = create(config, dataset.getnBands(), fitness);
 
@@ -135,9 +139,9 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
                     mlDataset = new gpsiMLDataset(descriptor);
                     mlDataset.loadWholeDataset(rawDataset, true);
 
-                    dists = (new gpsiWholeSampler()).sample(mlDataset.getTrainingEntities(), this.classLabels);;
+                    dists = (new gpsiWholeSampler()).sample(mlDataset.getTrainingEntities(), this.classLabels);
                     for (i = 0; i < this.classLabels.length; i++) {
-                        stream.register(new gpsiCsvIOElement(dists[i], null, "gens/" + classLabels[i] + "/" + (generation + 1) + ".csv"));
+                        stream.register(new gpsiDoubleCsvIOElement(dists[i], null, "gens/f" + (f + 1) + "/" + classLabels[i] + "/" + (generation + 1) + ".csv"));
                     }
 
                 }
@@ -181,7 +185,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
 
             }
 
-            stream.register(new gpsiCsvIOElement(fitnessCurves, curveLabels, "curves/f" + (f + 1) + ".csv"));
+            stream.register(new gpsiDoubleCsvIOElement(fitnessCurves, curveLabels, "curves/f" + (f + 1) + ".csv"));
 
             System.out.println("Best solution for trainning: " + gp.getAllTimeBest().toStringNorm(0));
             stream.register(new gpsiStringIOElement(gp.getAllTimeBest().toStringNorm(0), "programs/f" + (f + 1) + "train.program"));
@@ -191,6 +195,32 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
                 stream.register(new gpsiStringIOElement(bestVal.toStringNorm(0), "programs/f" + (f + 1) + "train_val.program"));
             }
 
+            
+            descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[0]));
+            gpsi1NNToMomentScalarClassificationAlgorithm classificationAlgorithm = new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean());
+            gpsiClassifier classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
+            
+            classifier.fit(this.rawDataset.getTrainingEntities());
+            classifier.predict(this.rawDataset.getTestEntities());
+            
+            int[][] confusionMatrix = classifier.getConfusionMatrix();
+            
+            stream.register(new gpsiIntegerCsvIOElement(confusionMatrix, null, "confusion_matrices/f" + (f + 1) + "_train.csv"));
+            
+            if(validation > 0){
+                 descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[0]));
+                 classificationAlgorithm = new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean());
+                 classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
+                 
+                 classifier.fit(this.rawDataset.getTrainingEntities());
+                 classifier.predict(this.rawDataset.getTestEntities());
+                 
+                 confusionMatrix = classifier.getConfusionMatrix();
+                 
+                 stream.register(new gpsiIntegerCsvIOElement(confusionMatrix, null, "confusion_matrices/f" + (f + 1) + "_train_val.csv"));
+                 
+           }
+            
         }
 
     }
