@@ -24,8 +24,14 @@ import br.unicamp.ic.recod.gpsi.io.element.gpsiDoubleCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiIntegerCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiStringIOElement;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
+import br.unicamp.ic.recod.gpsi.measures.gpsiNormalBhattacharyyaDistanceScore;
 import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiDistanceOfMediansScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiHellingerDistanceScore;
 import br.unicamp.ic.recod.gpsi.measures.gpsiMeanAndStandardDeviationDistanceScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiDualScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiScore;
 import br.unicamp.ic.recod.gpsi.ml.gpsi1NNToMomentScalarClassificationAlgorithm;
 import br.unicamp.ic.recod.gpsi.ml.gpsiClassifier;
 import org.apache.commons.lang.ArrayUtils;
@@ -68,7 +74,8 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             int validation,
             double bootstrap,
             boolean dumpGens,
-            int maxInitDepth) throws InvalidConfigurationException, Exception {
+            int maxInitDepth,
+            gpsiSampleSeparationScore score) throws InvalidConfigurationException, Exception {
 
         super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens);
         this.maxInitDepth = maxInitDepth;
@@ -83,8 +90,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         
         gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap) : new gpsiConstantBootstrapper((int) bootstrap);
 
-        //fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, new gpsiClusterSilhouetteScore(), sampler);
-        fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, new gpsiMeanAndStandardDeviationDistanceScore(), sampler);
+        fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, score, sampler);
         config.setFitnessFunction(fitness);
 
         stream.register(new gpsiConfigurationIOElement(null, "report.out"));
@@ -175,12 +181,12 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
                     best[0] = gp.getAllTimeBest();
                     best[1] = bestVal;
                     fitnessCurves[generation] = new double[]{best[0].getFitnessValue() - 1.0, bestTrainScore, bestValidationScore};
-                    System.out.printf("Gen %d:\t%.5f\t%.5f\t%.5f\n", generation + 1, fitnessCurves[generation][0], fitnessCurves[generation][1], fitnessCurves[generation][2]);
+                    System.out.printf("%3dg: %.4f  %.4f  %.4f\n", generation + 1, fitnessCurves[generation][0], fitnessCurves[generation][1], fitnessCurves[generation][2]);
                 } else {
                     best = new IGPProgram[1];
                     best[0] = gp.getAllTimeBest();
                     fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
-                    System.out.printf("Gen %d:\t%.5f\n", generation + 1, fitnessCurves[generation][0]);
+                    System.out.printf("%3dg: %.4f\n", generation + 1, fitnessCurves[generation][0]);
                 }
 
             }

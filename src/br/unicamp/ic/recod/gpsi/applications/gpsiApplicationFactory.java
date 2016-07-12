@@ -9,6 +9,13 @@ import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiMatlabFileReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiRoiDatasetReader;
 import br.unicamp.ic.recod.gpsi.io.gpsiVoxelDatasetReader;
+import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiDistanceOfMediansScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiDualScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiHellingerDistanceScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiMeanAndStandardDeviationDistanceScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiNormalBhattacharyyaDistanceScore;
+import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.Option;
 
@@ -57,6 +64,9 @@ public class gpsiApplicationFactory {
     @Option(name = "-programs", usage = "Path to stored programs")
     public String programsPath;
     
+    @Option(name = "-score", usage = "Distance measure to be considered in the fitness function.")
+    public String scoreName = "None";
+    
     @Argument
     public Byte[] classLabels;
     
@@ -75,9 +85,32 @@ public class gpsiApplicationFactory {
                 reader = new gpsiVoxelDatasetReader(new gpsiMatlabFileReader());
         }
         
+        gpsiSampleSeparationScore score = null;
+        
+        switch(scoreName){
+            case "Silhouette":
+                score = new gpsiClusterSilhouetteScore();
+                break;
+            case "Hellinger":
+                score = new gpsiHellingerDistanceScore();
+                break;
+            case "Medians":
+                score = new gpsiDistanceOfMediansScore();
+                break;
+            case "Bhattacharyya":
+                score = new gpsiNormalBhattacharyyaDistanceScore();
+                break;
+            case "Dual":
+                score = new gpsiDualScore();
+                break;
+            case "NormMeanDistance":
+                score = new gpsiMeanAndStandardDeviationDistanceScore();
+                break;
+        }
+        
         switch(type){
             case "JGAPEvolver":
-                return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth);
+                return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, score);
             case "OVOFromFiles":
                 return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath);
             case "JGAPClassifier":
