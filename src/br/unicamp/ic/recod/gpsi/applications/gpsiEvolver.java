@@ -32,8 +32,9 @@ public abstract class gpsiEvolver extends gpsiApplication{
             double mutRate,
             int validation,
             double bootstrap,
-            boolean dumpGens) throws Exception {
-        super(dataSetPath, datasetReader, classLabels, outputPath);
+            boolean dumpGens,
+            double errorScore) throws Exception {
+        super(dataSetPath, datasetReader, classLabels, outputPath, errorScore);
         this.popSize = popSize;
         this.numGenerations = numGenerations;
         this.crossRate = crossRate;

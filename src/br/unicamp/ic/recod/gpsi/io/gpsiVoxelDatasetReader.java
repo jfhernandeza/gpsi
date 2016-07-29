@@ -10,6 +10,7 @@ import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 /**
@@ -23,20 +24,32 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
     }
 
     @Override
-    public gpsiVoxelRawDataset readDataset(String path, Byte[] classLabels) throws Exception {
+    public gpsiVoxelRawDataset readDataset(String path, Byte[] classLabels, double errorScore) throws Exception {
         
         if((new File(path + "img.mat")).exists())
-            return readOneSceneDataset(path, classLabels);
+            return readOneSceneDataset(path, classLabels, errorScore);
         
-        return readMultipleScenesDataset(path, classLabels);
+        return readMultipleScenesDataset(path, classLabels, errorScore);
         
     }
     
-    private gpsiVoxelRawDataset readOneSceneDataset(String path, Byte[] classLabels) throws IOException{
+    private double[] applyError(double[] voxel, double errorScore){
+        
+        if(errorScore <= 0.0)
+            return voxel;
+        
+        if(voxel[voxel.length - 1] >= errorScore)
+            return null;
+        
+        return Arrays.copyOf(voxel, voxel.length - 1);
+        
+    }
+    
+    private gpsiVoxelRawDataset readOneSceneDataset(String path, Byte[] classLabels, double errorScore) throws IOException{
         
         gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
         double[][][] hyperspectralImage = this.fileReader.read3dStructure(path + "img.mat");
-        rawDataset.setnBands(hyperspectralImage[0][0].length);
+        rawDataset.setnBands(hyperspectralImage[0][0].length - (errorScore > 0.0 ? 1 : 0));
         
         File dir = new File(path);
         String[] foldsFolders = dir.list((File current, String name) -> new File(current, name).isDirectory());
@@ -52,6 +65,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
             }
         }
         
+        double[] nVoxel;
         double[][] mask;
         HashMap<Byte, ArrayList<gpsiVoxel>> fold;
         for(String foldFolder : foldsFolders){
@@ -61,8 +75,11 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
                 fold.put(label, new ArrayList<>());
                 for(int x = 0; x < mask[0].length; x++)
                     for(int y = 0; y < mask.length; y++)
-                        if(mask[y][x] == 1.0)
-                            fold.get(label).add(new gpsiVoxel(hyperspectralImage[y][x]));
+                        if(mask[y][x] == 1.0){
+                            nVoxel = applyError(hyperspectralImage[y][x], errorScore);
+                            if(nVoxel != null)
+                                fold.get(label).add(new gpsiVoxel(nVoxel));
+                        }
             }
             folds.add(fold);
         }
@@ -72,7 +89,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         return rawDataset;
     }
     
-    private gpsiVoxelRawDataset readMultipleScenesDataset(String path, Byte[] classLabels) throws IOException{
+    private gpsiVoxelRawDataset readMultipleScenesDataset(String path, Byte[] classLabels, double errorScore) throws IOException{
         
         gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
         
@@ -92,6 +109,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         }
         
         ArrayList<HashMap<Byte, ArrayList<gpsiVoxel>>> folds = new ArrayList<>();
+        double[] nVoxel;
         
         HashMap<Byte, ArrayList<gpsiVoxel>> fold;
         for(String foldFolder : foldsFolders){
@@ -104,8 +122,11 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
                 for(String scene : scenesFiles){
                     hyperspectralImage = super.fileReader.read3dStructure(path + foldFolder + "/" + label + "/" + scene);
                     for(int x = 0; x < hyperspectralImage[0].length; x++)
-                        for(int y = 0; y < hyperspectralImage.length; y++)
-                            fold.get(label).add(new gpsiVoxel(hyperspectralImage[y][x]));
+                        for(int y = 0; y < hyperspectralImage.length; y++){
+                            nVoxel = applyError(hyperspectralImage[y][x], errorScore);
+                            if(nVoxel != null)
+                                fold.get(label).add(new gpsiVoxel(nVoxel));
+                        }
                 }
                 
             }

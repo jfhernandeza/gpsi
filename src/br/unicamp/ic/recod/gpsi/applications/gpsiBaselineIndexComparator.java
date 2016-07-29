@@ -25,8 +25,8 @@ public class gpsiBaselineIndexComparator extends gpsiApplication{
     private final gpsiScalarSpectralIndexDescriptor[] descriptors;
     private final String names[];
     
-    public gpsiBaselineIndexComparator(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, String programsPath) throws Exception {
-        super(datasetPath, datasetReader, classLabels, outputPath);
+    public gpsiBaselineIndexComparator(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, String programsPath, double errorScore) throws Exception {
+        super(datasetPath, datasetReader, classLabels, outputPath, errorScore);
         
         int i, j;
         File dir = new File(programsPath);

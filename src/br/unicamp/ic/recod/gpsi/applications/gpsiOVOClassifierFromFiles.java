@@ -24,8 +24,8 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication{
 
     private final gpsiOVOEnsembleMethod ensemble;
     
-    public gpsiOVOClassifierFromFiles(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, String programsPath) throws Exception {
-        super(datasetPath, datasetReader, classLabels, outputPath);
+    public gpsiOVOClassifierFromFiles(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, String programsPath, double errorScore) throws Exception {
+        super(datasetPath, datasetReader, classLabels, outputPath, errorScore);
         
         int nClasses, i, j;
         gpsiClassifier[][] classifiers;

@@ -43,9 +43,10 @@ public class gpsiJGAPClassifier extends gpsiEvolver{
             int validation,
             double bootstrap,
             boolean dumpGens,
-            int maxInitDepth) throws Exception {
+            int maxInitDepth,
+            double errorScore) throws Exception {
         
-        super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens);
+        super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, errorScore);
         this.maxInitDepth = maxInitDepth;
         
         config = new GPConfiguration();

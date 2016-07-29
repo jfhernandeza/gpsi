@@ -23,12 +23,12 @@ public abstract class gpsiApplication {
     protected final gpsiIOStream stream;
     protected String outputPath;
 
-    public gpsiApplication(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath) throws Exception {
+    public gpsiApplication(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, double errorScore) throws Exception {
         
         this.datsetPath = datasetPath;
         this.outputPath = outputPath;
         
-        rawDataset = datasetReader.readDataset(datasetPath, classLabels);
+        rawDataset = datasetReader.readDataset(datasetPath, classLabels, errorScore);
                 
         if(classLabels == null)
             this.classLabels = rawDataset.getClassLabels();

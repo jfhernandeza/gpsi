@@ -44,8 +44,10 @@ public class gpsiConfigurationIOElement extends gpsiIOElement<Object> {
         outR.println("popSize=" + element.popSize);
         outR.println("crossRate=" + element.crossRate);
         outR.println("mutRate=" + element.mutRate);
+        outR.println("score=" + element.scoreName);
         outR.println("validation=" + element.validation);
         outR.println("bootstrap=" + element.bootstrap);
+        outR.println("errorScore=" + element.errorScore);
         
         if(element.programsPath != null)
             outR.println("programsPath=" + element.programsPath);

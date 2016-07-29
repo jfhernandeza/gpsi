@@ -24,7 +24,7 @@ public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsi
     }
 
     @Override
-    public gpsiRoiRawDataset readDataset(String path, Byte[] classLabels) throws Exception {
+    public gpsiRoiRawDataset readDataset(String path, Byte[] classLabels, double errorScore) throws Exception {
         
         gpsiRoiRawDataset rawDataset = new gpsiRoiRawDataset();
         

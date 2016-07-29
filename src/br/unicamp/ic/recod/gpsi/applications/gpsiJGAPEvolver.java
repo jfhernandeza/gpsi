@@ -24,14 +24,7 @@ import br.unicamp.ic.recod.gpsi.io.element.gpsiDoubleCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiIntegerCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiStringIOElement;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
-import br.unicamp.ic.recod.gpsi.measures.gpsiNormalBhattacharyyaDistanceScore;
-import br.unicamp.ic.recod.gpsi.measures.gpsiClusterSilhouetteScore;
-import br.unicamp.ic.recod.gpsi.measures.gpsiDistanceOfMediansScore;
-import br.unicamp.ic.recod.gpsi.measures.gpsiHellingerDistanceScore;
-import br.unicamp.ic.recod.gpsi.measures.gpsiMeanAndStandardDeviationDistanceScore;
-import br.unicamp.ic.recod.gpsi.measures.gpsiDualScore;
 import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
-import br.unicamp.ic.recod.gpsi.measures.gpsiScore;
 import br.unicamp.ic.recod.gpsi.ml.gpsi1NNToMomentScalarClassificationAlgorithm;
 import br.unicamp.ic.recod.gpsi.ml.gpsiClassifier;
 import org.apache.commons.lang.ArrayUtils;
@@ -75,9 +68,10 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             double bootstrap,
             boolean dumpGens,
             int maxInitDepth,
-            gpsiSampleSeparationScore score) throws InvalidConfigurationException, Exception {
+            gpsiSampleSeparationScore score,
+            double errorScore) throws InvalidConfigurationException, Exception {
 
-        super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens);
+        super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, errorScore);
         this.maxInitDepth = maxInitDepth;
 
         config = new GPConfiguration();
@@ -237,6 +231,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         Class[][] argTypes = {{}};
 
         CommandGene[] variables = new CommandGene[n_bands];
+        
         Variable[] b = new Variable[n_bands];
         CommandGene[] functions = {
             new Add(conf, CommandGene.DoubleClass),

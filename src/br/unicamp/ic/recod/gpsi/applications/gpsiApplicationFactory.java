@@ -67,6 +67,9 @@ public class gpsiApplicationFactory {
     @Option(name = "-score", usage = "Distance measure to be considered in the fitness function.")
     public String scoreName = "None";
     
+    @Option(name = "-errorScore", usage = "Threshold of error score to consider a pixel. This value must be in the last spectral band.")
+    public double errorScore = 0.0;
+    
     @Argument
     public Byte[] classLabels;
     
@@ -110,13 +113,13 @@ public class gpsiApplicationFactory {
         
         switch(type){
             case "JGAPEvolver":
-                return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, score);
+                return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, score, errorScore);
             case "OVOFromFiles":
-                return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath);
+                return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath, errorScore);
             case "JGAPClassifier":
-                return new gpsiJGAPClassifier(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth);
+                return new gpsiJGAPClassifier(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, errorScore);
             case "BaselineComparator":
-                return new gpsiBaselineIndexComparator(datasetPath, reader, classLabels, outputPath, programsPath);
+                return new gpsiBaselineIndexComparator(datasetPath, reader, classLabels, outputPath, programsPath, errorScore);
         }
         return null;
     }
