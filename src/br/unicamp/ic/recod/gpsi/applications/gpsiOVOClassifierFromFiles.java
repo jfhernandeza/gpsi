@@ -29,7 +29,7 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication{
         
         int nClasses, i, j;
         gpsiClassifier[][] classifiers;
-        File dir = new File(programsPath + "3/");
+        File dir = new File(programsPath + "5/");
        
         BufferedReader reader;
         File[] files = dir.listFiles((File dir1, String name) -> name.toLowerCase().endsWith(".program"));
@@ -59,7 +59,7 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication{
     @Override
     public void run() throws Exception {
         
-        this.rawDataset.assignFolds(new byte[] {3,4,0}, null, new byte[] {2});
+        this.rawDataset.assignFolds(new byte[] {4,0,1}, null, new byte[] {3});
         
         System.out.println("Fitting...");
         ensemble.fit(this.rawDataset.getTrainingEntities());

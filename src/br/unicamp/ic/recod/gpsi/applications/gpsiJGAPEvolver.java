@@ -110,7 +110,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
 
         double validationScore, trainScore, bestValidationScore, bestTrainScore;
         double[][][] samples;
-
+        
         for (byte f = 0; f < nFolds; f++) {
             
             System.out.println("\nRun " + (f + 1) + "\n");
@@ -208,7 +208,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             stream.register(new gpsiIntegerCsvIOElement(confusionMatrix, null, "confusion_matrices/f" + (f + 1) + "_train.csv"));
             
             if(validation > 0){
-                 descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[0]));
+                 descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[1]));
                  classificationAlgorithm = new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean());
                  classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
                  
