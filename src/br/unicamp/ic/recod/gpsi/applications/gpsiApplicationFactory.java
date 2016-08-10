@@ -37,6 +37,9 @@ public class gpsiApplicationFactory {
     @Option(name = "-numGens", usage = "Number of generations")
     public int numGenerations = 50;
     
+    @Option(name = "-numGensSel", usage = "Number of generations for selection phase")
+    public int numGenerationsSel = 0;
+    
     @Option(name = "-maxInitDepth", usage = "Max initial depth of trees")
     public int maxInitDepth = 6;
     
@@ -114,6 +117,8 @@ public class gpsiApplicationFactory {
         switch(type){
             case "JGAPEvolver":
                 return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, score, errorScore);
+            case "JGAPSelectorEvolver":
+                return new gpsiJGAPSelectorEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, score, errorScore, numGenerationsSel);
             case "OVOFromFiles":
                 return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath, errorScore);
             case "JGAPClassifier":
