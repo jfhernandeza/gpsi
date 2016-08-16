@@ -108,12 +108,13 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
         double[][] fitnessCurves;
         String[] curveLabels = new String[]{"train", "train_val", "val"};
         double bestScore, currentScore;
-        IGPProgram current, bestVal;
+        IGPProgram current;
+        IGPProgram[] elite = null;
 
         Mean mean = new Mean();
         StandardDeviation sd = new StandardDeviation();
 
-        double validationScore, trainScore, bestValidationScore, bestTrainScore;
+        double validationScore, trainScore;
         double[][][] samples;
 
         for (byte f = 0; f < nFolds; f++) {
@@ -126,19 +127,19 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
 
             // 0: train, 1: train_val, 2: val
             fitnessCurves = new double[super.numGenerations + numGenerationsSel][];
-            current = null;
-            bestVal = null;
             bestScore = -Double.MAX_VALUE;
-            bestValidationScore = -1.0;
-            bestTrainScore = -1.0;
 
-            
-            
+            if (validation > 0) 
+                elite = new IGPProgram[validation];
+
             for (int generation = 0; generation < numGenerationsSel; generation++) {
 
                 gp.evolve(1);
                 gp.getGPPopulation().sortByFitness();
 
+                if (validation > 0) 
+                    elite = mergeElite(elite, gp.getGPPopulation().getGPPrograms(), generation);
+
                 if (this.dumpGens) {
 
                     double[][][] dists;
@@ -153,62 +154,35 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
 
                 }
 
-                for (i = 0; i < super.validation; i++) {
-
-                    current = gp.getGPPopulation().getGPPrograms()[i];
-
-                    descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), current));
-                    mlDataset = new gpsiMLDataset(descriptor);
-                    mlDataset.loadWholeDataset(rawDataset, true);
-
-                    samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
-
-                    validationScore = fitness.getScore().score(samples);
-                    trainScore = current.getFitnessValue() - 1.0;
-
-                    currentScore = mean.evaluate(new double[]{trainScore, validationScore}) - sd.evaluate(new double[]{trainScore, validationScore});
-
-                    if (currentScore > bestScore) {
-                        bestVal = current;
-                        bestScore = currentScore;
-                        bestTrainScore = trainScore;
-                        bestValidationScore = validationScore;
-                    }
-
-                }
-
-                if (validation > 0) {
-                    best = new IGPProgram[2];
-                    best[0] = gp.getAllTimeBest();
-                    best[1] = bestVal;
-                    fitnessCurves[generation] = new double[]{best[0].getFitnessValue() - 1.0, bestTrainScore, bestValidationScore};
-                    System.out.printf("%3dg: %.4f  %.4f  %.4f\n", generation + 1, fitnessCurves[generation][0], fitnessCurves[generation][1], fitnessCurves[generation][2]);
-                } else {
-                    best = new IGPProgram[1];
-                    best[0] = gp.getAllTimeBest();
-                    fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
-                    System.out.printf("%3dg: %.4f\n", generation + 1, fitnessCurves[generation][0]);
-                }
+                fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
+                System.out.printf("%3dg: %.4f\n", generation + 1, fitnessCurves[generation][0]);
 
             }
             
             HashSet<Integer> variables = new HashSet<>();
-            for(CommandGene node : best[0].getChromosome(0).getFunctions()){
-                if(node instanceof Variable){
-                    variables.add(Integer.parseInt(node.getName().replace('b', '0')));
+            for(IGPProgram ind : elite){
+                for (CommandGene node : ind.getChromosome(0).getFunctions()) {
+                    if (node instanceof Variable) {
+                       variables.add(Integer.parseInt(node.getName().replace('b', '0')));
+                    }
                 }
             }
-
+            
             int[] vars = variables.stream().mapToInt(p -> p).toArray();
+            Arrays.sort(vars);
+            stream.register(new gpsiStringIOElement(Arrays.toString(vars), "selected_bands/f" + (f + 1) + ".out"));
             
             gp = create(config, dataset.getnBands(), fitness, vars);
-            gp.addFittestProgram(best[0]);
-            
+            gp.addFittestProgram(elite[0]);
+
             for (int generation = numGenerationsSel; generation < numGenerationsSel + super.numGenerations; generation++) {
 
                 gp.evolve(1);
                 gp.getGPPopulation().sortByFitness();
 
+                if (validation > 0)
+                    elite = mergeElite(elite, gp.getGPPopulation().getGPPrograms(), generation);
+                
                 if (this.dumpGens) {
 
                     double[][][] dists;
@@ -223,41 +197,31 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
 
                 }
 
-                for (i = 0; i < super.validation; i++) {
+                fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
+                System.out.printf("%3dg: %.4f\n", generation + 1, fitnessCurves[generation][0]);
 
-                    current = gp.getGPPopulation().getGPPrograms()[i];
+            }
 
-                    descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), current));
-                    mlDataset = new gpsiMLDataset(descriptor);
-                    mlDataset.loadWholeDataset(rawDataset, true);
+            best = new IGPProgram[2];
+            best[0] = gp.getAllTimeBest();
+            for (i = 0; i < super.validation; i++) {
 
-                    samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
+                current = elite[i];
 
-                    validationScore = fitness.getScore().score(samples);
-                    trainScore = current.getFitnessValue() - 1.0;
+                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), current));
+                mlDataset = new gpsiMLDataset(descriptor);
+                mlDataset.loadWholeDataset(rawDataset, true);
 
-                    currentScore = mean.evaluate(new double[]{trainScore, validationScore}) - sd.evaluate(new double[]{trainScore, validationScore});
+                samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
 
-                    if (currentScore > bestScore) {
-                        bestVal = current;
-                        bestScore = currentScore;
-                        bestTrainScore = trainScore;
-                        bestValidationScore = validationScore;
-                    }
+                validationScore = fitness.getScore().score(samples);
+                trainScore = current.getFitnessValue() - 1.0;
 
-                }
+                currentScore = mean.evaluate(new double[]{trainScore, validationScore}) - sd.evaluate(new double[]{trainScore, validationScore});
 
-                if (validation > 0) {
-                    best = new IGPProgram[2];
-                    best[0] = gp.getAllTimeBest();
-                    best[1] = bestVal;
-                    fitnessCurves[generation] = new double[]{best[0].getFitnessValue() - 1.0, bestTrainScore, bestValidationScore};
-                    System.out.printf("%3dg: %.4f  %.4f  %.4f\n", generation + 1, fitnessCurves[generation][0], fitnessCurves[generation][1], fitnessCurves[generation][2]);
-                } else {
-                    best = new IGPProgram[1];
-                    best[0] = gp.getAllTimeBest();
-                    fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
-                    System.out.printf("%3dg: %.4f\n", generation + 1, fitnessCurves[generation][0]);
+                if (currentScore > bestScore) {
+                    best[1] = current;
+                    bestScore = currentScore;
                 }
 
             }
@@ -268,8 +232,8 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
             stream.register(new gpsiStringIOElement(gp.getAllTimeBest().toStringNorm(0), "programs/f" + (f + 1) + "train.program"));
 
             if (validation > 0) {
-                System.out.println("Best solution for trainning and validation: " + bestVal.toStringNorm(0));
-                stream.register(new gpsiStringIOElement(bestVal.toStringNorm(0), "programs/f" + (f + 1) + "train_val.program"));
+                System.out.println("Best solution for trainning and validation: " + best[1].toStringNorm(0));
+                stream.register(new gpsiStringIOElement(best[1].toStringNorm(0), "programs/f" + (f + 1) + "train_val.program"));
             }
 
             descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[0]));
@@ -299,6 +263,50 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
 
         }
 
+    }
+
+    private IGPProgram[] mergeElite(IGPProgram[] elite, IGPProgram[] programs, int generation) {
+        
+        int i, j, k;
+        
+        if (generation == 0) {
+            elite[0] = programs[0];
+            i = 1;
+            j = 1;
+            while (i < validation) {
+                if (!programs[j].toStringNorm(0).equals(elite[i - 1].toStringNorm(0))) {
+                    elite[i] = programs[j];
+                    i++;
+                }
+                j++;
+            }
+        } else {
+            i = -1;
+            j = 0;
+            while (j < validation) {
+                i++;
+                for (k = 0; k < validation; k++) {
+                    if (programs[i].toStringNorm(0).equals(elite[k].toStringNorm(0))) {
+                        break;
+                    }
+                }
+                if (k < validation) {
+                    continue;
+                }
+                k = validation - 1;
+                while (k >= 0 && programs[i].getFitnessValue() > elite[k].getFitnessValue()) {
+                    if (k < validation - 1) {
+                        elite[k + 1] = elite[k];
+                    }
+                    elite[k] = programs[i];
+                    k--;
+                }
+                j++;
+            }
+        }
+        
+        return elite;
+        
     }
 
     private GPGenotype create(GPConfiguration conf, int n_bands, gpsiJGAPFitnessFunction fitness, int[] bands) throws InvalidConfigurationException {
@@ -332,7 +340,7 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
         } else {
             Arrays.sort(bands);
             variables = new CommandGene[bands.length];
-            for (i = 0; i < bands.length; i++){
+            for (i = 0; i < bands.length; i++) {
                 variables[i] = b[bands[i]];
             }
         }

@@ -67,7 +67,7 @@ public class gpsiApplicationFactory {
     @Option(name = "-programs", usage = "Path to stored programs")
     public String programsPath;
     
-    @Option(name = "-score", usage = "Distance measure to be considered in the fitness function.")
+    @Option(name = "-score", usage = "Distance measure to be considered in the fitness function")
     public String scoreName = "None";
     
     @Option(name = "-errorScore", usage = "Threshold of error score to consider a pixel. This value must be in the last spectral band.")
