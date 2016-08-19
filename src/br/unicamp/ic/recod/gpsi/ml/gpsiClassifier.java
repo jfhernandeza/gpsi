@@ -61,7 +61,7 @@ public class gpsiClassifier {
         
         int confusionMatrix[][] = new int [algorithm.getnClasses()][algorithm.getnClasses()];
         
-        Byte[] labels = prediction.keySet().toArray(new Byte[] {});
+        Byte[] labels = dataset.getTrainingEntities().keySet().toArray(new Byte[] {});
         Arrays.sort(labels);
         
         for(int i = 0; i < labels.length; i++){

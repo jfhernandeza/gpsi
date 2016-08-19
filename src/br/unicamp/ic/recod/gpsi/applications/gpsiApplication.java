@@ -18,18 +18,23 @@ import java.util.Calendar;
 public abstract class gpsiApplication {
     
     protected final gpsiRawDataset rawDataset;
-    protected final String datsetPath;
+    protected final String datasetPath;
     protected final Byte[] classLabels;
     protected final gpsiIOStream stream;
+    protected final gpsiDatasetReader datasetReader;
+    protected final double errorScore;
     protected String outputPath;
 
     public gpsiApplication(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, double errorScore) throws Exception {
         
-        this.datsetPath = datasetPath;
+        this.datasetPath = datasetPath;
         this.outputPath = outputPath;
         
         rawDataset = datasetReader.readDataset(datasetPath, classLabels, errorScore);
-                
+
+        this.datasetReader = datasetReader;
+        this.errorScore = errorScore;
+        
         if(classLabels == null)
             this.classLabels = rawDataset.getClassLabels();
         else

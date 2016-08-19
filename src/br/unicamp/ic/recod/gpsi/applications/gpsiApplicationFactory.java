@@ -73,6 +73,9 @@ public class gpsiApplicationFactory {
     @Option(name = "-errorScore", usage = "Threshold of error score to consider a pixel. This value must be in the last spectral band.")
     public double errorScore = 0.0;
     
+    @Option(name = "-testDataset", usage = "Path to the test dataset")
+    public String testDatasetPath;
+    
     @Argument
     public Byte[] classLabels;
     
@@ -125,6 +128,10 @@ public class gpsiApplicationFactory {
                 return new gpsiJGAPClassifier(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, errorScore);
             case "BaselineComparator":
                 return new gpsiBaselineIndexComparator(datasetPath, reader, classLabels, outputPath, programsPath, errorScore);
+            case "TimeSeriesCreator":
+                return new gpsiTimeSeriesCreator(datasetPath, reader, classLabels, outputPath, programsPath, errorScore);
+            case "DistCMGenerator":
+                return new gpsiDistCMGenerator(datasetPath, reader, classLabels, outputPath, programsPath, errorScore, testDatasetPath);
         }
         return null;
     }
