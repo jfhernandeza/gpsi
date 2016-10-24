@@ -13,7 +13,7 @@ import br.unicamp.ic.recod.gpsi.features.gpsiScalarSpectralIndexDescriptor;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiDoubleCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiIntegerCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
-import br.unicamp.ic.recod.gpsi.ml.gpsi1NNToMomentScalarClassificationAlgorithm;
+import br.unicamp.ic.recod.gpsi.ml.gpsiNearestCentroidClassificationAlgorithm;
 import br.unicamp.ic.recod.gpsi.ml.gpsiClassifier;
 import java.io.BufferedReader;
 import java.io.File;
@@ -64,7 +64,7 @@ public class gpsiDistCMGenerator extends gpsiApplication {
         File[] locations, days, years = new File(testDatasetPath).listFiles(File::isDirectory);
 
         for (i = 0; i < descriptors.length; i++) {
-            classifier = new gpsiClassifier(descriptors[i], new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean()));
+            classifier = new gpsiClassifier(descriptors[i], new gpsiNearestCentroidClassificationAlgorithm(new Mean()));
             classifier.fit(super.rawDataset.getTrainingEntities());
 
             for (File year : years) {

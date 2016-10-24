@@ -15,12 +15,12 @@ import org.apache.commons.math3.stat.descriptive.AbstractUnivariateStatistic;
  *
  * @author juan
  */
-public class gpsi1NNToMomentScalarClassificationAlgorithm extends gpsiClassificationAlgorithm {
+public class gpsiNearestCentroidClassificationAlgorithm extends gpsiClassificationAlgorithm {
     
     private final AbstractUnivariateStatistic moment;
     private HashMap<Byte, double[]> centroids;
 
-    public gpsi1NNToMomentScalarClassificationAlgorithm(AbstractUnivariateStatistic moment) {
+    public gpsiNearestCentroidClassificationAlgorithm(AbstractUnivariateStatistic moment) {
         this.moment = moment;
     }
 

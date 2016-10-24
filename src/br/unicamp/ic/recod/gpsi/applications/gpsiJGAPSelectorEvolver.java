@@ -25,7 +25,7 @@ import br.unicamp.ic.recod.gpsi.io.element.gpsiIntegerCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiStringIOElement;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
-import br.unicamp.ic.recod.gpsi.ml.gpsi1NNToMomentScalarClassificationAlgorithm;
+import br.unicamp.ic.recod.gpsi.ml.gpsiNearestCentroidClassificationAlgorithm;
 import br.unicamp.ic.recod.gpsi.ml.gpsiClassifier;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -92,6 +92,8 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
         fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, score, sampler);
         config.setFitnessFunction(fitness);
 
+        config.setPreservFittestIndividual(true);
+        
         stream.register(new gpsiConfigurationIOElement(null, "report.out"));
 
     }
@@ -99,14 +101,13 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
     @Override
     public void run() throws InvalidConfigurationException, InterruptedException, Exception {
 
-        int i, j, k;
+        int i;
         byte nFolds = 5;
         gpsiDescriptor descriptor;
         gpsiMLDataset mlDataset;
         gpsiVoxelRawDataset dataset;
         GPGenotype gp;
         double[][] fitnessCurves;
-        String[] curveLabels = new String[]{"train", "train_val", "val"};
         double bestScore, currentScore;
         IGPProgram current;
         IGPProgram[] elite = null;
@@ -121,11 +122,11 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
 
             System.out.println("\nRun " + (f + 1) + "\n");
 
-            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, new byte[]{(byte) ((f + 4) % nFolds)});
+            //rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, new byte[]{(byte) ((f + 4) % nFolds)});
+            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds)}, null, null);
             dataset = (gpsiVoxelRawDataset) rawDataset;
             gp = create(config, dataset.getnBands(), fitness, null);
 
-            // 0: train, 1: train_val, 2: val
             fitnessCurves = new double[super.numGenerations + numGenerationsSel][];
             bestScore = -Double.MAX_VALUE;
 
@@ -155,7 +156,7 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
                 }
 
                 fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
-                System.out.printf("%3dg: %.4f\n", generation + 1, fitnessCurves[generation][0]);
+                System.out.printf("%3dg: %.5f\n", generation + 1, fitnessCurves[generation][0]);
 
             }
             
@@ -175,11 +176,13 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
             gp = create(config, dataset.getnBands(), fitness, vars);
             gp.addFittestProgram(elite[0]);
 
+            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, null, null);
+            
             for (int generation = numGenerationsSel; generation < numGenerationsSel + super.numGenerations; generation++) {
 
                 gp.evolve(1);
                 gp.getGPPopulation().sortByFitness();
-
+                
                 if (validation > 0)
                     elite = mergeElite(elite, gp.getGPPopulation().getGPPrograms(), generation);
                 
@@ -202,6 +205,8 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
 
             }
 
+            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, null);
+            
             best = new IGPProgram[2];
             best[0] = gp.getAllTimeBest();
             for (i = 0; i < super.validation; i++) {
@@ -226,18 +231,20 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
 
             }
 
-            stream.register(new gpsiDoubleCsvIOElement(fitnessCurves, curveLabels, "curves/f" + (f + 1) + ".csv"));
+            stream.register(new gpsiDoubleCsvIOElement(fitnessCurves, null, "curves/f" + (f + 1) + ".csv"));
 
-            System.out.println("Best solution for trainning: " + gp.getAllTimeBest().toStringNorm(0));
+            System.out.println("Best solution tr: " + gp.getAllTimeBest().toStringNorm(0));
             stream.register(new gpsiStringIOElement(gp.getAllTimeBest().toStringNorm(0), "programs/f" + (f + 1) + "train.program"));
 
             if (validation > 0) {
-                System.out.println("Best solution for trainning and validation: " + best[1].toStringNorm(0));
+                System.out.println("Best solution tv: " + best[1].toStringNorm(0));
                 stream.register(new gpsiStringIOElement(best[1].toStringNorm(0), "programs/f" + (f + 1) + "train_val.program"));
             }
 
+            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds), (byte) ((f + 3) % nFolds)}, null, new byte[]{(byte) ((f + 4) % nFolds)});
+            
             descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[0]));
-            gpsi1NNToMomentScalarClassificationAlgorithm classificationAlgorithm = new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean());
+            gpsiNearestCentroidClassificationAlgorithm classificationAlgorithm = new gpsiNearestCentroidClassificationAlgorithm(new Mean());
             gpsiClassifier classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
 
             classifier.fit(this.rawDataset.getTrainingEntities());
@@ -249,7 +256,7 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
 
             if (validation > 0) {
                 descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[1]));
-                classificationAlgorithm = new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean());
+                classificationAlgorithm = new gpsiNearestCentroidClassificationAlgorithm(new Mean());
                 classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
 
                 classifier.fit(this.rawDataset.getTrainingEntities());

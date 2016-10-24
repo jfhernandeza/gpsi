@@ -38,7 +38,7 @@ public class gpsiJGAPProtectedSquareRoot extends MathCommand implements ICloneab
      */
     @Override
     public String getName() {
-        return "Protected Log";
+        return "Protected Sqrt";
     }
 
     @Override

@@ -25,8 +25,11 @@ import br.unicamp.ic.recod.gpsi.io.element.gpsiIntegerCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiStringIOElement;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
 import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
-import br.unicamp.ic.recod.gpsi.ml.gpsi1NNToMomentScalarClassificationAlgorithm;
+import br.unicamp.ic.recod.gpsi.ml.gpsiNearestCentroidClassificationAlgorithm;
+import br.unicamp.ic.recod.gpsi.ml.gpsiClassificationAlgorithm;
 import br.unicamp.ic.recod.gpsi.ml.gpsiClassifier;
+import br.unicamp.ic.recod.gpsi.ml.gpsiGaussianNaiveBayesClassificationAlgorithm;
+import java.util.HashMap;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
@@ -81,11 +84,13 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         config.setPopulationSize(popSize);
         config.setCrossoverProb((float) crossRate);
         config.setMutationProb((float) mutRate);
-        
+
         gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap) : new gpsiConstantBootstrapper((int) bootstrap);
 
         fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, score, sampler);
         config.setFitnessFunction(fitness);
+
+        config.setPreservFittestIndividual(true);
 
         stream.register(new gpsiConfigurationIOElement(null, "report.out"));
 
@@ -94,32 +99,30 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
     @Override
     public void run() throws InvalidConfigurationException, InterruptedException, Exception {
 
-        int i, j, k;
+        int i;
         byte nFolds = 5;
+        double bestScore, currentScore, fitnessCurves[][];
+        
         gpsiDescriptor descriptor;
         gpsiMLDataset mlDataset;
         gpsiVoxelRawDataset dataset;
         GPGenotype gp;
-        double[][] fitnessCurves;
-        String[] curveLabels = new String[]{"train", "train_val", "val"};
-        double bestScore, currentScore;
-        IGPProgram current, bestVal;
+        
+        IGPProgram current, bestVal, elite[] = null;
 
         Mean mean = new Mean();
         StandardDeviation sd = new StandardDeviation();
 
-        double validationScore, trainScore, bestValidationScore, bestTrainScore;
-        double[][][] samples;
-        
+        double validationScore, trainScore, bestValidationScore, bestTrainScore, samples[][][];
+
         for (byte f = 0; f < nFolds; f++) {
-            
+
             System.out.println("\nRun " + (f + 1) + "\n");
 
             rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)}, new byte[]{(byte) ((f + 3) % nFolds)}, new byte[]{(byte) ((f + 4) % nFolds)});
             dataset = (gpsiVoxelRawDataset) rawDataset;
             gp = create(config, dataset.getnBands(), fitness);
 
-            // 0: train, 1: train_val, 2: val
             fitnessCurves = new double[super.numGenerations][];
             current = null;
             bestVal = null;
@@ -127,13 +130,21 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             bestValidationScore = -1.0;
             bestTrainScore = -1.0;
 
+            if (validation > 0) {
+                elite = new IGPProgram[validation];
+            }
+
             for (int generation = 0; generation < super.numGenerations; generation++) {
 
                 gp.evolve(1);
                 gp.getGPPopulation().sortByFitness();
 
+                if (validation > 0) {
+                    elite = mergeElite(elite, gp.getGPPopulation().getGPPrograms(), generation);
+                }
+
                 if (this.dumpGens) {
-                    
+
                     double[][][] dists;
                     descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), gp.getGPPopulation().getGPPrograms()[0]));
                     mlDataset = new gpsiMLDataset(descriptor);
@@ -146,82 +157,140 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
 
                 }
 
-                for (i = 0; i < super.validation; i++) {
-
-                    current = gp.getGPPopulation().getGPPrograms()[i];
-
-                    descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), current));
-                    mlDataset = new gpsiMLDataset(descriptor);
-                    mlDataset.loadWholeDataset(rawDataset, true);
-
-                    samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
-
-                    validationScore = fitness.getScore().score(samples);
-                    trainScore = current.getFitnessValue() - 1.0;
-
-                    currentScore = mean.evaluate(new double[]{trainScore, validationScore}) - sd.evaluate(new double[]{trainScore, validationScore});
-
-                    if (currentScore > bestScore) {
-                        bestVal = current;
-                        bestScore = currentScore;
-                        bestTrainScore = trainScore;
-                        bestValidationScore = validationScore;
+                i = this.popSize - 1;
+                for(IGPProgram prog : elite)
+                    if(!in(gp.getGPPopulation().getGPPrograms(), prog)){
+                        gp.getGPPopulation().setGPProgram(i, prog);
+                        i--;
                     }
-
-                }
-
-                if (validation > 0) {
-                    best = new IGPProgram[2];
-                    best[0] = gp.getAllTimeBest();
-                    best[1] = bestVal;
-                    fitnessCurves[generation] = new double[]{best[0].getFitnessValue() - 1.0, bestTrainScore, bestValidationScore};
-                    System.out.printf("%3dg: %.4f  %.4f  %.4f\n", generation + 1, fitnessCurves[generation][0], fitnessCurves[generation][1], fitnessCurves[generation][2]);
-                } else {
-                    best = new IGPProgram[1];
-                    best[0] = gp.getAllTimeBest();
-                    fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
-                    System.out.printf("%3dg: %.4f\n", generation + 1, fitnessCurves[generation][0]);
-                }
+                
+                fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
+                System.out.printf("%3dg: %.5f\n", generation + 1, fitnessCurves[generation][0]);
 
             }
 
-            stream.register(new gpsiDoubleCsvIOElement(fitnessCurves, curveLabels, "curves/f" + (f + 1) + ".csv"));
+            best = new IGPProgram[2];
+            best[0] = gp.getAllTimeBest();
+            for (i = 0; i < super.validation; i++) {
 
-            System.out.println("Best solution for trainning: " + gp.getAllTimeBest().toStringNorm(0));
+                current = elite[i];
+
+                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), current));
+                mlDataset = new gpsiMLDataset(descriptor);
+                mlDataset.loadWholeDataset(rawDataset, true);
+
+                samples = this.fitness.getSampler().sample(mlDataset.getValidationEntities(), classLabels);
+
+                validationScore = fitness.getScore().score(samples);
+                trainScore = current.getFitnessValue() - 1.0;
+
+                currentScore = mean.evaluate(new double[]{trainScore, validationScore}) - sd.evaluate(new double[]{trainScore, validationScore});
+
+                if (currentScore > bestScore) {
+                    best[1] = current;
+                    bestScore = currentScore;
+                }
+                
+            }
+
+            stream.register(new gpsiDoubleCsvIOElement(fitnessCurves, null, "curves/f" + (f + 1) + ".csv"));
+
+            System.out.println("Best solution tr: " + gp.getAllTimeBest().toStringNorm(0));
             stream.register(new gpsiStringIOElement(gp.getAllTimeBest().toStringNorm(0), "programs/f" + (f + 1) + "train.program"));
 
             if (validation > 0) {
-                System.out.println("Best solution for trainning and validation: " + bestVal.toStringNorm(0));
-                stream.register(new gpsiStringIOElement(bestVal.toStringNorm(0), "programs/f" + (f + 1) + "train_val.program"));
+                System.out.println("Best solution tv: " + best[1].toStringNorm(0));
+                stream.register(new gpsiStringIOElement(best[1].toStringNorm(0), "programs/f" + (f + 1) + "train_val.program"));
             }
 
-            
-            descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[0]));
-            gpsi1NNToMomentScalarClassificationAlgorithm classificationAlgorithm = new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean());
-            gpsiClassifier classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
-            
-            classifier.fit(this.rawDataset.getTrainingEntities());
-            classifier.predict(this.rawDataset.getTestEntities());
-            
-            int[][] confusionMatrix = classifier.getConfusionMatrix();
-            
-            stream.register(new gpsiIntegerCsvIOElement(confusionMatrix, null, "confusion_matrices/f" + (f + 1) + "_train.csv"));
-            
-            if(validation > 0){
-                 descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[1]));
-                 classificationAlgorithm = new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean());
-                 classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
-                 
-                 classifier.fit(this.rawDataset.getTrainingEntities());
-                 classifier.predict(this.rawDataset.getTestEntities());
-                 
-                 confusionMatrix = classifier.getConfusionMatrix();
-                 
-                 stream.register(new gpsiIntegerCsvIOElement(confusionMatrix, null, "confusion_matrices/f" + (f + 1) + "_train_val.csv"));
-                 
-           }
-            
+            rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds), (byte) ((f + 3) % nFolds)}, null, new byte[]{(byte) ((f + 4) % nFolds)});
+
+            HashMap<String, gpsiClassificationAlgorithm> classificationAlgorithms = new HashMap<>();
+            classificationAlgorithms.put("NCC", new gpsiNearestCentroidClassificationAlgorithm(new Mean()));
+            classificationAlgorithms.put("GNB", new gpsiGaussianNaiveBayesClassificationAlgorithm());
+
+            gpsiClassificationAlgorithm classificationAlgorithm;
+            gpsiClassifier classifier;
+            int[][] confusionMatrix;
+
+            for (String alg : classificationAlgorithms.keySet()) {
+                
+                descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[0]));
+                
+                classificationAlgorithm = classificationAlgorithms.get(alg);
+                classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
+
+                classifier.fit(this.rawDataset.getTrainingEntities());
+                classifier.predict(this.rawDataset.getTestEntities());
+
+                confusionMatrix = classifier.getConfusionMatrix();
+
+                stream.register(new gpsiIntegerCsvIOElement(confusionMatrix, null, "confusion_matrices/" + alg + "/f" + (f + 1) + "_train.csv"));
+
+                if (validation > 0) {
+                    descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[1]));
+                    classificationAlgorithm = classificationAlgorithms.get(alg);
+                    classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
+
+                    classifier.fit(this.rawDataset.getTrainingEntities());
+                    classifier.predict(this.rawDataset.getTestEntities());
+
+                    confusionMatrix = classifier.getConfusionMatrix();
+
+                    stream.register(new gpsiIntegerCsvIOElement(confusionMatrix, null, "confusion_matrices/" + alg + "/f" + (f + 1) + "_train_val.csv"));
+
+                }
+            }
+
         }
+
+    }
+
+    private boolean in(IGPProgram[] pop, IGPProgram prog){
+        for(IGPProgram prog_ : pop){
+            if(prog.toStringNorm(0).equals(prog_.toStringNorm(0)))
+                return true;
+        }
+        return false;
+    }
+    
+    private IGPProgram[] mergeElite(IGPProgram[] elite, IGPProgram[] programs, int generation) {
+
+        int i, j, k;
+
+        if (generation == 0) {
+            elite[0] = programs[0];
+            i = 1;
+            j = 1;
+            while (i < validation) {
+                if (!programs[j].toStringNorm(0).equals(elite[i - 1].toStringNorm(0))) {
+                    elite[i] = programs[j];
+                    i++;
+                }
+                j++;
+            }
+        } else {
+            i = -1;
+            j = 0;
+            while (j < validation) {
+                i++;
+                for (k = 0; k < validation; k++)
+                    if (programs[i].toStringNorm(0).equals(elite[k].toStringNorm(0)))
+                        break;
+                if (k < validation)
+                    continue;
+                k = validation - 1;
+                while (k >= 0 && programs[i].getFitnessValue() > elite[k].getFitnessValue()) {
+                    if (k < validation - 1)
+                        elite[k + 1] = elite[k];
+                    elite[k] = programs[i];
+                    k--;
+                }
+                j++;
+            }
+        }
+
+        return elite;
 
     }
 
@@ -231,7 +300,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         Class[][] argTypes = {{}};
 
         CommandGene[] variables = new CommandGene[n_bands];
-        
+
         Variable[] b = new Variable[n_bands];
         CommandGene[] functions = {
             new Add(conf, CommandGene.DoubleClass),

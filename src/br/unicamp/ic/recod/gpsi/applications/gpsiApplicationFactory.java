@@ -38,7 +38,7 @@ public class gpsiApplicationFactory {
     public int numGenerations = 50;
     
     @Option(name = "-numGensSel", usage = "Number of generations for selection phase")
-    public int numGenerationsSel = 0;
+    public int numGenerationsSel = 50;
     
     @Option(name = "-maxInitDepth", usage = "Max initial depth of trees")
     public int maxInitDepth = 6;

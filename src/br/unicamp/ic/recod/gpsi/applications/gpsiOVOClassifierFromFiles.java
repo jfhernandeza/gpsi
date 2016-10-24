@@ -10,7 +10,7 @@ import br.unicamp.ic.recod.gpsi.ml.gpsiClassifier;
 import br.unicamp.ic.recod.gpsi.combine.gpsiStringParserVoxelCombiner;
 import br.unicamp.ic.recod.gpsi.features.gpsiScalarSpectralIndexDescriptor;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
-import br.unicamp.ic.recod.gpsi.ml.gpsi1NNToMomentScalarClassificationAlgorithm;
+import br.unicamp.ic.recod.gpsi.ml.gpsiNearestCentroidClassificationAlgorithm;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -29,7 +29,7 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication{
         
         int nClasses, i, j;
         gpsiClassifier[][] classifiers;
-        File dir = new File(programsPath + "5/");
+        File dir = new File(programsPath + "1/");
        
         BufferedReader reader;
         File[] files = dir.listFiles((File dir1, String name) -> name.toLowerCase().endsWith(".program"));
@@ -47,7 +47,7 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication{
             labels = program.getName().split("[_.]");
             i = Integer.parseInt(labels[0]) - 1;
             j = Integer.parseInt(labels[1]) - i - 2;
-            classifiers[i][j] = new gpsiClassifier(new gpsiScalarSpectralIndexDescriptor(new gpsiStringParserVoxelCombiner(null, reader.readLine())), new gpsi1NNToMomentScalarClassificationAlgorithm(new Mean()));
+            classifiers[i][j] = new gpsiClassifier(new gpsiScalarSpectralIndexDescriptor(new gpsiStringParserVoxelCombiner(null, reader.readLine())), new gpsiNearestCentroidClassificationAlgorithm(new Mean()));
             reader.close();
         }
         
@@ -59,7 +59,7 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication{
     @Override
     public void run() throws Exception {
         
-        this.rawDataset.assignFolds(new byte[] {4,0,1}, null, new byte[] {3});
+        this.rawDataset.assignFolds(new byte[] {0,1,2}, null, new byte[] {4});
         
         System.out.println("Fitting...");
         ensemble.fit(this.rawDataset.getTrainingEntities());
