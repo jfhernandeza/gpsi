@@ -16,7 +16,8 @@ public class gpsiConstantBootstrapper extends gpsiBootstrapper {
 
     private final int n;
 
-    public gpsiConstantBootstrapper(int n) {
+    public gpsiConstantBootstrapper(int n, long seed) {
+        super(seed);
         this.n = n;
     }
     

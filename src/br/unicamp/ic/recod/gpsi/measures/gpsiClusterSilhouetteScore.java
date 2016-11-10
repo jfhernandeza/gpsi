@@ -13,8 +13,12 @@ import org.apache.commons.math3.ml.distance.ManhattanDistance;
  *
  * @author ra163128
  */
-public class gpsiClusterSilhouetteScore implements gpsiSampleSeparationScore{
+public class gpsiClusterSilhouetteScore extends gpsiSampleSeparationScore{
 
+    public gpsiClusterSilhouetteScore() {
+        this.optimum = 1.0;
+    }
+    
     @Override
     public double score(double[][][] samples) {
         

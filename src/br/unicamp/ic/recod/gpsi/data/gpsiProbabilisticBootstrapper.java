@@ -16,7 +16,8 @@ public class gpsiProbabilisticBootstrapper extends gpsiBootstrapper{
     
     private final double p;
 
-    public gpsiProbabilisticBootstrapper(double p) {
+    public gpsiProbabilisticBootstrapper(double p, long seed) {
+        super(seed);
         this.p = p;
     }
     

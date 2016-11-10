@@ -13,7 +13,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
  * Works only in one dimension
  * @author juan
  */
-public class gpsiDistanceOfMediansScore implements gpsiSampleSeparationScore{
+public class gpsiDistanceOfMediansScore extends gpsiSampleSeparationScore{
 
     @Override
     public double score(double[][][] input) {

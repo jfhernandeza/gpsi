@@ -30,8 +30,11 @@ public class gpsiTimeSeriesCreator extends gpsiApplication {
     private final gpsiScalarSpectralIndexDescriptor[] descriptors;
     private final String names[];
     
-    public gpsiTimeSeriesCreator(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, String programsPath, double errorScore) throws Exception {
-        super(datasetPath, datasetReader, classLabels, outputPath, errorScore);
+    public gpsiTimeSeriesCreator(String datasetPath,
+            gpsiDatasetReader datasetReader, Byte[] classLabels,
+            String outputPath, String programsPath, double errorScore,
+            long seed) throws Exception {
+        super(datasetPath, datasetReader, classLabels, outputPath, errorScore, seed);
         
         int i, j;
         File dir = new File(programsPath);

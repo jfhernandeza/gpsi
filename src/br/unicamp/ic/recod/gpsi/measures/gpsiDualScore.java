@@ -13,7 +13,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Min;
  *
  * @author juan
  */
-public class gpsiDualScore implements gpsiSampleSeparationScore{
+public class gpsiDualScore extends gpsiSampleSeparationScore{
 
     @Override
     public double score(double[][][] input) {

@@ -43,6 +43,7 @@ import org.jgap.gp.impl.GPConfiguration;
 import org.jgap.gp.impl.GPGenotype;
 import org.jgap.gp.terminal.Terminal;
 import org.jgap.gp.terminal.Variable;
+import org.jgap.impl.SeededRandomGenerator;
 
 /**
  *
@@ -73,9 +74,12 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
             int maxInitDepth,
             gpsiSampleSeparationScore score,
             double errorScore,
-            int numGenerationsSel) throws InvalidConfigurationException, Exception {
+            int numGenerationsSel,
+            long seed) throws InvalidConfigurationException, Exception {
 
-        super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, errorScore);
+        super(dataSetPath, datasetReader, classLabels, outputPath, popSize,
+                numGenerations, crossRate, mutRate, validation, bootstrap,
+                dumpGens, errorScore, seed);
         this.maxInitDepth = maxInitDepth;
         this.numGenerationsSel = numGenerationsSel;
 
@@ -87,12 +91,14 @@ public class gpsiJGAPSelectorEvolver extends gpsiEvolver {
         config.setCrossoverProb((float) crossRate);
         config.setMutationProb((float) mutRate);
 
-        gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap) : new gpsiConstantBootstrapper((int) bootstrap);
+        gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap, this.seed) : new gpsiConstantBootstrapper((int) bootstrap, this.seed);
 
         fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, score, sampler);
         config.setFitnessFunction(fitness);
 
         config.setPreservFittestIndividual(true);
+        if(this.seed != 0)
+            config.setRandomGenerator(new SeededRandomGenerator(this.seed));
         
         stream.register(new gpsiConfigurationIOElement(null, "report.out"));
 

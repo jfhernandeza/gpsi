@@ -13,7 +13,7 @@ import org.apache.commons.math3.stat.inference.MannWhitneyUTest;
  *
  * @author ra163128
  */
-public class gpsiWilcoxonRankSumTestScore implements gpsiSampleSeparationScore {
+public class gpsiWilcoxonRankSumTestScore extends gpsiSampleSeparationScore {
     
     @Override
     public double score(double[][][] samples) {

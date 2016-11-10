@@ -14,7 +14,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Min;
  *
  * @author juan
  */
-public class gpsiHellingerDistanceScore implements gpsiSampleSeparationScore{
+public class gpsiHellingerDistanceScore extends gpsiSampleSeparationScore{
 
     @Override
     public double score(double[][][] input) {

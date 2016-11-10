@@ -13,7 +13,7 @@ import org.apache.commons.math3.stat.descriptive.moment.Variance;
  *
  * @author juan
  */
-public class gpsiNormalBhattacharyyaDistanceScore implements gpsiSampleSeparationScore{
+public class gpsiNormalBhattacharyyaDistanceScore extends gpsiSampleSeparationScore{
 
     @Override
     public double score(double[][][] input) {

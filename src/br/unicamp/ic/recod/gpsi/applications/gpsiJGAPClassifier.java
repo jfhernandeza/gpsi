@@ -44,9 +44,12 @@ public class gpsiJGAPClassifier extends gpsiEvolver{
             double bootstrap,
             boolean dumpGens,
             int maxInitDepth,
-            double errorScore) throws Exception {
+            double errorScore,
+            long seed) throws Exception {
         
-        super(dataSetPath, datasetReader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, errorScore);
+        super(dataSetPath, datasetReader, classLabels, outputPath, popSize,
+                numGenerations, crossRate, mutRate, validation, bootstrap,
+                dumpGens, errorScore, seed);
         this.maxInitDepth = maxInitDepth;
         
         config = new GPConfiguration();
@@ -55,7 +58,7 @@ public class gpsiJGAPClassifier extends gpsiEvolver{
         config.setMaxInitDepth(this.maxInitDepth);
         config.setPopulationSize(popSize);
 
-        gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap) : new gpsiConstantBootstrapper((int) bootstrap);
+        gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap, this.seed) : new gpsiConstantBootstrapper((int) bootstrap, this.seed);
         
         fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, new gpsiClusterSilhouetteScore(), sampler);
         config.setFitnessFunction(fitness);

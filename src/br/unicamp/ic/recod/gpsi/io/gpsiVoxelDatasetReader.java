@@ -52,7 +52,13 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         rawDataset.setnBands(hyperspectralImage[0][0].length - (errorScore > 0.0 ? 1 : 0));
         
         File dir = new File(path);
-        String[] foldsFolders = dir.list((File current, String name) -> new File(current, name).isDirectory());
+        String[] foldsFoldersS = dir.list((File current, String name) -> new File(current, name).isDirectory());
+        int[] foldsFolders = new int[foldsFoldersS.length];
+        
+        for(int i = 0; i < foldsFolders.length; i++)
+            foldsFolders[i] = Integer.parseInt(foldsFoldersS[i]);
+        
+        Arrays.sort(foldsFolders);
         
         ArrayList<HashMap<Byte, ArrayList<gpsiVoxel>>> folds = new ArrayList<>();
         
@@ -68,7 +74,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         double[] nVoxel;
         double[][] mask;
         HashMap<Byte, ArrayList<gpsiVoxel>> fold;
-        for(String foldFolder : foldsFolders){
+        for(int foldFolder : foldsFolders){
             fold = new HashMap<>();
             for(Byte label : classLabels){
                 mask = super.fileReader.read2dStructure(path + foldFolder + "/" + label + ".mat");

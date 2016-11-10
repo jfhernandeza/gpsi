@@ -13,7 +13,7 @@ import org.apache.commons.math3.stat.descriptive.moment.VectorialMean;
  *
  * @author juan
  */
-public class gpsiMeanAndStandardDeviationDistanceScore implements gpsiSampleSeparationScore{
+public class gpsiMeanAndStandardDeviationDistanceScore extends gpsiSampleSeparationScore{
 
     @Override
     public double score(double[][][] input) {

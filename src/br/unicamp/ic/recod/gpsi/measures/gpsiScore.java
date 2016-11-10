@@ -10,8 +10,10 @@ package br.unicamp.ic.recod.gpsi.measures;
  * @author ra163128
  * @param <T>
  */
-public interface gpsiScore<T> {
+public abstract class gpsiScore<T> {
     
-    public double score(T input);
+    public double optimum = Double.POSITIVE_INFINITY;
+    
+    public abstract double score(T input);
     
 }

@@ -12,7 +12,6 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.descriptive.moment.StandardDeviation;
-import org.apache.commons.math3.stat.descriptive.moment.Variance;
 
 /**
  *
@@ -52,8 +51,7 @@ public class gpsiGaussianNaiveBayesClassificationAlgorithm extends gpsiClassific
         }
         
         for(byte label : this.priors.keySet())
-            this.priors.put(label, 0.5);
-            //this.priors.put(label, this.priors.get(label) / m);
+            this.priors.put(label, this.priors.get(label) / m);
         
     }
 

@@ -9,5 +9,5 @@ package br.unicamp.ic.recod.gpsi.measures;
  *
  * @author ra163128
  */
-public interface gpsiSampleSeparationScore extends gpsiScore<double[][][]>{
+public abstract class gpsiSampleSeparationScore extends gpsiScore<double[][][]>{
 }

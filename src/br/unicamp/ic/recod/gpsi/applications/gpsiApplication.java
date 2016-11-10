@@ -23,9 +23,10 @@ public abstract class gpsiApplication {
     protected final gpsiIOStream stream;
     protected final gpsiDatasetReader datasetReader;
     protected final double errorScore;
+    protected final long seed;
     protected String outputPath;
 
-    public gpsiApplication(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, double errorScore) throws Exception {
+    public gpsiApplication(String datasetPath, gpsiDatasetReader datasetReader, Byte[] classLabels, String outputPath, double errorScore, long seed) throws Exception {
         
         this.datasetPath = datasetPath;
         this.outputPath = outputPath;
@@ -34,6 +35,7 @@ public abstract class gpsiApplication {
 
         this.datasetReader = datasetReader;
         this.errorScore = errorScore;
+        this.seed = seed;
         
         if(classLabels == null)
             this.classLabels = rawDataset.getClassLabels();

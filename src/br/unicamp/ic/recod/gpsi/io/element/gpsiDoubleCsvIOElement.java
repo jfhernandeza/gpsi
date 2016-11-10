@@ -37,6 +37,8 @@ public class gpsiDoubleCsvIOElement extends gpsiIOElement<double[][]>{
             outR.print("\n");
         }
         for(i = 0; i < element.length; i++){
+            if(element[i] == null)
+                break;
             outR.print(element[i][0]);
             for(int j = 1; j < element[i].length; j++)
                 outR.print("," + element[i][j]);

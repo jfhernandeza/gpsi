@@ -12,7 +12,7 @@ import org.apache.commons.math3.stat.descriptive.moment.VectorialMean;
  *
  * @author ra163128
  */
-public class gpsiClusterDistortionScore implements gpsiSampleSeparationScore {
+public class gpsiClusterDistortionScore extends gpsiSampleSeparationScore {
 
     @Override
     public double score(double[][][] samples) {
