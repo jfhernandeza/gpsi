@@ -5,6 +5,8 @@
  */
 package br.unicamp.ic.recod.gpsi.ml;
 
+import br.unicamp.ic.recod.gpsi.data.gpsiSampler;
+import br.unicamp.ic.recod.gpsi.data.gpsiWholeSampler;
 import br.unicamp.ic.recod.gpsi.measures.gpsiHClustScore;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,9 +26,14 @@ public class gpsiHierarchicalClusteringClassificationAlgorithm extends gpsiClass
     
     private final HierarchicalClusterer clusterer;
     private final HashMap<Integer, Byte> labelIndices = new HashMap<>();
+    private final gpsiSampler sampler;
 
-    public gpsiHierarchicalClusteringClassificationAlgorithm(String linkType) {
+    public gpsiHierarchicalClusteringClassificationAlgorithm(String linkType, gpsiSampler sampler) {
         this.clusterer = new HierarchicalClusterer();
+        if(sampler != null)
+            this.sampler = sampler;
+        else
+            this.sampler = new gpsiWholeSampler();
         try {
             this.clusterer.setOptions(new String[]{"-L", linkType});
         } catch (Exception ex) {
@@ -37,7 +44,7 @@ public class gpsiHierarchicalClusteringClassificationAlgorithm extends gpsiClass
     @Override
     public void fit(HashMap<Byte, ArrayList<double[]>> x) {
         
-        int i = 0;
+        int i = 0, j;
         
         this.clusterer.setNumClusters(x.size());
         this.nClasses = x.size();
@@ -50,6 +57,7 @@ public class gpsiHierarchicalClusteringClassificationAlgorithm extends gpsiClass
             break;
         }
 
+        double[][][] x_ = sampler.sample(x, x.keySet().toArray(new Byte[0]));
         
         FastVector attributes = new FastVector();
         for (i = 0; i < dimensionality; i++)
@@ -57,9 +65,9 @@ public class gpsiHierarchicalClusteringClassificationAlgorithm extends gpsiClass
 
         Instances data = new Instances("Clust", attributes, 0);
 
-        for(byte c : x.keySet())
-            for (i = 0; i < x.get(c).size(); i++)
-                data.add(new Instance(1.0, x.get(c).get(i)));
+        for(i = 0; i < x_.length; i++)
+            for (j = 0; j < x_[i].length; j++)
+                data.add(new Instance(1.0, x_[i][j]));
 
         try {
             clusterer.buildClusterer(data);

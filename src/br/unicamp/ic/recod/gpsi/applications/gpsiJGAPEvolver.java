@@ -24,7 +24,6 @@ import br.unicamp.ic.recod.gpsi.io.element.gpsiDoubleCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiIntegerCsvIOElement;
 import br.unicamp.ic.recod.gpsi.io.element.gpsiStringIOElement;
 import br.unicamp.ic.recod.gpsi.io.gpsiDatasetReader;
-import br.unicamp.ic.recod.gpsi.measures.gpsiHClustScore;
 import br.unicamp.ic.recod.gpsi.measures.gpsiSampleSeparationScore;
 import br.unicamp.ic.recod.gpsi.ml.gpsiNearestCentroidClassificationAlgorithm;
 import br.unicamp.ic.recod.gpsi.ml.gpsiClassificationAlgorithm;
@@ -59,6 +58,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
     private final double optimum;
     private final GPConfiguration config;
     private final gpsiJGAPVoxelFitnessFunction fitness;
+    private final gpsiSampler sampler;
 
     private IGPProgram[] best;
 
@@ -91,16 +91,18 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         config.setPopulationSize(popSize);
         config.setCrossoverProb((float) crossRate);
         config.setMutationProb((float) mutRate);
+        config.setUseProgramCache(true);
 
-        gpsiSampler sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap, this.seed) : new gpsiConstantBootstrapper((int) bootstrap, this.seed);
+        this.sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap, this.seed) : new gpsiConstantBootstrapper((int) bootstrap, this.seed);
 
         fitness = new gpsiJGAPVoxelFitnessFunction((gpsiVoxelRawDataset) rawDataset, this.classLabels, score, sampler);
         optimum = fitness.getScore().optimum;
         config.setFitnessFunction(fitness);
 
         config.setPreservFittestIndividual(true);
-        if(this.seed != 0)
+        if (this.seed != 0) {
             config.setRandomGenerator(new SeededRandomGenerator(this.seed));
+        }
 
         stream.register(new gpsiConfigurationIOElement(null, "report.out"));
 
@@ -112,26 +114,26 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         int i;
         byte nFolds = 5;
         double bestScore, currentScore, fitnessCurves[][];
-        
+
         gpsiDescriptor descriptor;
         gpsiMLDataset mlDataset;
         gpsiVoxelRawDataset dataset;
         GPGenotype gp;
-        
+
         IGPProgram current, bestVal, elite[] = null;
 
         Mean mean = new Mean();
         StandardDeviation sd = new StandardDeviation();
-        
+
         double validationScore, trainScore, bestValidationScore, bestTrainScore, samples[][][];
-        
+
         for (byte f = 0; f < nFolds; f++) {
 
             System.out.println("\nRun " + (f + 1) + "\n");
 
             rawDataset.assignFolds(new byte[]{f, (byte) ((f + 1) % nFolds), (byte) ((f + 2) % nFolds)},
-                                   new byte[]{(byte) ((f + 3) % nFolds)},
-                                   new byte[]{(byte) ((f + 4) % nFolds)});
+                    new byte[]{(byte) ((f + 3) % nFolds)},
+                    new byte[]{(byte) ((f + 4) % nFolds)});
             dataset = (gpsiVoxelRawDataset) rawDataset;
             gp = create(config, dataset.getnBands(), fitness);
 
@@ -145,7 +147,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             if (validation > 0) {
                 elite = new IGPProgram[validation];
             }
-            
+
             for (int generation = 0; generation < super.numGenerations; generation++) {
 
                 gp.evolve(1);
@@ -170,18 +172,20 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
                 }
 
                 i = this.popSize - 1;
-                for(IGPProgram prog : elite)
-                    if(!in(gp.getGPPopulation().getGPPrograms(), prog)){
+                for (IGPProgram prog : elite) {
+                    if (!in(gp.getGPPopulation().getGPPrograms(), prog)) {
                         gp.getGPPopulation().setGPProgram(i, prog);
                         i--;
                     }
-                
+                }
+
                 fitnessCurves[generation] = new double[]{gp.getAllTimeBest().getFitnessValue() - 1.0};
                 System.out.printf("%3dg: %.5f\n", generation + 1, fitnessCurves[generation][0]);
-                
-                if(fitnessCurves[generation][0] >= optimum)
+
+                if (fitnessCurves[generation][0] >= optimum) {
                     break;
-                
+                }
+
             }
 
             best = new IGPProgram[2];
@@ -205,7 +209,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
                     best[1] = current;
                     bestScore = currentScore;
                 }
-                
+
             }
 
             stream.register(new gpsiDoubleCsvIOElement(fitnessCurves, null, "curves/f" + (f + 1) + ".csv"));
@@ -223,22 +227,32 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             HashMap<String, gpsiClassificationAlgorithm> classificationAlgorithms = new HashMap<>();
             classificationAlgorithms.put("NCC", new gpsiNearestCentroidClassificationAlgorithm(new Mean()));
             classificationAlgorithms.put("GNB", new gpsiGaussianNaiveBayesClassificationAlgorithm());
+            //if(this.fitness.getScore() instanceof gpsiHClustScore){
+//                classificationAlgorithms.put("HC-CENTROID", new gpsiHierarchicalClusteringClassificationAlgorithm("CENTROID",null));
+//                classificationAlgorithms.put("HC-WARD", new gpsiHierarchicalClusteringClassificationAlgorithm("WARD",null));
+//                classificationAlgorithms.put("HC-MEAN", new gpsiHierarchicalClusteringClassificationAlgorithm("MEAN",null));
+//                classificationAlgorithms.put("HC-COMPLETE", new gpsiHierarchicalClusteringClassificationAlgorithm("COMPLETE",null));
+            //}
 
-            if(this.fitness.getScore() instanceof gpsiHClustScore)
-                classificationAlgorithms.put("HC", new gpsiHierarchicalClusteringClassificationAlgorithm(((gpsiHClustScore)this.fitness.getScore()).getLinkType()));
-            
+            /*            if(this.fitness.getScore() instanceof gpsiHClustScore)
+                classificationAlgorithms.put("HC", new gpsiHierarchicalClusteringClassificationAlgorithm(((gpsiHClustScore)this.fitness.getScore()).getLinkType(),this.sampler));*/
             gpsiClassificationAlgorithm classificationAlgorithm;
             gpsiClassifier classifier;
             int[][] confusionMatrix;
 
             for (String alg : classificationAlgorithms.keySet()) {
-                
+
                 descriptor = new gpsiScalarSpectralIndexDescriptor(new gpsiJGAPVoxelCombiner(fitness.getB(), best[0]));
-                
+
                 classificationAlgorithm = classificationAlgorithms.get(alg);
                 classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
 
-                classifier.fit(this.rawDataset.getTrainingEntities());
+                if (classificationAlgorithm instanceof gpsiHierarchicalClusteringClassificationAlgorithm) {
+                    classifier.fit(this.rawDataset.getTestEntities());
+                } else {
+                    classifier.fit(this.rawDataset.getTrainingEntities());
+                }
+
                 classifier.predict(this.rawDataset.getTestEntities());
 
                 confusionMatrix = classifier.getConfusionMatrix();
@@ -250,7 +264,12 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
                     classificationAlgorithm = classificationAlgorithms.get(alg);
                     classifier = new gpsiClassifier(descriptor, classificationAlgorithm);
 
-                    classifier.fit(this.rawDataset.getTrainingEntities());
+                    if (classificationAlgorithm instanceof gpsiHierarchicalClusteringClassificationAlgorithm) {
+                        classifier.fit(this.rawDataset.getTestEntities());
+                    } else {
+                        classifier.fit(this.rawDataset.getTrainingEntities());
+                    }
+
                     classifier.predict(this.rawDataset.getTestEntities());
 
                     confusionMatrix = classifier.getConfusionMatrix();
@@ -264,14 +283,15 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
 
     }
 
-    private boolean in(IGPProgram[] pop, IGPProgram prog){
-        for(IGPProgram prog_ : pop){
-            if(prog.toStringNorm(0).equals(prog_.toStringNorm(0)))
+    private boolean in(IGPProgram[] pop, IGPProgram prog) {
+        for (IGPProgram prog_ : pop) {
+            if (prog.toStringNorm(0).equals(prog_.toStringNorm(0))) {
                 return true;
+            }
         }
         return false;
     }
-    
+
     private IGPProgram[] mergeElite(IGPProgram[] elite, IGPProgram[] programs, int generation) {
 
         int i, j, k;
@@ -292,15 +312,19 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             j = 0;
             while (j < validation) {
                 i++;
-                for (k = 0; k < validation; k++)
-                    if (programs[i].toStringNorm(0).equals(elite[k].toStringNorm(0)))
+                for (k = 0; k < validation; k++) {
+                    if (programs[i].toStringNorm(0).equals(elite[k].toStringNorm(0))) {
                         break;
-                if (k < validation)
+                    }
+                }
+                if (k < validation) {
                     continue;
+                }
                 k = validation - 1;
                 while (k >= 0 && programs[i].getFitnessValue() > elite[k].getFitnessValue()) {
-                    if (k < validation - 1)
+                    if (k < validation - 1) {
                         elite[k + 1] = elite[k];
+                    }
                     elite[k] = programs[i];
                     k--;
                 }
@@ -339,7 +363,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         nodeSets[0] = (CommandGene[]) ArrayUtils.addAll(variables, functions);
 
         fitness.setB(b);
-        
+
         return GPGenotype.randomInitialGenotype(conf, types, argTypes, nodeSets, 100, true);
     }
 

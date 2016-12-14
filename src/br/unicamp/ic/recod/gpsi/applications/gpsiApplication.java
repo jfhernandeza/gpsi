@@ -39,6 +39,8 @@ public abstract class gpsiApplication {
         
         if(classLabels == null)
             this.classLabels = rawDataset.getClassLabels();
+        else if (classLabels.length == 1)
+            this.classLabels = new Byte[] {classLabels[0], (byte) (classLabels[0] + 1)};
         else
             this.classLabels = classLabels;
         

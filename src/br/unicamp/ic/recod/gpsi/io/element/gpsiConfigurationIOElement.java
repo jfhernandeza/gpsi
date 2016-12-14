@@ -48,6 +48,7 @@ public class gpsiConfigurationIOElement extends gpsiIOElement<Object> {
         outR.println("validation=" + element.validation);
         outR.println("bootstrap=" + element.bootstrap);
         outR.println("errorScore=" + element.errorScore);
+        outR.println("seed=" + element.seed);
         
         if(element.programsPath != null)
             outR.println("programsPath=" + element.programsPath);

@@ -47,6 +47,8 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
     
     private gpsiVoxelRawDataset readOneSceneDataset(String path, Byte[] classLabels, double errorScore) throws IOException{
         
+        int ova = -1;
+        
         gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
         double[][][] hyperspectralImage = this.fileReader.read3dStructure(path + "img.mat");
         rawDataset.setnBands(hyperspectralImage[0][0].length - (errorScore > 0.0 ? 1 : 0));
@@ -62,7 +64,8 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         
         ArrayList<HashMap<Byte, ArrayList<gpsiVoxel>>> folds = new ArrayList<>();
         
-        if(classLabels == null){
+        if(classLabels == null || classLabels.length == 1){
+            ova = classLabels != null ? classLabels[0] : -1;
             File dir_ = new File(path + foldsFolders[0]);
             File[] files = dir_.listFiles((File dir1, String name) -> name.toLowerCase().endsWith(".mat"));
             classLabels = new Byte[files.length];
@@ -78,7 +81,10 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
             fold = new HashMap<>();
             for(Byte label : classLabels){
                 mask = super.fileReader.read2dStructure(path + foldFolder + "/" + label + ".mat");
-                fold.put(label, new ArrayList<>());
+                if(ova > 0 && label != ova)
+                    label = (byte) (ova + 1);
+                if(!fold.containsKey(label))
+                    fold.put(label, new ArrayList<>());
                 for(int x = 0; x < mask[0].length; x++)
                     for(int y = 0; y < mask.length; y++)
                         if(mask[y][x] == 1.0){
