@@ -15,6 +15,7 @@ import java.util.HashMap;
 public abstract class gpsiClassificationAlgorithm {
     
     protected int dimensionality, nClasses;
+    protected HashMap<Byte, Double> confidence;
 
     public int getDimensionality() {
         return dimensionality;
@@ -26,5 +27,8 @@ public abstract class gpsiClassificationAlgorithm {
     
     public abstract void fit(HashMap<Byte, ArrayList<double[]>> x);
     public abstract byte predict(double[] x);
+    public HashMap<Byte, Double> getConfidence(){
+        return this.confidence;
+    }
     
 }

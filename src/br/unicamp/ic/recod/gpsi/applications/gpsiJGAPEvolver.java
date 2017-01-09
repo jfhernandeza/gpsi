@@ -53,7 +53,7 @@ import org.jgap.impl.SeededRandomGenerator;
  */
 public class gpsiJGAPEvolver extends gpsiEvolver {
 
-    private final int maxInitDepth;
+    private final int maxInitDepth, maxDepth, maxNodes;
 
     private final double optimum;
     private final GPConfiguration config;
@@ -75,6 +75,8 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             double bootstrap,
             boolean dumpGens,
             int maxInitDepth,
+            int maxDepth,
+            int maxNodes,
             gpsiSampleSeparationScore score,
             double errorScore,
             long seed) throws InvalidConfigurationException, Exception {
@@ -83,6 +85,8 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
                 numGenerations, crossRate, mutRate, validation, bootstrap,
                 dumpGens, errorScore, seed);
         this.maxInitDepth = maxInitDepth;
+        this.maxDepth = maxDepth;
+        this.maxNodes = maxNodes;
 
         config = new GPConfiguration();
         config.setGPFitnessEvaluator(new DefaultGPFitnessEvaluator());
@@ -92,6 +96,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
         config.setCrossoverProb((float) crossRate);
         config.setMutationProb((float) mutRate);
         config.setUseProgramCache(true);
+        config.setMaxCrossoverDepth(this.maxDepth);
 
         this.sampler = (bootstrap <= 0.0) ? new gpsiWholeSampler() : (bootstrap < 1.0) ? new gpsiProbabilisticBootstrapper(bootstrap, this.seed) : new gpsiConstantBootstrapper((int) bootstrap, this.seed);
 
@@ -364,7 +369,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
 
         fitness.setB(b);
 
-        return GPGenotype.randomInitialGenotype(conf, types, argTypes, nodeSets, 100, true);
+        return GPGenotype.randomInitialGenotype(conf, types, argTypes, nodeSets, this.maxNodes, true);
     }
 
     public IGPProgram[] getBest() {

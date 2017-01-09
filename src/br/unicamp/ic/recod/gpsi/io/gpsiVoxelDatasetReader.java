@@ -49,8 +49,8 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         
         int ova = -1;
         
-        gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
         double[][][] hyperspectralImage = this.fileReader.read3dStructure(path + "img.mat");
+        gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset(hyperspectralImage.length, hyperspectralImage[0].length);
         rawDataset.setnBands(hyperspectralImage[0][0].length - (errorScore > 0.0 ? 1 : 0));
         
         File dir = new File(path);
@@ -90,7 +90,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
                         if(mask[y][x] == 1.0){
                             nVoxel = applyError(hyperspectralImage[y][x], errorScore);
                             if(nVoxel != null)
-                                fold.get(label).add(new gpsiVoxel(nVoxel));
+                                fold.get(label).add(new gpsiVoxel(nVoxel, y, x));
                         }
             }
             folds.add(fold);
@@ -103,7 +103,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
     
     private gpsiVoxelRawDataset readMultipleScenesDataset(String path, Byte[] classLabels, double errorScore) throws IOException{
         
-        gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset();
+        gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset(0,0);
         
         double[][][] hyperspectralImage;
         
@@ -137,7 +137,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
                         for(int y = 0; y < hyperspectralImage.length; y++){
                             nVoxel = applyError(hyperspectralImage[y][x], errorScore);
                             if(nVoxel != null)
-                                fold.get(label).add(new gpsiVoxel(nVoxel));
+                                fold.get(label).add(new gpsiVoxel(nVoxel, y, x));
                         }
                 }
                 

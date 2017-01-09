@@ -20,7 +20,7 @@ public class gpsiRoi implements gpsiEntity{
         
         for(int x = 0; x < this.roi[0].length; x++)
             for(int y = 0; y < this.roi.length; y++)
-                    this.roi[y][x] = mask[y][x] != 0.0 ? new gpsiVoxel(hyperspectralImage[y][x]): null;
+                    this.roi[y][x] = mask[y][x] != 0.0 ? new gpsiVoxel(hyperspectralImage[y][x], y, x): null;
         
         calculateBoundingBox();
     }

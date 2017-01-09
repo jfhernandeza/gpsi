@@ -44,6 +44,12 @@ public class gpsiApplicationFactory {
     @Option(name = "-maxInitDepth", usage = "Max initial depth of trees")
     public int maxInitDepth = 6;
 
+    @Option(name = "-maxDepth", usage = "Max depth of trees")
+    public int maxDepth = 100;
+    
+    @Option(name = "-maxNodes", usage = "Max numer of nodes")
+    public int maxNodes = 500;
+    
     @Option(name = "-crossRate", usage = "Crossover probability")
     public double crossRate = 0.9;
 
@@ -133,11 +139,15 @@ public class gpsiApplicationFactory {
 
         switch (type) {
             case "JGAPEvolver":
-                return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, score, errorScore, seed);
+                return new gpsiJGAPEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, maxDepth, maxNodes, score, errorScore, seed);
             case "JGAPSelectorEvolver":
                 return new gpsiJGAPSelectorEvolver(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, score, errorScore, numGenerationsSel, seed);
             case "OVOFromFiles":
                 return new gpsiOVOClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath, errorScore, seed);
+            case "OVAFromFiles":
+                return new gpsiOVAClassifierFromFiles(datasetPath, reader, classLabels, outputPath, programsPath, errorScore, seed);
+            case "FvDump":
+                return new gpsiFeatureVectorDumper(datasetPath, reader, classLabels, outputPath, programsPath, errorScore, seed);
             case "JGAPClassifier":
                 return new gpsiJGAPClassifier(datasetPath, reader, classLabels, outputPath, popSize, numGenerations, crossRate, mutRate, validation, bootstrap, dumpGens, maxInitDepth, errorScore, seed);
             case "BaselineComparator":
@@ -158,7 +168,6 @@ public class gpsiApplicationFactory {
     }
 
     private static class gpsiApplicationFactoryHolder {
-
         private static final gpsiApplicationFactory INSTANCE = new gpsiApplicationFactory();
     }
 }

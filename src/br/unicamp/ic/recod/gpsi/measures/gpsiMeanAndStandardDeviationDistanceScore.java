@@ -36,13 +36,13 @@ public class gpsiMeanAndStandardDeviationDistanceScore extends gpsiSampleSeparat
         
         d = distance.compute(means[0], means[1]);
         
-        double deviations = 0.0;
+        double deviations = Double.NEGATIVE_INFINITY;
         
         for(i = 0; i < 2; i++){
             sDistances = new double[input[i].length];
             for(j = 0; j < input[i].length; j++)
                 sDistances[j] = distance.compute(means[i], input[i][j]);
-            deviations += mean_.evaluate(sDistances);
+            deviations = Math.max(deviations, mean_.evaluate(sDistances));
         }
         
         return d / deviations;

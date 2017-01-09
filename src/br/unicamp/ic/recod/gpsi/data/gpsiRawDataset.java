@@ -11,4 +11,20 @@ package br.unicamp.ic.recod.gpsi.data;
  * @param <E>
  */
 public class gpsiRawDataset<E> extends gpsiDataset {
+    
+    private final int imgCols, imgRows;
+
+    public gpsiRawDataset(int imgRows, int imgCols) {
+        this.imgCols = imgCols;
+        this.imgRows = imgRows;
+    }
+
+    public int getImgCols() {
+        return imgCols;
+    }
+
+    public int getImgRows() {
+        return imgRows;
+    }
+    
 }

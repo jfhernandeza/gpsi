@@ -12,4 +12,10 @@ import br.unicamp.ic.recod.gpsi.img.gpsiVoxel;
  * @author juan
  */
 public class gpsiVoxelRawDataset extends gpsiRawDataset<gpsiVoxel> {
+
+    public gpsiVoxelRawDataset(int imgRows, int imgCols) {
+        super(imgRows, imgCols);
+    }
+
+    
 }

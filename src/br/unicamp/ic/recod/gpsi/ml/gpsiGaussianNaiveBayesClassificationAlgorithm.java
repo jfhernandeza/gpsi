@@ -86,8 +86,8 @@ public class gpsiGaussianNaiveBayesClassificationAlgorithm extends gpsiClassific
                 
     }
 
-    public double getConfidence() {
+    /*public double getConfidence() {
         return confidence;
-    }
+    }*/
     
 }

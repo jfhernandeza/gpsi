@@ -54,6 +54,8 @@ public class gpsiNearestCentroidClassificationAlgorithm extends gpsiClassificati
         byte minDistanceIndex = 0;
         double distance, minDistance = Double.POSITIVE_INFINITY;
         
+        confidence = new HashMap<>();
+        
         for(byte j : this.centroids.keySet()){
             distance = 0.0;
             for(int k = 0; k < this.dimensionality; k++)
@@ -62,6 +64,31 @@ public class gpsiNearestCentroidClassificationAlgorithm extends gpsiClassificati
                 minDistanceIndex = j;
                 minDistance = distance;
             }
+        }
+        
+        if(centroids.size() == 2 && this.dimensionality == 1){
+            byte minC, maxC;
+            Byte[] l = centroids.keySet().toArray(new Byte[] {});
+            double conf;
+            
+            minC = centroids.get(l[0])[0] <= centroids.get(l[1])[0] ? l[0] : l[1];
+            maxC = centroids.get(l[0])[0] > centroids.get(l[1])[0] ? l[0] : l[1];
+            
+            if(x[0] <= centroids.get(minC)[0]){
+                this.confidence.put(minC, 1.0);
+                this.confidence.put(maxC, 0.0);
+            }else if (x[0] >= centroids.get(maxC)[0]){
+                this.confidence.put(minC, 0.0);
+                this.confidence.put(maxC, 1.0);
+            }else{
+                conf = minDistance / (centroids.get(maxC)[0] - centroids.get(minC)[0]);
+                this.confidence.put(minDistanceIndex, 1 - conf);
+                if(minDistanceIndex == minC)
+                    this.confidence.put(maxC, conf);
+                else
+                    this.confidence.put(minC, conf);
+            }
+            
         }
         
         return minDistanceIndex;

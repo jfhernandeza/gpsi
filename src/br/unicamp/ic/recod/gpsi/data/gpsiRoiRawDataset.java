@@ -12,4 +12,9 @@ import br.unicamp.ic.recod.gpsi.img.gpsiRoi;
  * @author jfhernandeza
  */
 public class gpsiRoiRawDataset extends gpsiRawDataset<gpsiRoi> {
+
+    public gpsiRoiRawDataset(int imgRows, int imgCols) {
+        super(imgRows, imgCols);
+    }
+ 
 }

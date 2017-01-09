@@ -21,6 +21,7 @@ public class gpsiClassifier {
     private final gpsiClassificationAlgorithm algorithm;
     private final gpsiMLDataset dataset;
     private HashMap<Byte, byte[]> prediction;
+    private HashMap<Byte, ArrayList<HashMap<Byte, Double>>> confidence;
 
     public gpsiClassifier(gpsiDescriptor descriptor, gpsiClassificationAlgorithm algorithm) {
         this.algorithm = algorithm;
@@ -39,16 +40,22 @@ public class gpsiClassifier {
         dataset.loadTestSet(X, true);
         
         prediction = new HashMap<>();
+        confidence = new HashMap<>();
         ArrayList<double[]> x;
         byte[] Y;
+        ArrayList<HashMap<Byte, Double>> C;
         
         for(byte label : X.keySet()){
             x = dataset.getTestEntities().get(label);
             Y = new byte[x.size()];
-            for(int i = 0; i < x.size(); i++)
+            C = new ArrayList<>();
+            for(int i = 0; i < x.size(); i++){
                 Y[i] = algorithm.predict(x.get(i));
+                C.add(algorithm.getConfidence());
+            }
             
             prediction.put(label, Y);
+            confidence.put(label, C);
             
         }
         
@@ -74,6 +81,10 @@ public class gpsiClassifier {
         
         return confusionMatrix;
                 
+    }
+
+    public HashMap<Byte, ArrayList<HashMap<Byte, Double>>> getConfidence() {
+        return confidence;
     }
     
 }

@@ -26,9 +26,9 @@ public class gpsiRoiDatasetReader extends gpsiDatasetReader<gpsiFileReader, gpsi
     @Override
     public gpsiRoiRawDataset readDataset(String path, Byte[] classLabels, double errorScore) throws Exception {
         
-        gpsiRoiRawDataset rawDataset = new gpsiRoiRawDataset();
         
         double[][][] hyperspectralImage = this.fileReader.read3dStructure(path + "img.mat");
+        gpsiRoiRawDataset rawDataset = new gpsiRoiRawDataset(hyperspectralImage.length, hyperspectralImage[0].length);
         rawDataset.setnBands(hyperspectralImage[0][0].length);
         
         File dir = new File(path);

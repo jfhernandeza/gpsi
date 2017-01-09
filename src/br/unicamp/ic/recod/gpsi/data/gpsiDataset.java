@@ -38,6 +38,10 @@ public abstract class gpsiDataset<E> {
             
     }
 
+    public ArrayList<HashMap<Byte, ArrayList<E>>> getFolds() {
+        return folds;
+    }
+
     public HashMap<Byte, ArrayList<E>> getValidationEntities() {
         return validationEntities;
     }
