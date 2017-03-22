@@ -45,7 +45,7 @@ public class gpsiMeanAndStandardDeviationDistanceScore extends gpsiSampleSeparat
             deviations = Math.max(deviations, mean_.evaluate(sDistances));
         }
         
-        return d / deviations;
+        return d / (2.0 * deviations);
         
     }
     

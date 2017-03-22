@@ -356,7 +356,7 @@ public class gpsiJGAPEvolver extends gpsiEvolver {
             new gpsiJGAPProtectedDivision(conf, CommandGene.DoubleClass),
             new gpsiJGAPProtectedNaturalLogarithm(conf, CommandGene.DoubleClass),
             new gpsiJGAPProtectedSquareRoot(conf, CommandGene.DoubleClass),
-            new Terminal(conf, CommandGene.DoubleClass, 1.0d, 1000000.0d, false)
+            new Terminal(conf, CommandGene.DoubleClass, 0.0d, 1000.0d, false)
         };
 
         for (int i = 0; i < n_bands; i++) {
