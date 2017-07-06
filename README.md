@@ -2,6 +2,8 @@
 
 Java library for automatic spectral index learning from data. Runs correctly on Java 8.
 
+The package can be either compiled as a NetBeans project, or run directly from the .jar file provided in **dist/**
+
 ## Dependencies
 
 The library depends on the next packages:
@@ -14,5 +16,5 @@ The library depends on the next packages:
 + **JMatIO:** Matlab's MAT-file I/O in JAVA [:link:](https://sourceforge.net/projects/jmatio/)
 + **Weka:** Data Mining Software in Java [:link:](http://www.cs.waikato.ac.nz/ml/weka/)
 
-The .jar dependencies with which the last working version was developed, are provided in the folder lib/
+The .jar files are available in **dist/lib/**
 
