@@ -2,4 +2,5 @@
 /build/
 /results/
 /conf/
+/dist/
 log4j_jgap.log
