@@ -26,8 +26,8 @@ import org.kohsuke.args4j.Option;
  */
 public class gpsiApplicationFactory {
 
-    @Option(name = "-type", usage = "Path to the scene")
-    public String type;
+    @Option(name = "-type", usage = "Type of excecutable")
+    public String type = "JGAPEvolver";
 
     @Option(name = "-dataset", usage = "Path to the scene")
     public String datasetPath;
@@ -47,7 +47,7 @@ public class gpsiApplicationFactory {
     @Option(name = "-maxDepth", usage = "Max depth of trees")
     public int maxDepth = 100;
     
-    @Option(name = "-maxNodes", usage = "Max numer of nodes")
+    @Option(name = "-maxNodes", usage = "Max number of nodes")
     public int maxNodes = 500;
     
     @Option(name = "-crossRate", usage = "Crossover probability")
