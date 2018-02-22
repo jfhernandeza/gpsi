@@ -57,7 +57,7 @@ public class gpsiApplicationFactory {
     public double mutRate = 0.1;
 
     @Option(name = "-val", usage = "Number of individuals used for validation")
-    public int validation = 0;
+    public int validation = 1;
 
     @Option(name = "-bootstrap", usage = "Number of boostrapped samples during evolution")
     public double bootstrap = 0;
@@ -75,7 +75,7 @@ public class gpsiApplicationFactory {
     public String programsPath;
 
     @Option(name = "-score", usage = "Distance measure to be considered in the fitness function")
-    public String scoreName = "None";
+    public String scoreName = "NormMeanDistance";
 
     @Option(name = "-errorScore", usage = "Threshold of error score to consider a pixel. This value must be in the last spectral band.")
     public double errorScore = 0.0;

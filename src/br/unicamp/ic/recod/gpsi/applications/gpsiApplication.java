@@ -54,7 +54,7 @@ public abstract class gpsiApplication {
     public void report() throws Exception{
         if(this.outputPath == null)
             this.outputPath = (new SimpleDateFormat("yyyyMMdd_HHmmss")).format(Calendar.getInstance().getTime());
-        this.stream.setRoot("results/" + this.outputPath + "/");
+        this.stream.setRoot(this.outputPath);
         this.stream.flush();
     }
     
