@@ -69,9 +69,8 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
             File dir_ = new File(path + foldsFolders[0]);
             File[] files = dir_.listFiles((File dir1, String name) -> name.toLowerCase().endsWith(".mat"));
             classLabels = new Byte[files.length];
-            for(int i = 0; i < files.length; i++){
+            for(int i = 0; i < files.length; i++)
                 classLabels[i] = Byte.parseByte(files[i].getName().replace(".mat", ""));
-            }
         }
         
         double[] nVoxel;
@@ -106,12 +105,15 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         gpsiVoxelRawDataset rawDataset = new gpsiVoxelRawDataset(0,0);
         
         double[][][] hyperspectralImage;
+        int ova = -1;
+        Byte label0;
         
         File dir = new File(path);
         String[] foldsFolders = dir.list((File current, String name) -> new File(current, name).isDirectory());
         String[] scenesFiles;
         
-        if(classLabels == null){
+        if(classLabels == null || classLabels.length == 1){
+            ova = classLabels != null ? classLabels[0] : -1;
             File dir_ = new File(path + foldsFolders[0]);
             File[] files = dir_.listFiles((File dir1, String name) -> new File(dir1, name).isDirectory());
             classLabels = new Byte[files.length];
@@ -129,15 +131,17 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
             for(Byte label : classLabels){
                 dir = new File(path + foldFolder + "/" + label);
                 scenesFiles = dir.list((File dir1, String name) -> name.toLowerCase().endsWith(".mat"));
-                fold.put(label, new ArrayList<>());
                 
+                label0 = (ova > 0 && label != ova) ? (byte) (ova + 1) : label;
+                if(!fold.containsKey(label0))
+                    fold.put(label0, new ArrayList<>());
                 for(String scene : scenesFiles){
                     hyperspectralImage = super.fileReader.read3dStructure(path + foldFolder + "/" + label + "/" + scene);
                     for(int x = 0; x < hyperspectralImage[0].length; x++)
                         for(int y = 0; y < hyperspectralImage.length; y++){
                             nVoxel = applyError(hyperspectralImage[y][x], errorScore);
                             if(nVoxel != null)
-                                fold.get(label).add(new gpsiVoxel(nVoxel, y, x));
+                                fold.get(label0).add(new gpsiVoxel(nVoxel, y, x));
                         }
                 }
                 
@@ -146,8 +150,7 @@ public class gpsiVoxelDatasetReader extends gpsiDatasetReader<gpsiFileReader, gp
         }
         
         rawDataset.setFolds(folds);
-        rawDataset.setnBands(folds.get(0).get(classLabels[0]).get(0).getHyperspectralData().length);
-        
+        rawDataset.setnBands(folds.get(0).get((byte) folds.get(0).keySet().toArray()[0]).get(0).getHyperspectralData().length);
         
         return rawDataset;
     }
