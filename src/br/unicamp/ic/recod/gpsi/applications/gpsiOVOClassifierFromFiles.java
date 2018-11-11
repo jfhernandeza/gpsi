@@ -77,6 +77,7 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication {
         gpsiVoxel voxel;
         
         int img[][] = new int[this.rawDataset.getImgRows()][this.rawDataset.getImgCols()];
+        boolean raster = this.rawDataset.getImgRows() > 0 && this.rawDataset.getImgCols() > 0;
         
         for (int f = 0; f < n; f++) {
             
@@ -97,7 +98,8 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication {
             for(byte label : ensemble[f_].getPrediction().keySet()){
                 for(int i = 0; i < ensemble[f_].getPrediction().get(label).length; i++){
                     voxel = (gpsiVoxel) ((ArrayList) this.rawDataset.getTestEntities().get(label)).get(i);
-                    img[voxel.getRow()][voxel.getCol()] = ensemble[f_].getPrediction().get(label)[i];
+                    if(raster)
+                        img[voxel.getRow()][voxel.getCol()] = ensemble[f_].getPrediction().get(label)[i];
                 }
             }
             
@@ -105,7 +107,8 @@ public class gpsiOVOClassifierFromFiles extends gpsiApplication {
             ensemble[f_] = null;
         }
         
-        stream.register(new gpsiIntegerCsvIOElement(img, null, "img.csv"));
+        if(raster)
+            stream.register(new gpsiIntegerCsvIOElement(img, null, "img.csv"));
         
     }
 
